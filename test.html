@@ -40,8 +40,19 @@ async function loadConfig() {
 // LOAD FILES FROM GITHUB
 async function loadSlidesList() {
   const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${slidesPath}`;
-  const res = await fetch(url);
+
+  const res = await fetch(url, {
+    headers: {
+      "Accept": "application/vnd.github.v3+json"
+    }
+  });
+
   const files = await res.json();
+
+  if (!Array.isArray(files)) {
+    console.error("Slides fetch failed:", files);
+    return;
+  }
 
   slideFiles = files.filter(file =>
     file.name.match(/\.(jpg|jpeg|png|mp4)$/i)

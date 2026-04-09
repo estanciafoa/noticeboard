@@ -19,35 +19,10 @@ iframe {
 }
 </style>
 
-<script>
-// reload whole page every 5 minutes (300000 ms)
-setInterval(function() {
-  location.reload();
-}, 1800000);
-</script>
-
 </head>
 
 <body>
-<audio id="bgAudio" autoplay loop muted>
-  <source src="https://drive.google.com/file/d/1DBgGi75tnRvhaZS7izaZHh-k0PCebKXq/view?usp=sharing" type="audio/mpeg">
-</audio>
 <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSUh6DVZw7TFMNNXsHBXdMqZGY8ls0_JNx_ZpsnfXUQcnU3lTV9zTGUPCODPGwd2Bb9x8ktKXRTvcNJ/pubembed?start=true&loop=true&delayms=10000" frameborder="0" width="1080" height="1949" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
-<script>
-const audio = document.getElementById("bgAudio");
 
-// Force play (muted allowed)
-window.onload = () => {
-  audio.play().then(() => {
-    // try to unmute after slight delay
-    setTimeout(() => {
-      audio.muted = false;
-      audio.volume = 0.3;
-    }, 1000);
-  }).catch(() => {
-    console.log("Autoplay still blocked");
-  });
-};
-</script>
 </body>
 </html>

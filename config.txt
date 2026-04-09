@@ -1,0 +1,7 @@
+# filename | duration(sec) | start | end
+
+slide1.jpg | 10
+slide2.png | 10
+slide3.mp4 | auto
+slide4.png | 10 | 07:00 | 11:00
+slide5.jpg | 10 | 11:00 | 15:00

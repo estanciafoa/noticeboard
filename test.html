@@ -2,29 +2,199 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Estancia Notice Board</title>
+<title>Estancia Display</title>
 
 <style>
-html, body {
+body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
   background: black;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
 }
-iframe {
+
+.slide {
+  position: absolute;
   width: 100%;
   height: 100%;
-  border: none;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide img, .slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.active {
+  display: flex;
+  animation: fade 1s;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>
-
 </head>
 
 <body>
+
 <script>
-// redirect to presentation mode
-window.location.href = "https://docs.google.com/presentation/d/e/2PACX-1vSUh6DVZw7TFMNNXsHBXdMqZGY8ls0_JNx_ZpsnfXUQcnU3lTV9zTGUPCODPGwd2Bb9x8ktKXRTvcNJ/present?start=true&loop=true&delayms=3000";
+const repoOwner = "YOUR_USERNAME";
+const repoName = "estancia-notice-board";
+
+const slidesPath = "slides";
+const configFile = "config.txt";
+
+let slidesConfig = [];
+let slideElements = [];
+let index = 0;
+let refreshInterval = 300000; // 5 minutes
+
+// LOAD CONFIG
+async function loadConfig() {
+  const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${configFile}?t=${Date.now()}`;
+  const res = await fetch(url);
+  const text = await res.text();
+
+  const lines = text.split("\n").filter(l => l.trim() && !l.startsWith("#"));
+
+  return lines.map(line => {
+    const parts = line.split("|").map(p => p.trim());
+
+    return {
+      name: parts[0],
+      duration: parts[1] === "auto" ? "auto" : Number(parts[1]) * 1000,
+      start: parts[2] || null,
+      end: parts[3] || null
+    };
+  });
+}
+
+// TIME FILTER
+function isVisible(slide) {
+  if (!slide.start || !slide.end) return true;
+
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+
+  const [sh, sm] = slide.start.split(":").map(Number);
+  const [eh, em] = slide.end.split(":").map(Number);
+
+  const startMin = sh * 60 + sm;
+  const endMin = eh * 60 + em;
+
+  return current >= startMin && current <= endMin;
+}
+
+// BUILD SLIDES
+function buildSlides(config) {
+  slideElements.forEach(el => el.remove());
+  slideElements = [];
+
+  config.forEach(cfg => {
+
+    if (!isVisible(cfg)) return;
+
+    const div = document.createElement("div");
+    div.className = "slide";
+
+    const fileUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${slidesPath}/${cfg.name}?t=${Date.now()}`;
+
+    if (cfg.name.match(/\.mp4$/i)) {
+      const video = document.createElement("video");
+      video.src = fileUrl;
+      video.autoplay = true;
+      video.playsInline = true;
+      video.style.width = "100%";
+      video.style.height = "100%";
+      video.style.objectFit = "cover";
+
+      div.appendChild(video);
+
+      video.onended = nextSlide;
+
+    } else {
+      const img = document.createElement("img");
+      img.src = fileUrl;
+
+      div.appendChild(img);
+
+      div.dataset.duration = cfg.duration || 10000;
+    }
+
+    document.body.appendChild(div);
+    slideElements.push(div);
+  });
+
+  index = 0;
+  showSlide(index);
+}
+
+// SHOW SLIDE
+function showSlide(i) {
+  if (slideElements.length === 0) return;
+
+  slideElements.forEach(s => s.classList.remove("active"));
+
+  let slide = slideElements[i];
+  slide.classList.add("active");
+
+  let video = slide.querySelector("video");
+
+  if (video) {
+    video.currentTime = 0;
+    video.muted = false;
+    video.play().catch(()=>{});
+  } else {
+    setTimeout(nextSlide, slide.dataset.duration);
+  }
+}
+
+// NEXT SLIDE
+function nextSlide() {
+  if (slideElements.length === 0) return;
+
+  index = (index + 1) % slideElements.length;
+  showSlide(index);
+}
+
+// AUTO REFRESH
+async function refreshSlides() {
+  try {
+    const newConfig = await loadConfig();
+
+    const old = JSON.stringify(slidesConfig);
+    const latest = JSON.stringify(newConfig);
+
+    if (old !== latest) {
+      console.log("🔄 Updating slides...");
+      slidesConfig = newConfig;
+      buildSlides(slidesConfig);
+    } else {
+      console.log("✅ No changes");
+    }
+
+  } catch (e) {
+    console.log("Refresh error", e);
+  }
+}
+
+// INIT
+async function init() {
+  slidesConfig = await loadConfig();
+  buildSlides(slidesConfig);
+
+  setInterval(refreshSlides, refreshInterval);
+
+  // optional safety full reload every hour
+  setInterval(() => location.reload(), 3600000);
+}
+
+init();
 </script>
+
 </body>
 </html>

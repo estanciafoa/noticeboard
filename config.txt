@@ -1,7 +1,7 @@
-# filename | duration(sec) | start | end
+# DEFAULT CONFIG
+default | 10
 
-slide1.jpg | 10
-slide2.png | 10
-slide3.mp4 | auto
-slide4.png | 10 | 07:00 | 11:00
-slide5.jpg | 10 | 11:00 | 15:00
+# OVERRIDES
+promo.mp4 | auto
+morning.jpg | 10 | 07:00 | 11:00
+alert.jpg | 5

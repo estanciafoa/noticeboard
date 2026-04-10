@@ -2,6 +2,7 @@
 default | 10
 
 # OVERRIDES
-promo.mp4 | auto
-morning.jpg | 10 | 07:00 | 11:00
-alert.jpg | 5
+firemockdrill.png
+gardening1april.png
+slide1.jpeg
+slides2.png

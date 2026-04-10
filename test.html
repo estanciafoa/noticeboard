@@ -1,73 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Estancia Display</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+.slide img,
+.slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.active {
+  display: block;
+  animation: fade 1s;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
 <script>
 const repoOwner = "saravanansengamalan";
-const repoName = "estancianoticeboard";
+const repoName = "estancia-notice-board";
 
-const slidesPath = "slides";
-const configFile = "config.txt";
+const configUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt`;
 
 let defaultDuration = 10000;
-let configMap = {};
-let slideFiles = [];
+let slides = [];
 let slideElements = [];
 let index = 0;
-let refreshInterval = 300000;
+let refreshInterval = 300000; // 5 minutes
 
 // LOAD CONFIG
 async function loadConfig() {
-  const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${configFile}?t=${Date.now()}`;
-  const res = await fetch(url);
+  const res = await fetch(configUrl + "?t=" + Date.now());
   const text = await res.text();
 
-  const lines = text.split("\n").filter(l => l.trim() && !l.startsWith("#"));
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
 
-  configMap = {};
+  slides = [];
+  let inSlides = false;
 
   lines.forEach(line => {
+
+    if (line.startsWith("#")) return;
+
+    if (line.toLowerCase() === "slides:") {
+      inSlides = true;
+      return;
+    }
+
+    if (!inSlides) {
+      const parts = line.split("|").map(p => p.trim());
+      if (parts[0].toLowerCase() === "default") {
+        defaultDuration = Number(parts[1]) * 1000;
+      }
+      return;
+    }
+
+    // Parse slide line
     const parts = line.split("|").map(p => p.trim());
 
-    if (parts[0].toLowerCase() === "default") {
-      defaultDuration = Number(parts[1]) * 1000;
-    } else {
-      configMap[parts[0]] = {
-        duration: parts[1] === "auto" ? "auto" : Number(parts[1]) * 1000,
-        start: parts[2] || null,
-        end: parts[3] || null
-      };
-    }
+    slides.push({
+      name: parts[0],
+      duration: parts[1] === "auto"
+        ? "auto"
+        : parts[1]
+        ? Number(parts[1]) * 1000
+        : defaultDuration,
+      start: parts[2] || null,
+      end: parts[3] || null
+    });
   });
-}
-
-// LOAD FILES FROM GITHUB
-async function loadSlidesList() {
-  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${slidesPath}`;
-
-  const res = await fetch(url, {
-    headers: {
-      "Accept": "application/vnd.github.v3+json"
-    }
-  });
-
-  const files = await res.json();
-
-  if (!Array.isArray(files)) {
-    console.error("Slides fetch failed:", files);
-    return;
-  }
-
-  slideFiles = files.filter(file =>
-    file.name.match(/\.(jpg|jpeg|png|mp4)$/i)
-  );
 }
 
 // TIME FILTER
-function isVisible(cfg) {
-  if (!cfg.start || !cfg.end) return true;
+function isVisible(slide) {
+  if (!slide.start || !slide.end) return true;
 
   const now = new Date();
   const current = now.getHours() * 60 + now.getMinutes();
 
-  const [sh, sm] = cfg.start.split(":").map(Number);
-  const [eh, em] = cfg.end.split(":").map(Number);
+  const [sh, sm] = slide.start.split(":").map(Number);
+  const [eh, em] = slide.end.split(":").map(Number);
 
   const startMin = sh * 60 + sm;
   const endMin = eh * 60 + em;
@@ -80,22 +116,16 @@ function buildSlides() {
   slideElements.forEach(el => el.remove());
   slideElements = [];
 
-  slideFiles.forEach(file => {
+  slides.forEach(slide => {
 
-    const cfg = configMap[file.name] || {
-      duration: defaultDuration,
-      start: null,
-      end: null
-    };
-
-    if (!isVisible(cfg)) return;
+    if (!isVisible(slide)) return;
 
     const div = document.createElement("div");
     div.className = "slide";
 
-    const fileUrl = file.download_url + "?t=" + Date.now();
+    const fileUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${slide.name}?t=${Date.now()}`;
 
-    if (file.name.match(/\.mp4$/i)) {
+    if (slide.name.match(/\.mp4$/i)) {
       const video = document.createElement("video");
       video.src = fileUrl;
       video.autoplay = true;
@@ -114,7 +144,7 @@ function buildSlides() {
 
       div.appendChild(img);
 
-      div.dataset.duration = cfg.duration || defaultDuration;
+      div.dataset.duration = slide.duration;
     }
 
     document.body.appendChild(div);
@@ -145,35 +175,36 @@ function showSlide(i) {
   }
 }
 
-// NEXT
+// NEXT SLIDE
 function nextSlide() {
   index = (index + 1) % slideElements.length;
   showSlide(index);
 }
 
-// REFRESH
+// AUTO REFRESH
 async function refreshSlides() {
   try {
     await loadConfig();
-    await loadSlidesList();
-
-    console.log("🔄 Refreshing slides...");
     buildSlides();
-
+    console.log("🔄 Slides updated");
   } catch (e) {
-    console.log("Refresh error", e);
+    console.log("Error:", e);
   }
 }
 
 // INIT
 async function init() {
   await loadConfig();
-  await loadSlidesList();
   buildSlides();
 
   setInterval(refreshSlides, refreshInterval);
+
+  // safety full reload every hour
   setInterval(() => location.reload(), 3600000);
 }
 
 init();
 </script>
+
+</body>
+</html>

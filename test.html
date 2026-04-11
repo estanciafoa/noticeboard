@@ -123,19 +123,35 @@ function buildSlides() {
     const fileUrl = `https://${repoOwner}.github.io/${repoName}/slides/${slide.name}?t=${Date.now()}`;
     
     if (slide.name.match(/\.mp4$/i)) {
+
       const video = document.createElement("video");
+    
       video.src = fileUrl;
       video.autoplay = true;
+      video.muted = true;          // 🔴 REQUIRED
       video.playsInline = true;
-      video.style.width = "100%";
+      video.preload = "auto";
+    
       video.style.height = "100%";
-      video.style.objectFit = "cover";
-
+      video.style.width = "auto";
+    
       div.appendChild(video);
-
+    
+      // Force play
+      video.onloadeddata = () => {
+        video.play().then(() => {
+          // Try to unmute after starting
+          setTimeout(() => {
+            video.muted = false;
+            video.volume = 0.5;
+          }, 500);
+        }).catch(err => {
+          console.log("Autoplay blocked:", err);
+        });
+      };
+    
       video.onended = nextSlide;
-
-    } else {
+    }else {
       const img = document.createElement("img");
       img.src = fileUrl;
 
@@ -164,34 +180,12 @@ function showSlide(i) {
   let video = slide.querySelector("video");
 
   if (video) {
-     const video = document.createElement("video");
-
-      video.src = fileUrl;
-      video.autoplay = true;
-      video.muted = true;          // 🔴 REQUIRED
-      video.playsInline = true;
-      video.preload = "auto";
-    
-      video.style.height = "100%";
-      video.style.width = "auto";
-    
-      div.appendChild(video);
-    
-      // Force play
-      video.onloadeddata = () => {
-        video.play().then(() => {
-          // Try to unmute after starting
-          setTimeout(() => {
-            video.muted = false;
-            video.volume = 0.5;
-          }, 500);
-        }).catch(err => {
-          console.log("Autoplay blocked:", err);
-        });
-      };
-    
-      video.onended = nextSlide;
-    }
+    video.currentTime = 0;
+    video.muted = false;
+    video.play().catch(()=>{});
+  } else {
+    setTimeout(nextSlide, slide.dataset.duration);
+  }
 }
 
 // NEXT SLIDE

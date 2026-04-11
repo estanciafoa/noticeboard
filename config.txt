@@ -1,7 +1,7 @@
 # DEFAULT CONFIG
 default | 10
 
-# OVERRIDES
+slides:
 firemockdrill.png
 gardening1april.png
 slide1.jpeg

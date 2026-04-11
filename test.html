@@ -142,7 +142,7 @@ function buildSlides() {
         video.play().then(() => {
           // Try to unmute after starting
           setTimeout(() => {
-            video.muted = false;
+            video.muted = true;
             video.volume = 0.5;
           }, 500);
         }).catch(err => {

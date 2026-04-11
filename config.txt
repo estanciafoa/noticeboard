@@ -4,6 +4,6 @@ default | 3
 slides:
 firemockdrill.png | 10 | 19:55 | 19:56
 gardening1april.png
-0a971288-8982-410a-9330-e977daf77fdd.mp4 | auto
+video.mp4 | auto
 slide1.jpeg
 slides2.png

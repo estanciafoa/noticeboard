@@ -1,8 +1,8 @@
 # DEFAULT CONFIG
-default | 10
+default | 3
 
 slides:
-firemockdrill.png
+firemockdrill.png | 10
 gardening1april.png
 slide1.jpeg
 slides2.png

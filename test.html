@@ -5,29 +5,36 @@
 <title>Estancia Display</title>
 
 <style>
-body {
+html, body {
   margin: 0;
-  background: black;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  font-family: Arial, sans-serif;
+  background: black;
 }
 
 .slide {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: none;
+  position: fixed; /* key change */
+  top: 0;
+  left: 0;
+  width: 100vw;   /* full viewport width */
+  height: 100vh;  /* full viewport height */
+  opacity: 0;
+  pointer-events: none;
 }
 
 .slide img,
 .slide video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* fills screen nicely */
 }
 
 .active {
-  display: block;
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 10;
   animation: fade 1s;
 }
 

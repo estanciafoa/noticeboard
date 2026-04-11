@@ -120,8 +120,8 @@ function buildSlides() {
     const div = document.createElement("div");
     div.className = "slide";
 
-    const fileUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${slide.name}?t=${Date.now()}`;
-
+    const fileUrl = `https://${repoOwner}.github.io/${repoName}/slides/${slide.name}?t=${Date.now()}`;
+    
     if (slide.name.match(/\.mp4$/i)) {
       const video = document.createElement("video");
       video.src = fileUrl;

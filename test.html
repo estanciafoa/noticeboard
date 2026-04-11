@@ -124,34 +124,34 @@ function buildSlides() {
     
     if (slide.name.match(/\.mp4$/i)) {
 
-      const video = document.createElement("video");
-    
-      video.src = fileUrl;
-      video.autoplay = true;
-      video.muted = true;          // 🔴 REQUIRED
-      video.playsInline = true;
-      video.preload = "auto";
-    
-      video.style.height = "100%";
-      video.style.width = "auto";
-    
-      div.appendChild(video);
-    
-      // Force play
-      video.onloadeddata = () => {
-        video.play().then(() => {
-          // Try to unmute after starting
-          setTimeout(() => {
-            video.muted = true;
-            video.volume = 0.5;
-          }, 500);
-        }).catch(err => {
-          console.log("Autoplay blocked:", err);
-        });
-      };
-    
-      video.onended = nextSlide;
-    }else {
+  const video = document.createElement("video");
+
+  video.src = fileUrl;
+  video.muted = true;              // 🔴 MUST for autoplay
+  video.autoplay = true;
+  video.playsInline = true;
+  video.preload = "auto";
+  video.loop = false;
+
+  video.style.height = "100%";
+  video.style.width = "auto";
+
+  div.appendChild(video);
+
+  // 🔥 MOST IMPORTANT: force play after load
+  video.oncanplay = () => {
+    video.play().catch(err => {
+      console.log("Play failed:", err);
+    });
+  };
+
+  // fallback retry (important for TVs)
+  setTimeout(() => {
+    video.play().catch(()=>{});
+  }, 1000);
+
+  video.onended = nextSlide;
+}else {
       const img = document.createElement("img");
       img.src = fileUrl;
 

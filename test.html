@@ -181,7 +181,6 @@ function showSlide(i) {
 
   if (video) {
     video.currentTime = 0;
-    video.muted = false;
     video.play().catch(()=>{});
   } else {
     setTimeout(nextSlide, slide.dataset.duration);

@@ -41,7 +41,7 @@ body {
   height: calc(100vh - 60px);
 }
 
-/* LEFT */
+/* LEFT THUMBNAILS */
 .left {
   width: 180px;
   background: #f8fafc;
@@ -69,7 +69,7 @@ body {
   object-fit: cover;
 }
 
-/* CENTER */
+/* CENTER DISPLAY */
 .center {
   flex: 1;
   display: flex;
@@ -77,21 +77,20 @@ body {
   justify-content: center;
 }
 
-/* DISPLAY AREA */
+/* DISPLAY WRAPPER */
 .displayWrapper {
   position: relative;
-  height: 90%;
+  height: 92%;
   aspect-ratio: 9 / 16;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* CONTENT */
-.screenContent {
+/* ✅ FIXED SCREEN AREA (based on your frame image) */
+.screenArea {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  top: 6%;
+  left: 6%;
+  width: 88%;
+  height: 84%;
   z-index: 1;
   background: black;
   display: flex;
@@ -99,14 +98,14 @@ body {
   justify-content: center;
 }
 
-.screenContent img,
-.screenContent video {
+.screenArea img,
+.screenArea video {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* FRAME ON TOP */
+/* FRAME OVERLAY */
 .frameOverlay {
   position: absolute;
   width: 100%;
@@ -115,7 +114,7 @@ body {
   pointer-events: none;
 }
 
-/* RIGHT */
+/* RIGHT PANEL */
 .right {
   width: 300px;
   background: white;
@@ -140,6 +139,7 @@ button {
   border-radius: 6px;
   cursor: pointer;
 }
+
 .deleteBtn {
   background: #dc2626;
 }
@@ -175,8 +175,8 @@ button {
 
   <div class="displayWrapper">
 
-    <!-- CONTENT -->
-    <div class="screenContent" id="screenArea"></div>
+    <!-- SCREEN -->
+    <div class="screenArea" id="screenArea"></div>
 
     <!-- FRAME -->
     <img src="images/screen.png" class="frameOverlay">
@@ -197,7 +197,7 @@ button {
 <div class="field">End Time <input type="time" id="endTime"></div>
 <div class="field">Start Date <input type="date" id="startDate"></div>
 <div class="field">End Date <input type="date" id="endDate"></div>
-<div class="field">Expiry <input id="expiry"></div>
+<div class="field">Expiry (2h / 3d) <input id="expiry"></div>
 
 <button class="deleteBtn" onclick="deleteSlide()">Delete</button>
 
@@ -207,57 +207,81 @@ button {
 </div>
 
 <script>
-const repoOwner="saravanansengamalan";
-const repoName="estancianoticeboard";
+const repoOwner = "saravanansengamalan";
+const repoName = "estancianoticeboard";
 
 let token="", files=[], config={}, selected=null;
 
+// START
 function start(){
-  token=tokenInput.value.trim();
-  if(!token)return alert("Token required");
-  login.style.display="none";
-  app.style.display="block";
+  token = document.getElementById("tokenInput").value.trim();
+  if(!token) return alert("Token required");
+
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+
   load();
 }
 
+// LOAD
 async function load(){
 
-  const txt=await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt`).then(r=>r.text());
+  // LOAD CONFIG
+  const txt = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt`)
+    .then(r=>r.text());
+
   let inSlides=false;
 
-  txt.split("\n").forEach(l=>{
-    l=l.trim();
-    if(l.toLowerCase()==="slides:"){inSlides=true;return;}
-    if(inSlides){
-      const p=l.split("|").map(x=>x.trim());
-      config[p[0]]={duration:p[1]||"",start:p[2]||"",end:p[3]||"",startDate:p[4]||"",endDate:p[5]||"",expiry:p[6]||""};
+  txt.split("\n").forEach(line=>{
+    line=line.trim();
+    if(line.toLowerCase()==="slides:"){inSlides=true;return;}
+    if(inSlides && line){
+      const p=line.split("|").map(x=>x.trim());
+      config[p[0]]={
+        duration:p[1]||"",
+        start:p[2]||"",
+        end:p[3]||"",
+        startDate:p[4]||"",
+        endDate:p[5]||"",
+        expiry:p[6]||""
+      };
     }
   });
 
-  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides`,{
+  // LOAD FILES
+  const res = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides`,{
     headers:{Authorization:`Bearer ${token}`}
   });
 
-  const list=await res.json();
-  files=list.map(f=>f.name);
+  const list = await res.json();
+  files = list.map(f=>f.name);
 
   render();
 }
 
+// RENDER THUMBNAILS
 function render(){
-  const thumbList=document.getElementById("thumbList");
+  const thumbList = document.getElementById("thumbList");
   thumbList.innerHTML="";
 
   files.forEach(name=>{
     const div=document.createElement("div");
     div.className="thumb";
-    if(name===selected)div.classList.add("active");
+    if(name===selected) div.classList.add("active");
 
     const url=`https://${repoOwner}.github.io/${repoName}/slides/${name}`;
 
-    let media=name.match(/\.mp4/i)?document.createElement("video"):document.createElement("img");
+    let media=name.match(/\.mp4/i)
+      ? document.createElement("video")
+      : document.createElement("img");
+
     media.src=url;
-    if(media.tagName==="VIDEO"){media.muted=true;media.autoplay=true;}
+
+    if(media.tagName==="VIDEO"){
+      media.muted=true;
+      media.autoplay=true;
+      media.loop=true;
+    }
 
     div.appendChild(media);
     div.onclick=()=>selectSlide(name);
@@ -266,6 +290,7 @@ function render(){
   });
 }
 
+// SELECT SLIDE
 function selectSlide(name){
   selected=name;
   render();
@@ -275,14 +300,22 @@ function selectSlide(name){
 
   const url=`https://${repoOwner}.github.io/${repoName}/slides/${name}`;
 
-  let media=name.match(/\.mp4/i)?document.createElement("video"):document.createElement("img");
+  let media=name.match(/\.mp4/i)
+    ? document.createElement("video")
+    : document.createElement("img");
+
   media.src=url;
-  if(media.tagName==="VIDEO"){media.autoplay=true;media.muted=true;}
+
+  if(media.tagName==="VIDEO"){
+    media.autoplay=true;
+    media.muted=true;
+    media.loop=true;
+  }
 
   screenEl.appendChild(media);
 
   const c=config[name]||{};
-  title.innerText=name;
+  document.getElementById("title").innerText=name;
 
   enabled.checked=!!config[name];
   duration.value=c.duration||"";
@@ -291,6 +324,136 @@ function selectSlide(name){
   startDate.value=c.startDate||"";
   endDate.value=c.endDate||"";
   expiry.value=c.expiry||"";
+}
+
+// UPDATE CONFIG
+document.querySelectorAll(".right input").forEach(el=>{
+  el.oninput=()=>{
+    if(!selected) return;
+
+    if(!enabled.checked){
+      delete config[selected];
+      return;
+    }
+
+    if(startDate.value && !endDate.value && !expiry.value){
+      alert("Start date needs end date or expiry");
+      return;
+    }
+
+    config[selected]={
+      duration:duration.value,
+      start:startTime.value,
+      end:endTime.value,
+      startDate:startDate.value,
+      endDate:endDate.value,
+      expiry:expiry.value
+    };
+  };
+});
+
+// UPLOAD
+async function upload(){
+  const filesInput=fileInput.files;
+
+  for(const f of filesInput){
+    const base64=await toBase64(f);
+
+    await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${f.name}`,{
+      method:"PUT",
+      headers:{
+        Authorization:`Bearer ${token}`,
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        message:"upload",
+        content:base64
+      })
+    });
+
+    files.push(f.name);
+  }
+
+  render();
+}
+
+// DELETE
+async function deleteSlide(){
+  if(!selected) return;
+
+  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${selected}`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+
+  const data=await res.json();
+
+  await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${selected}`,{
+    method:"DELETE",
+    headers:{
+      Authorization:`Bearer ${token}`,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      message:"delete",
+      sha:data.sha
+    })
+  });
+
+  delete config[selected];
+  files=files.filter(f=>f!==selected);
+  selected=null;
+
+  document.getElementById("screenArea").innerHTML="";
+  render();
+}
+
+// SAVE CONFIG
+async function saveConfig(){
+
+  let content="default | 10\n\nslides:\n";
+
+  Object.entries(config).forEach(([name,c])=>{
+    let line=name;
+
+    if(c.duration) line+=` | ${c.duration}`;
+    if(c.start) line+=` | ${c.start}`;
+    if(c.end) line+=` | ${c.end}`;
+    if(c.startDate) line+=` | ${c.startDate}`;
+    if(c.endDate) line+=` | ${c.endDate}`;
+    if(c.expiry) line+=` | ${c.expiry}`;
+
+    content+=line+"\n";
+  });
+
+  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+
+  const data=await res.json();
+
+  await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`,{
+    method:"PUT",
+    headers:{
+      Authorization:`Bearer ${token}`,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      message:"update config",
+      content:btoa(unescape(encodeURIComponent(content))),
+      sha:data.sha
+    })
+  });
+
+  alert("Saved!");
+}
+
+// BASE64
+function toBase64(file){
+  return new Promise(res=>{
+    const reader=new FileReader();
+    reader.onload=()=>res(reader.result.split(",")[1]);
+    reader.readAsDataURL(file);
+  });
 }
 </script>
 

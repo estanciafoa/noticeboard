@@ -2,220 +2,364 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Estancia Display</title>
+<title>Estancia Admin</title>
 
 <style>
-.slide {
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #eef1f5;
+}
+
+/* LOGIN */
+#login {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-
-  display: flex;              /* key */
-  justify-content: center;    /* horizontal center */
-  align-items: center;        /* vertical center */
-
-  opacity: 0;
-  pointer-events: none;
+  inset: 0;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#loginBox {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
 }
 
-.slide img,
-.slide video {
+/* HEADER */
+.header {
+  background: white;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* MAIN LAYOUT */
+.container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* LEFT THUMBNAILS */
+.left {
+  width: 180px;
+  background: #f8fafc;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.thumb {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  cursor: pointer;
+}
+
+.thumb.active {
+  border: 3px solid #2563eb;
+}
+
+.thumb img, .thumb video {
+  width: 100%;
   height: 100%;
-  width: auto;                /* maintain aspect ratio */
+  object-fit: cover;
 }
 
-.active {
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 10;
-  animation: fade 1s;
+/* CENTER TV PREVIEW */
+.center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* TV FRAME */
+.tv {
+  position: relative;
+  height: 90%;
+  aspect-ratio: 9 / 16;
+  background: black;
+  border: 12px solid #222;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+/* SCREEN CONTENT */
+.screen img,
+.screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: black;
+}
+
+/* RIGHT PANEL */
+.right {
+  width: 300px;
+  background: white;
+  padding: 15px;
+  border-left: 1px solid #ddd;
+}
+
+.field {
+  margin-bottom: 10px;
+}
+
+input {
+  width: 100%;
+  padding: 6px;
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.deleteBtn {
+  background: #dc2626;
 }
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div id="login">
+  <div id="loginBox">
+    <h3>Enter GitHub Token</h3>
+    <input type="password" id="tokenInput"><br><br>
+    <button onclick="start()">Start</button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+
+<div class="header">
+  <input type="file" id="fileInput" multiple>
+  <button onclick="upload()">Upload</button>
+  <button onclick="saveConfig()">Save</button>
+</div>
+
+<div class="container">
+
+  <!-- LEFT -->
+  <div class="left" id="thumbList"></div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <div class="tv">
+      <div class="screen" id="screen"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+
+    <h3 id="title">Select Slide</h3>
+
+    <label><input type="checkbox" id="enabled"> Enable</label>
+
+    <div class="field">Duration <input id="duration"></div>
+    <div class="field">Start Time <input type="time" id="startTime"></div>
+    <div class="field">End Time <input type="time" id="endTime"></div>
+    <div class="field">Start Date <input type="date" id="startDate"></div>
+    <div class="field">End Date <input type="date" id="endDate"></div>
+    <div class="field">Expiry <input id="expiry"></div>
+
+    <button class="deleteBtn" onclick="deleteSlide()">Delete</button>
+
+  </div>
+
+</div>
+
+</div>
+
 <script>
-const repoOwner = "saravanansengamalan";
-const repoName = "estancianoticeboard";
+const repoOwner="saravanansengamalan";
+const repoName="estancianoticeboard";
 
-const configUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt`;
+let token="", files=[], config={}, selected=null;
 
-let defaultDuration = 10000;
-let slides = [];
-let slideElements = [];
-let index = 0;
-let refreshInterval = 300000; // 5 minutes
+function start(){
+  token=tokenInput.value.trim();
+  if(!token)return alert("Token required");
+  login.style.display="none";
+  app.style.display="block";
+  load();
+}
 
-// LOAD CONFIG
-async function loadConfig() {
-  const res = await fetch(configUrl + "?t=" + Date.now());
-  const text = await res.text();
+async function load(){
 
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  // CONFIG
+  const txt=await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt`).then(r=>r.text());
+  let inSlides=false;
 
-  slides = [];
-  let inSlides = false;
-
-  lines.forEach(line => {
-
-    if (line.startsWith("#")) return;
-
-    if (line.toLowerCase() === "slides:") {
-      inSlides = true;
-      return;
+  txt.split("\n").forEach(l=>{
+    l=l.trim();
+    if(l.toLowerCase()==="slides:"){inSlides=true;return;}
+    if(inSlides){
+      const p=l.split("|").map(x=>x.trim());
+      config[p[0]]={duration:p[1]||"",start:p[2]||"",end:p[3]||"",startDate:p[4]||"",endDate:p[5]||"",expiry:p[6]||""};
     }
+  });
 
-    if (!inSlides) {
-      const parts = line.split("|").map(p => p.trim());
-      if (parts[0].toLowerCase() === "default") {
-        defaultDuration = Number(parts[1]) * 1000;
-      }
-      return;
-    }
+  // FILES
+  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+  const list=await res.json();
+  files=list.map(f=>f.name);
 
-    // Parse slide line
-    const parts = line.split("|").map(p => p.trim());
+  render();
+}
 
-    slides.push({
-      name: parts[0],
-      duration: parts[1] === "auto"
-        ? "auto"
-        : parts[1]
-        ? Number(parts[1]) * 1000
-        : defaultDuration,
-      start: parts[2] || null,
-      end: parts[3] || null
-    });
+function render(){
+
+  thumbList.innerHTML="";
+
+  files.forEach(name=>{
+
+    const div=document.createElement("div");
+    div.className="thumb";
+    if(name===selected)div.classList.add("active");
+
+    const url=`https://${repoOwner}.github.io/${repoName}/slides/${name}`;
+
+    let media=name.match(/\.mp4/i)?document.createElement("video"):document.createElement("img");
+    media.src=url;
+    if(media.tagName==="VIDEO"){media.muted=true;media.autoplay=true;}
+
+    div.appendChild(media);
+    div.onclick=()=>selectSlide(name);
+
+    thumbList.appendChild(div);
   });
 }
 
-// TIME FILTER
-function isVisible(slide) {
-  if (!slide.start || !slide.end) return true;
+function selectSlide(name){
+  selected=name;
+  render();
 
-  const now = new Date();
-  const current = now.getHours() * 60 + now.getMinutes();
+  const url=`https://${repoOwner}.github.io/${repoName}/slides/${name}`;
+  screen.innerHTML="";
 
-  const [sh, sm] = slide.start.split(":").map(Number);
-  const [eh, em] = slide.end.split(":").map(Number);
+  let media=name.match(/\.mp4/i)?document.createElement("video"):document.createElement("img");
+  media.src=url;
+  if(media.tagName==="VIDEO"){media.autoplay=true;media.muted=true;}
 
-  const startMin = sh * 60 + sm;
-  const endMin = eh * 60 + em;
+  screen.appendChild(media);
 
-  return current >= startMin && current <= endMin;
+  const c=config[name]||{};
+  title.innerText=name;
+
+  enabled.checked=!!config[name];
+  duration.value=c.duration||"";
+  startTime.value=c.start||"";
+  endTime.value=c.end||"";
+  startDate.value=c.startDate||"";
+  endDate.value=c.endDate||"";
+  expiry.value=c.expiry||"";
 }
 
-// BUILD SLIDES
-function buildSlides() {
-  slideElements.forEach(el => el.remove());
-  slideElements = [];
+// UPDATE CONFIG
+document.querySelectorAll(".right input").forEach(el=>{
+  el.oninput=()=>{
+    if(!selected)return;
 
-  slides.forEach(slide => {
+    if(!enabled.checked){delete config[selected];return;}
 
-    if (!isVisible(slide)) return;
+    if(startDate.value && !endDate.value && !expiry.value){
+      alert("Start date needs end date or expiry");return;
+    }
 
-    const div = document.createElement("div");
-    div.className = "slide";
-
-    const fileUrl = `https://${repoOwner}.github.io/${repoName}/slides/${slide.name}?t=${Date.now()}`;
-    
-    if (slide.name.match(/\.mp4$/i)) {
-
-  const video = document.createElement("video");
-
-  video.src = fileUrl;
-  video.muted = true;              // 🔴 MUST for autoplay
-  video.autoplay = true;
-  video.playsInline = true;
-  video.preload = "auto";
-  video.loop = false;
-
-  video.style.height = "100%";
-  video.style.width = "auto";
-
-  div.appendChild(video);
-
-  // 🔥 MOST IMPORTANT: force play after load
-  video.oncanplay = () => {
-    video.play().catch(err => {
-      console.log("Play failed:", err);
-    });
+    config[selected]={duration:duration.value,start:startTime.value,end:endTime.value,startDate:startDate.value,endDate:endDate.value,expiry:expiry.value};
   };
+});
 
-  // fallback retry (important for TVs)
-  setTimeout(() => {
-    video.play().catch(()=>{});
-  }, 1000);
+// UPLOAD
+async function upload(){
+  const filesInput=fileInput.files;
 
-  video.onended = nextSlide;
-}else {
-      const img = document.createElement("img");
-      img.src = fileUrl;
+  for(const f of filesInput){
+    const base64=await toBase64(f);
 
-      div.appendChild(img);
+    await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${f.name}`,{
+      method:"PUT",
+      headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
+      body:JSON.stringify({message:"upload",content:base64})
+    });
 
-      div.dataset.duration = slide.duration;
-    }
+    files.push(f.name);
+  }
+  render();
+}
 
-    document.body.appendChild(div);
-    slideElements.push(div);
+// DELETE
+async function deleteSlide(){
+  if(!selected)return;
+
+  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${selected}`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+  const data=await res.json();
+
+  await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${selected}`,{
+    method:"DELETE",
+    headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
+    body:JSON.stringify({message:"delete",sha:data.sha})
   });
 
-  index = 0;
-  showSlide(index);
+  delete config[selected];
+  files=files.filter(f=>f!==selected);
+  selected=null;
+  screen.innerHTML="";
+  render();
 }
 
-// SHOW SLIDE
-function showSlide(i) {
-  if (slideElements.length === 0) return;
+// SAVE
+async function saveConfig(){
+  let content="default | 10\n\nslides:\n";
 
-  slideElements.forEach(s => s.classList.remove("active"));
+  Object.entries(config).forEach(([n,c])=>{
+    let line=n;
+    if(c.duration)line+=` | ${c.duration}`;
+    if(c.start)line+=` | ${c.start}`;
+    if(c.end)line+=` | ${c.end}`;
+    if(c.startDate)line+=` | ${c.startDate}`;
+    if(c.endDate)line+=` | ${c.endDate}`;
+    if(c.expiry)line+=` | ${c.expiry}`;
+    content+=line+"\n";
+  });
 
-  let slide = slideElements[i];
-  slide.classList.add("active");
+  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+  const data=await res.json();
 
-  let video = slide.querySelector("video");
+  await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`,{
+    method:"PUT",
+    headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
+    body:JSON.stringify({message:"update",content:btoa(unescape(encodeURIComponent(content))),sha:data.sha})
+  });
 
-  if (video) {
-    video.currentTime = 0;
-    video.play().catch(()=>{});
-  } else {
-    setTimeout(nextSlide, slide.dataset.duration);
-  }
+  alert("Saved!");
 }
 
-// NEXT SLIDE
-function nextSlide() {
-  index = (index + 1) % slideElements.length;
-  showSlide(index);
+function toBase64(f){
+  return new Promise(r=>{
+    const reader=new FileReader();
+    reader.onload=()=>r(reader.result.split(",")[1]);
+    reader.readAsDataURL(f);
+  });
 }
-
-// AUTO REFRESH
-async function refreshSlides() {
-  try {
-    await loadConfig();
-    buildSlides();
-    console.log("🔄 Slides updated");
-  } catch (e) {
-    console.log("Error:", e);
-  }
-}
-
-// INIT
-async function init() {
-  await loadConfig();
-  buildSlides();
-
-  setInterval(refreshSlides, refreshInterval);
-
-  // safety full reload every hour
-  setInterval(() => location.reload(), 3600000);
-}
-
-init();
 </script>
 
 </body>

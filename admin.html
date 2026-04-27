@@ -35,7 +35,7 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-/* MAIN */
+/* LAYOUT */
 .container {
   display: flex;
   height: calc(100vh - 60px);
@@ -77,28 +77,21 @@ body {
   justify-content: center;
 }
 
-/* TV FRAME */
-.tv {
+/* DISPLAY AREA */
+.displayWrapper {
   position: relative;
   height: 90%;
   aspect-ratio: 9 / 16;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.tv img.frame {
+/* CONTENT */
+.screenContent {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* SCREEN AREA (adjust if needed) */
-.screenArea {
-  position: absolute;
-  top: 5%;
-  left: 5%;
-  width: 90%;
-  height: 90%;
   z-index: 1;
   background: black;
   display: flex;
@@ -106,11 +99,20 @@ body {
   justify-content: center;
 }
 
-.screenArea img,
-.screenArea video {
+.screenContent img,
+.screenContent video {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* FRAME ON TOP */
+.frameOverlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* RIGHT */
@@ -170,15 +172,17 @@ button {
 
 <!-- CENTER -->
 <div class="center">
-  <div class="tv">
 
-    <!-- SCREEN CONTENT -->
-    <div class="screenArea" id="screenArea"></div>
+  <div class="displayWrapper">
 
-    <!-- FRAME IMAGE -->
-    <img src="images/screen.png" class="frame">
+    <!-- CONTENT -->
+    <div class="screenContent" id="screenArea"></div>
+
+    <!-- FRAME -->
+    <img src="images/screen.png" class="frameOverlay">
 
   </div>
+
 </div>
 
 <!-- RIGHT -->
@@ -200,7 +204,6 @@ button {
 </div>
 
 </div>
-
 </div>
 
 <script>
@@ -209,16 +212,14 @@ const repoName="estancianoticeboard";
 
 let token="", files=[], config={}, selected=null;
 
-// START
 function start(){
-  token=document.getElementById("tokenInput").value.trim();
+  token=tokenInput.value.trim();
   if(!token)return alert("Token required");
   login.style.display="none";
   app.style.display="block";
   load();
 }
 
-// LOAD
 async function load(){
 
   const txt=await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt`).then(r=>r.text());
@@ -243,7 +244,6 @@ async function load(){
   render();
 }
 
-// RENDER
 function render(){
   const thumbList=document.getElementById("thumbList");
   thumbList.innerHTML="";
@@ -266,7 +266,6 @@ function render(){
   });
 }
 
-// SELECT
 function selectSlide(name){
   selected=name;
   render();
@@ -292,98 +291,6 @@ function selectSlide(name){
   startDate.value=c.startDate||"";
   endDate.value=c.endDate||"";
   expiry.value=c.expiry||"";
-}
-
-// UPDATE
-document.querySelectorAll(".right input").forEach(el=>{
-  el.oninput=()=>{
-    if(!selected)return;
-
-    if(!enabled.checked){delete config[selected];return;}
-
-    if(startDate.value && !endDate.value && !expiry.value){
-      alert("Start date needs end date or expiry");return;
-    }
-
-    config[selected]={duration:duration.value,start:startTime.value,end:endTime.value,startDate:startDate.value,endDate:endDate.value,expiry:expiry.value};
-  };
-});
-
-// UPLOAD
-async function upload(){
-  const filesInput=fileInput.files;
-
-  for(const f of filesInput){
-    const base64=await toBase64(f);
-
-    await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${f.name}`,{
-      method:"PUT",
-      headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
-      body:JSON.stringify({message:"upload",content:base64})
-    });
-
-    files.push(f.name);
-  }
-  render();
-}
-
-// DELETE
-async function deleteSlide(){
-  if(!selected)return;
-
-  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${selected}`,{
-    headers:{Authorization:`Bearer ${token}`}
-  });
-  const data=await res.json();
-
-  await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${selected}`,{
-    method:"DELETE",
-    headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
-    body:JSON.stringify({message:"delete",sha:data.sha})
-  });
-
-  delete config[selected];
-  files=files.filter(f=>f!==selected);
-  selected=null;
-  document.getElementById("screenArea").innerHTML="";
-  render();
-}
-
-// SAVE
-async function saveConfig(){
-  let content="default | 10\n\nslides:\n";
-
-  Object.entries(config).forEach(([n,c])=>{
-    let line=n;
-    if(c.duration)line+=` | ${c.duration}`;
-    if(c.start)line+=` | ${c.start}`;
-    if(c.end)line+=` | ${c.end}`;
-    if(c.startDate)line+=` | ${c.startDate}`;
-    if(c.endDate)line+=` | ${c.endDate}`;
-    if(c.expiry)line+=` | ${c.expiry}`;
-    content+=line+"\n";
-  });
-
-  const res=await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`,{
-    headers:{Authorization:`Bearer ${token}`}
-  });
-  const data=await res.json();
-
-  await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`,{
-    method:"PUT",
-    headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
-    body:JSON.stringify({message:"update",content:btoa(unescape(encodeURIComponent(content))),sha:data.sha})
-  });
-
-  alert("Saved!");
-}
-
-function toBase64(f){
-  return new Promise(r=>{
-    const reader=new FileReader();
-    reader.onload=()=>r(reader.result.split(",")[1]);
-    reader.readAsDataURL(f);
-  });
 }
 </script>
 

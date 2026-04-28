@@ -1,6 +1,5 @@
 default | 10
 
 slides:
-gardening1april.png | 5
 firemockdrill.png | 3
 slide1.jpeg | 10

@@ -20,16 +20,36 @@
 <!-- MAIN APP -->
 <div id="app" style="display:none">
 
+  <!-- HEADER BAND -->
+  <div class="header-band">
+    <h1>Estancia Noticeboard <span class="accent">Admin Configuration</span></h1>
+  </div>
+
   <!-- TOPBAR -->
   <div class="topbar">
-    <button onclick="fileInput.click()">Upload</button>
-    <button onclick="saveConfig()">Save</button>
+    <div class="topbar-left">
+      <button onclick="insertAtIndex=-1; fileInput.click()">Upload</button>
+      <button onclick="saveConfig()">Save</button>
+    </div>
   </div>
 
   <input type="file" id="fileInput" multiple style="display:none">
 
-  <!-- UPLOAD PREVIEW -->
-  <div id="uploadPreview"></div>
+  <!-- UPLOAD PREVIEW MODAL -->
+  <div id="uploadModal" class="modal" style="display:none">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Review uploads</h3>
+        <button class="modal-close" onclick="cancelUpload()" title="Cancel">&times;</button>
+      </div>
+      <div id="uploadPreview"></div>
+      <div class="modal-footer">
+        <button onclick="cancelUpload()">Cancel</button>
+        <button id="uploadConfirmBtn" class="primary" onclick="confirmUpload()">Upload</button>
+      </div>
+    </div>
+  </div>
 
   <!-- CONTAINER (LEFT, CENTER, RIGHT) -->
   <div class="container">
@@ -38,24 +58,38 @@
 
     <!-- CENTER PANE: TV PREVIEW -->
     <div class="center">
+      <div class="nav-controls">
+        <button onclick="navSlide(-1)" title="Previous slide">&larr; Prev</button>
+        <span id="slideCounter"></span>
+        <button onclick="navSlide(1)" title="Next slide">Next &rarr;</button>
+      </div>
       <div class="tv">
-        <div class="screen" id="screenEl"></div>
+        <div class="tv-bezel">
+          <div class="screen" id="screenEl"></div>
+          <div class="tv-brand">SAMSUNG</div>
+        </div>
+        <div class="tv-chin"></div>
+        <div class="tv-stand">
+          <div class="tv-stand-neck"></div>
+          <div class="tv-stand-base"></div>
+        </div>
       </div>
     </div>
-
-    <!-- RIGHT PANE: PROPERTIES -->
     <div class="right">
       <h3 id="titleEl">Slide</h3>
-      <label><input type="checkbox" id="enabled"> Enable</label>
 
-      <div class="field">Duration <input id="duration"></div>
-      <div class="field">Start <input type="time" id="startTime"></div>
-      <div class="field">End <input type="time" id="endTime"></div>
-      <div class="field">Start Date <input type="date" id="startDate"></div>
-      <div class="field">End Date <input type="date" id="endDate"></div>
-      <div class="field">Expiry <input id="expiry"></div>
+      <div class="field"><label>Duration</label><input id="duration" placeholder="seconds (e.g. 10)"></div>
+      <div class="field"><label>Start time</label><input type="time" id="startTime"></div>
+      <div class="field"><label>End time</label><input type="time" id="endTime"></div>
+      <div class="field"><label>Start date</label><input type="date" id="startDate"></div>
+      <div class="field"><label>End date</label><input type="date" id="endDate"></div>
+      <div class="field"><label>Expiry</label><input id="expiry" placeholder="e.g. 2h, 7d"></div>
 
-      <button class="deleteBtn" onclick="deleteSlide()">Delete</button>
+      <div class="field location-field">
+        <label>Locations</label>
+        <p class="loc-hint">No locations selected = slide is disabled</p>
+        <div id="locationPicker" class="location-picker"></div>
+      </div>
     </div>
 
   </div>

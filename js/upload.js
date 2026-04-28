@@ -1,8 +1,10 @@
 let newFiles = [];
 
-/* UPLOAD FILE CHANGE HANDLER */
+/* FILE PICKER → SHOW MODAL WITH PREVIEW */
 fileInput.onchange = e => {
   newFiles = [...e.target.files];
+  if (!newFiles.length) return;
+
   uploadPreview.innerHTML = "";
 
   newFiles.forEach((f, i) => {
@@ -21,9 +23,11 @@ fileInput.onchange = e => {
 
     const input = document.createElement("input");
     input.value = f.name;
+    f.customName = f.name;
     input.oninput = () => f.customName = input.value;
 
     const status = document.createElement("div");
+    status.className = "status";
     status.id = "status_" + i;
 
     div.appendChild(media);
@@ -32,17 +36,59 @@ fileInput.onchange = e => {
     uploadPreview.appendChild(div);
   });
 
-  upload();
+  // Reset the file input so picking the same file again retriggers onchange
+  fileInput.value = "";
+
+  openUploadModal();
 };
+
+/* MODAL CONTROLS */
+function openUploadModal() {
+  document.getElementById("uploadModal").style.display = "flex";
+  document.getElementById("uploadConfirmBtn").disabled = false;
+  document.getElementById("uploadConfirmBtn").innerText = `Upload (${newFiles.length})`;
+}
+
+function closeUploadModal() {
+  document.getElementById("uploadModal").style.display = "none";
+  uploadPreview.innerHTML = "";
+  newFiles = [];
+}
+
+function cancelUpload() {
+  closeUploadModal();
+}
+
+async function confirmUpload() {
+  const btn = document.getElementById("uploadConfirmBtn");
+  btn.disabled = true;
+  btn.innerText = "Uploading…";
+
+  await upload();
+
+  // If everything succeeded, close. Otherwise keep modal open so user sees errors.
+  const anyError = !!document.querySelector("#uploadPreview .status.error");
+  if (!anyError) {
+    closeUploadModal();
+  } else {
+    btn.disabled = false;
+    btn.innerText = "Retry";
+  }
+}
 
 /* UPLOAD FILES TO GITHUB */
 async function upload() {
   for (let i = 0; i < newFiles.length; i++) {
     const f = newFiles[i];
     const name = f.customName || f.name;
+    const statusEl = document.getElementById("status_" + i);
+
+    // Skip already-uploaded files (when user clicks Retry)
+    if (statusEl.classList.contains("done")) continue;
 
     try {
-      document.getElementById("status_" + i).innerText = "Uploading";
+      statusEl.className = "status";
+      statusEl.innerText = "Uploading…";
 
       const base64 = await toBase64(f);
 
@@ -52,12 +98,31 @@ async function upload() {
         body: JSON.stringify({ message: "upload", content: base64 })
       });
 
-      files.push(name);
-      document.getElementById("status_" + i).innerText = "Done";
+      // Cache a local blob URL so the thumbnail/preview shows the file
+      // immediately, before GitHub Pages rebuilds + the CDN propagates.
+      // Click the refresh icon on the thumb later to switch to the repo copy.
+      try {
+        if (localBlobs[name]) URL.revokeObjectURL(localBlobs[name]);
+        localBlobs[name] = URL.createObjectURL(f);
+      } catch (_) {}
+
+      if (!files.includes(name)) {
+        // Insert at the position where + was clicked, or append at end
+        if (typeof insertAtIndex === "number" && insertAtIndex >= 0) {
+          files.splice(insertAtIndex, 0, name);
+          insertAtIndex++;  // shift for next file in batch
+        } else {
+          files.push(name);
+        }
+      }
+      statusEl.className = "status done";
+      statusEl.innerText = "Done";
 
     } catch (e) {
-      document.getElementById("status_" + i).innerText = "Error";
+      statusEl.className = "status error";
+      statusEl.innerText = "Error: " + e.message;
     }
   }
   render();
+  insertAtIndex = -1;  // reset after upload
 }

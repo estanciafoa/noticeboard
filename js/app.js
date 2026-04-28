@@ -6,5 +6,6 @@ async function start() {
   login.style.display = "none";
   app.style.display = "block";
 
+  buildLocationPicker();
   await load();
 }

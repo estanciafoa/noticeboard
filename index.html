@@ -9,48 +9,313 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;
   background: black;
+  overflow: hidden;
+  font-family: system-ui;
 }
-.bottom-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 37px;
-    background: #000;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-    z-index: 9999;
-  }
-iframe {
+
+/* FRAME (9:16 portrait) */
+#frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: black;
+  overflow: hidden;
+}
+
+@media (max-aspect-ratio: 9/16) {
+  #frame { width: 100vw; height: calc(100vw * 16 / 9); }
+}
+@media (min-aspect-ratio: 9/16) {
+  #frame { height: 100vh; width: calc(100vh * 9 / 16); }
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+.slide.active { display: block; }
+
+.slide img,
+.slide video {
   width: 100%;
   height: 100%;
-  border: none;
+  object-fit: contain;
+  background: black;
+}
+
+/* BOTTOM BAR */
+.bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 37px;
+  background: #000;
+  color: #fff;
+  z-index: 10;
+}
+.bottom-bar .label {
+  position: absolute;
+  font-size: 6px;
+  font-style: italic;
+  right: 4px;
+  top: 26px;
+}
+.bottom-bar img {
+  height: 80px;
+  position: absolute;
+  right: 3px;
+  top: -26px;
+}
+
+/* EMPTY STATE */
+#empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 18px;
 }
 </style>
-
-<script>
-// reload whole page every 5 minutes (300000 ms)
-setInterval(function() {
-  location.reload();
-}, 1800000);
-</script>
-
 </head>
 
 <body>
 
-<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTHc0WY_flII6hDu21n6FimAeugp-nPCm5-4JULvAWnE4kkjarVKncd7wiB_V23EqJb1g0b-rfqbCuE/pubembed?start=true&loop=true&delayms=10000" frameborder="0" width="1224" height="1613" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
-<div class="bottom-bar" style="text-align: right;">
-  <div style="position:absolute;font-size: 6px;font-style: italic;right: 0px;top: 26px;">Flat Owners Association</div>
-  <img src="images/estancialogo.png" style="height: 80px;position: absolute;right: 3px;top: -26px;">
+<div id="frame">
+  <div id="empty">Loading…</div>
+  <div class="bottom-bar">
+    <div class="label">Flat Owners Association</div>
+    <img src="images/estancialogo.png" alt="Estancia">
+  </div>
 </div>
+
+<script>
+const repoOwner = "estanciafoa";
+const repoName  = "noticeboard";
+
+const DEFAULT_DURATION_MS = 10000;
+const RELOAD_INTERVAL_MS  = 5 * 60 * 1000;   // full reload every 5 min to pick up new slides
+const REBUILD_INTERVAL_MS = 60 * 1000;       // re-evaluate visibility rules every minute
+
+let slides   = [];
+let elements = [];
+let index    = 0;
+let timer    = null;
+
+/* TOWER FILTER — read from ?t= in URL */
+const towerParamRaw = new URLSearchParams(location.search).get("t");
+
+// Legacy/compat mapping:
+// - ?t=1  => tower 1 (matches t1c1, t1c2)
+// - ?t=t1 => tower 1 (matches t1c1, t1c2)
+// - ?t=t1c1 => exact core
+function normalizeTowerParam(raw) {
+  if (!raw) return "";
+  const v = String(raw).trim().toLowerCase();
+  if (/^\d+$/.test(v)) return `t${v}`;
+  if (/^t\d+$/.test(v)) return v;
+  if (/^t\d+c\d+$/.test(v)) return v;
+  return v;
+}
+
+const towerParam = normalizeTowerParam(towerParamRaw);
+
+// For legacy config lines that don't include the towers field yet
+const LEGACY_DEFAULT_TOWERS = [
+  "t1c1", "t1c2", "t2c1", "t2c2", "t3c1", "t3c2", "t4c1", "t4c2", "t5c1", "t5c2", "club"
+].join(",");
+
+/* LOAD CONFIG */
+async function load() {
+  try {
+    const res  = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt?t=${Date.now()}`);
+    const text = await res.text();
+
+    slides = [];
+    let defaultDuration = DEFAULT_DURATION_MS;
+    let inSlides = false;
+
+    text.split("\n").forEach(line => {
+      line = line.trim();
+      if (!line || line.startsWith("#")) return;
+
+      if (line.toLowerCase() === "slides:") { inSlides = true; return; }
+
+      const p = line.split("|").map(x => x.trim());
+
+      if (!inSlides) {
+        // header section: e.g. "default | 10"
+        if (p[0].toLowerCase() === "default" && p[1]) {
+          defaultDuration = Number(p[1]) * 1000;
+        }
+        return;
+      }
+
+      slides.push({
+        name: p[0],
+        duration: p[1] && !isNaN(Number(p[1])) ? Number(p[1]) * 1000 : defaultDuration,
+        start: p[2] || null,
+        end: p[3] || null,
+        startDate: p[4] || null,
+        endDate: p[5] || null,
+        expiry: p[6] || null,
+        // Backward compatibility:
+        // - No towers column (old config) => default to all except gate
+        // - Explicit empty towers column => disabled
+        towers: (p.length >= 8) ? (p[7] || "") : LEGACY_DEFAULT_TOWERS
+      });
+    });
+
+    build();
+  } catch (e) {
+    console.error("Failed to load config:", e);
+    document.getElementById("empty").innerText = "Failed to load slides";
+  }
+}
+
+/* VISIBILITY RULES */
+function isVisible(s) {
+  const now = new Date();
+
+  // tower/core filter: no towers assigned = disabled (hidden everywhere)
+  if (!s.towers) return false;
+  if (towerParam) {
+    const assigned = s.towers.split(",").map(t => t.trim());
+    const match = assigned.some(a => a === towerParam || a.startsWith(towerParam));
+    if (!match) return false;
+  }
+
+  // startDate must come with endDate or expiry, else skip
+  if (s.startDate && !s.endDate && !s.expiry) return false;
+
+  if (s.startDate) {
+    const sd = new Date(s.startDate);
+    if (now < sd) return false;
+    if (s.expiry) {
+      const dur = parseExpiry(s.expiry);
+      if (now - sd > dur) return false;
+    }
+  }
+
+  if (s.endDate) {
+    const ed = new Date(s.endDate);
+    ed.setHours(23, 59, 59, 999);
+    if (now > ed) return false;
+  }
+
+  if (s.start && s.end) {
+    const current = now.getHours() * 60 + now.getMinutes();
+    const [sh, sm] = s.start.split(":").map(Number);
+    const [eh, em] = s.end.split(":").map(Number);
+    if (!(current >= sh * 60 + sm && current <= eh * 60 + em)) return false;
+  }
+
+  return true;
+}
+
+function parseExpiry(exp) {
+  const n = parseInt(exp, 10);
+  if (isNaN(n)) return 0;
+  if (/h/i.test(exp)) return n * 3600000;
+  if (/d/i.test(exp)) return n * 86400000;
+  if (/m/i.test(exp)) return n * 60000;
+  return n * 1000;
+}
+
+function isVideo(name) {
+  return /\.(mp4|webm|ogg|mov|m4v)$/i.test(name);
+}
+
+/* BUILD ELEMENTS */
+function build() {
+  const frame = document.getElementById("frame");
+
+  frame.querySelectorAll(".slide").forEach(el => el.remove());
+  elements = [];
+
+  const visible = slides.filter(isVisible);
+  document.getElementById("empty").style.display = visible.length ? "none" : "flex";
+
+  visible.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "slide";
+    div.dataset.duration = s.duration;
+
+    const url = `https://${repoOwner}.github.io/${repoName}/slides/${encodeURIComponent(s.name)}?t=${Date.now()}`;
+
+    if (isVideo(s.name)) {
+      const video = document.createElement("video");
+      video.src = url;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "auto";
+      video.onended = next;
+      div.appendChild(video);
+    } else {
+      const img = document.createElement("img");
+      img.src = url;
+      div.appendChild(img);
+    }
+
+    frame.appendChild(div);
+    elements.push(div);
+  });
+
+  index = 0;
+  show(index);
+}
+
+/* SHOW SLIDE */
+function show(i) {
+  if (timer) { clearTimeout(timer); timer = null; }
+  if (!elements.length) return;
+
+  elements.forEach(e => {
+    e.classList.remove("active");
+    const v = e.querySelector("video");
+    if (v) { try { v.pause(); v.currentTime = 0; } catch (_) {} }
+  });
+
+  const el = elements[i];
+  el.classList.add("active");
+
+  const video = el.querySelector("video");
+  if (video) {
+    const p = video.play();
+    if (p && p.catch) p.catch(() => {
+      // autoplay rejected — fall back to timer
+      timer = setTimeout(next, DEFAULT_DURATION_MS);
+    });
+  } else {
+    timer = setTimeout(next, Number(el.dataset.duration) || DEFAULT_DURATION_MS);
+  }
+}
+
+function next() {
+  index = (index + 1) % elements.length;
+  show(index);
+}
+
+/* PERIODIC REBUILD (re-evaluate time-based visibility) */
+setInterval(() => {
+  const currentNames = elements
+    .map(el => el.querySelector("img,video")?.src.split("/").pop().split("?")[0])
+    .join("|");
+  const visibleNames = slides.filter(isVisible).map(s => encodeURIComponent(s.name)).join("|");
+  if (currentNames !== visibleNames) build();
+}, REBUILD_INTERVAL_MS);
+
+/* PERIODIC FULL RELOAD (pick up new uploads / config edits) */
+setInterval(() => location.reload(), RELOAD_INTERVAL_MS);
+
+/* INIT */
+load();
+</script>
 
 </body>
 </html>

@@ -172,10 +172,14 @@ function createMedia(name, { muted = true, controls = false } = {}) {
   if (isVideo(name)) {
     const video = document.createElement("video");
     video.src = url;
+    video.autoplay = true;
     video.muted = muted;
+    video.defaultMuted = !!muted;
     video.loop = true;
     video.playsInline = true;
-    video.autoplay = true;
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    if (muted) video.setAttribute("muted", "");
     video.onerror = () => {
       if (video.dataset.fallbackApplied) return;
       video.dataset.fallbackApplied = "1";

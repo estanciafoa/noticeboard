@@ -280,8 +280,13 @@ function build() {
     if (isVideo(s.name)) {
       const video = document.createElement("video");
       video.src = urls.primary;
+      video.autoplay = true;
       video.muted = true;
+      video.defaultMuted = true;
       video.playsInline = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
       video.preload = "auto";
       video.onended = next;
       video.onerror = () => {
@@ -327,9 +332,21 @@ function show(i) {
 
   const video = el.querySelector("video");
   if (video) {
+    const tryPlay = () => {
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {
+        timer = setTimeout(next, DEFAULT_DURATION_MS);
+      });
+    };
+
     const p = video.play();
     if (p && p.catch) p.catch(() => {
-      // autoplay rejected — fall back to timer
+      // Some embedded browsers reject early play() before media is ready.
+      const onReady = () => {
+        video.removeEventListener("canplay", onReady);
+        tryPlay();
+      };
+      video.addEventListener("canplay", onReady, { once: true });
       timer = setTimeout(next, DEFAULT_DURATION_MS);
     });
   } else {

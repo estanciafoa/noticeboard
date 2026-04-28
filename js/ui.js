@@ -171,7 +171,6 @@ function createMedia(name, { muted = true, controls = false } = {}) {
   const fallback = fallbackMediaUrl(name);
   if (isVideo(name)) {
     const video = document.createElement("video");
-    video.src = url;
     video.autoplay = true;
     video.muted = muted;
     video.defaultMuted = !!muted;
@@ -180,13 +179,29 @@ function createMedia(name, { muted = true, controls = false } = {}) {
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
     if (muted) video.setAttribute("muted", "");
-    video.onerror = () => {
+
+    const applyFallback = () => {
       if (video.dataset.fallbackApplied) return;
       video.dataset.fallbackApplied = "1";
       video.src = fallback;
+      video.load();
       const p = video.play();
       if (p && p.catch) p.catch(() => {});
     };
+    video.onerror = applyFallback;
+
+    // ORB/CORS blocks may not fire onerror; detect via stall timeout
+    let stallTimer = setTimeout(() => {
+      if (video.readyState === 0) applyFallback();
+    }, 4000);
+    video.onloadeddata = () => clearTimeout(stallTimer);
+
+    const source = document.createElement("source");
+    source.src = url;
+    source.type = "video/mp4";
+    source.onerror = applyFallback;
+    video.appendChild(source);
+
     if (controls) video.controls = true;
     return video;
   }

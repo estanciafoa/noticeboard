@@ -4,4 +4,3 @@ slides:
 gardening1april.png | 5
 firemockdrill.png | 3
 slide1.jpeg | 10
-IMG_4230.JPG | 5

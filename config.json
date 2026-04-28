@@ -16,77 +16,37 @@
       "startDate": "",
       "endDate": "",
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2"
     },
     {
       "name": "gardening1april.png",
-      "duration": "",
+      "duration": "10",
       "start": "",
       "end": "",
       "startDate": "",
       "endDate": "",
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2"
     },
     {
       "name": "slide1.jpeg",
-      "duration": "",
+      "duration": "10",
       "start": "",
       "end": "",
       "startDate": "",
       "endDate": "",
       "expiry": "",
-      "towers": "gate"
+      "towers": "t1c1,t1c2,t2c1,t2c2"
     },
     {
       "name": "minion.jpg",
-      "duration": "",
+      "duration": "10",
       "start": "",
       "end": "",
       "startDate": "",
       "endDate": "",
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
-    },
-    {
-      "name": "todel1.png",
-      "duration": "",
-      "start": "",
-      "end": "",
-      "startDate": "",
-      "endDate": "",
-      "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
-    },
-    {
-      "name": "todel2.png",
-      "duration": "",
-      "start": "",
-      "end": "",
-      "startDate": "",
-      "endDate": "",
-      "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
-    },
-    {
-      "name": "todel3.png",
-      "duration": "",
-      "start": "",
-      "end": "",
-      "startDate": "",
-      "endDate": "",
-      "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
-    },
-    {
-      "name": "todel4.png",
-      "duration": "",
-      "start": "",
-      "end": "",
-      "startDate": "",
-      "endDate": "",
-      "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2"
     }
   ]
 }

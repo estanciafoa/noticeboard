@@ -1,5 +1,5 @@
-const repoOwner = "saravanansengamalan";
-const repoName = "estancianoticeboard";
+const repoOwner = "estanciafoa";
+const repoName = "noticeboard";
 
 let token = "";
 

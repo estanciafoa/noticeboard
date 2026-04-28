@@ -1,0 +1,130 @@
+body { 
+  margin: 0; 
+  font-family: system-ui; 
+  background: #eef1f5; 
+}
+
+/* LOGIN */
+#login { 
+  position: fixed; 
+  inset: 0; 
+  background: #111; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+}
+
+#loginBox { 
+  background: white; 
+  padding: 30px; 
+  border-radius: 10px; 
+}
+
+/* TOP */
+.topbar { 
+  background: white; 
+  padding: 10px; 
+  border-bottom: 1px solid #ddd; 
+}
+
+/* LAYOUT */
+.container { 
+  display: flex; 
+  height: calc(100vh - 60px); 
+}
+
+/* LEFT */
+.left { 
+  width: 180px; 
+  overflow-y: auto; 
+  padding: 10px; 
+}
+
+.thumb {
+  width: 100%; 
+  aspect-ratio: 9/16; 
+  margin-bottom: 10px;
+  border-radius: 8px; 
+  overflow: hidden; 
+  border: 3px solid transparent;
+  cursor: grab;
+}
+
+.thumb.active { 
+  border: 3px solid #2563eb; 
+}
+
+.thumb img, .thumb video { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+
+/* CENTER */
+.center { 
+  flex: 1; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+}
+
+.tv {
+  height: 90%; 
+  aspect-ratio: 9/16;
+  background: black; 
+  border: 12px solid #222;
+  border-radius: 20px; 
+  overflow: hidden;
+}
+
+.screen img, .screen video { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: contain; 
+}
+
+/* RIGHT */
+.right { 
+  width: 280px; 
+  background: white; 
+  padding: 15px; 
+  border-left: 1px solid #ddd; 
+}
+
+.field { 
+  margin-bottom: 10px; 
+}
+
+input { 
+  width: 100%; 
+  padding: 6px; 
+}
+
+/* UPLOAD */
+#uploadPreview { 
+  display: flex; 
+  gap: 10px; 
+  padding: 10px; 
+  overflow-x: auto; 
+}
+
+.previewCard { 
+  width: 100px; 
+}
+
+.previewCard img, .previewCard video { 
+  width: 100%; 
+  aspect-ratio: 9/16; 
+  object-fit: cover; 
+}
+
+button { 
+  padding: 8px; 
+  margin-top: 5px; 
+}
+
+.deleteBtn { 
+  background: #dc2626; 
+  color: white; 
+  width: 100%; 
+}

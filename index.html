@@ -238,6 +238,15 @@ function isVideo(name) {
   return /\.(mp4|webm|ogg|mov|m4v)$/i.test(name);
 }
 
+function mediaUrls(name) {
+  const bust = Date.now();
+  const enc = encodeURIComponent(name);
+  return {
+    primary: `https://${repoOwner}.github.io/${repoName}/slides/${enc}?t=${bust}`,
+    fallback: `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${enc}?t=${bust}`
+  };
+}
+
 /* BUILD ELEMENTS */
 function build() {
   const frame = document.getElementById("frame");
@@ -266,19 +275,31 @@ function build() {
     div.className = "slide";
     div.dataset.duration = s.duration;
 
-    const url = `https://${repoOwner}.github.io/${repoName}/slides/${encodeURIComponent(s.name)}?t=${Date.now()}`;
+    const urls = mediaUrls(s.name);
 
     if (isVideo(s.name)) {
       const video = document.createElement("video");
-      video.src = url;
+      video.src = urls.primary;
       video.muted = true;
       video.playsInline = true;
       video.preload = "auto";
       video.onended = next;
+      video.onerror = () => {
+        if (video.dataset.fallbackApplied) return;
+        video.dataset.fallbackApplied = "1";
+        video.src = urls.fallback;
+        const p = video.play();
+        if (p && p.catch) p.catch(() => {});
+      };
       div.appendChild(video);
     } else {
       const img = document.createElement("img");
-      img.src = url;
+      img.src = urls.primary;
+      img.onerror = () => {
+        if (img.dataset.fallbackApplied) return;
+        img.dataset.fallbackApplied = "1";
+        img.src = urls.fallback;
+      };
       div.appendChild(img);
     }
 

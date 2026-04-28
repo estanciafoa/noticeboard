@@ -160,9 +160,15 @@ function mediaUrl(name) {
   return bust ? `${base}?t=${bust}` : base;
 }
 
+function fallbackMediaUrl(name) {
+  const bust = cacheBust[name] || Date.now();
+  return `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${encodeURIComponent(name)}?t=${bust}`;
+}
+
 /* CREATE MEDIA ELEMENT (img or video) */
 function createMedia(name, { muted = true, controls = false } = {}) {
   const url = mediaUrl(name);
+  const fallback = fallbackMediaUrl(name);
   if (isVideo(name)) {
     const video = document.createElement("video");
     video.src = url;
@@ -170,11 +176,23 @@ function createMedia(name, { muted = true, controls = false } = {}) {
     video.loop = true;
     video.playsInline = true;
     video.autoplay = true;
+    video.onerror = () => {
+      if (video.dataset.fallbackApplied) return;
+      video.dataset.fallbackApplied = "1";
+      video.src = fallback;
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {});
+    };
     if (controls) video.controls = true;
     return video;
   }
   const img = document.createElement("img");
   img.src = url;
+  img.onerror = () => {
+    if (img.dataset.fallbackApplied) return;
+    img.dataset.fallbackApplied = "1";
+    img.src = fallback;
+  };
   return img;
 }
 

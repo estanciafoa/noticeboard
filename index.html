@@ -34,9 +34,26 @@ html, body {
 .slide {
   position: absolute;
   inset: 0;
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-ms, 700ms) ease, transform var(--transition-ms, 700ms) ease;
 }
-.slide.active { display: block; }
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#frame.effect-cut .slide {
+  transition: none;
+}
+
+#frame.effect-zoom .slide {
+  transform: scale(1.03);
+}
+
+#frame.effect-zoom .slide.active {
+  transform: scale(1);
+}
 
 .slide img,
 .slide video {
@@ -106,6 +123,9 @@ let slides   = [];
 let elements = [];
 let index    = 0;
 let timer    = null;
+let transitionEffect = "fade";
+let transitionMs = 700;
+let emergency = { enabled: false, slide: "", towers: "" };
 
 /* TOWER FILTER — read from ?t= in URL */
 const towerParamRaw = new URLSearchParams(location.search).get("t");
@@ -133,14 +153,21 @@ async function load() {
 
     const data = await resJson.json();
     const defaultDuration = Number(data.defaultDuration) > 0 ? Number(data.defaultDuration) * 1000 : DEFAULT_DURATION_MS;
+    transitionEffect = data.transitionEffect || "fade";
+    transitionMs = Number(data.transitionMs) > 0 ? Number(data.transitionMs) : 700;
+    emergency = {
+      enabled: !!data.emergency?.enabled,
+      slide: data.emergency?.slide || "",
+      towers: data.emergency?.towers || ""
+    };
 
     slides = (Array.isArray(data.slides) ? data.slides : []).map(s => ({
       name: s.name,
       duration: s.duration && !isNaN(Number(s.duration)) ? Number(s.duration) * 1000 : defaultDuration,
-      start: s.start || null,
-      end: s.end || null,
-      startDate: s.startDate || null,
-      endDate: s.endDate || null,
+      times: Array.isArray(s.times) ? s.times
+           : (s.start && s.end ? [{start: s.start, end: s.end}] : []),
+      dates: Array.isArray(s.dates) ? s.dates
+           : (s.startDate ? [{startDate: s.startDate, endDate: s.endDate || ""}] : []),
       expiry: s.expiry || null,
       towers: s.towers || ""
     })).filter(s => !!s.name);
@@ -164,29 +191,35 @@ function isVisible(s) {
     if (!match) return false;
   }
 
-  // startDate must come with endDate or expiry, else skip
-  if (s.startDate && !s.endDate && !s.expiry) return false;
+  // startDate must come with endDate or expiry, else skip (legacy compat)
+  // Now use times[] and dates[] arrays with OR logic
 
-  if (s.startDate) {
-    const sd = new Date(s.startDate);
-    if (now < sd) return false;
-    if (s.expiry) {
-      const dur = parseExpiry(s.expiry);
-      if (now - sd > dur) return false;
-    }
-  }
-
-  if (s.endDate) {
-    const ed = new Date(s.endDate);
-    ed.setHours(23, 59, 59, 999);
-    if (now > ed) return false;
-  }
-
-  if (s.start && s.end) {
+  // Time slots: if any defined, NOW must fall inside at least one
+  if (s.times && s.times.length > 0) {
     const current = now.getHours() * 60 + now.getMinutes();
-    const [sh, sm] = s.start.split(":").map(Number);
-    const [eh, em] = s.end.split(":").map(Number);
-    if (!(current >= sh * 60 + sm && current <= eh * 60 + em)) return false;
+    const inAnySlot = s.times.some(t => {
+      if (!t.start || !t.end) return true;
+      const [sh, sm] = t.start.split(":").map(Number);
+      const [eh, em] = t.end.split(":").map(Number);
+      return current >= sh * 60 + sm && current <= eh * 60 + em;
+    });
+    if (!inAnySlot) return false;
+  }
+
+  // Date ranges: if any defined, NOW must fall inside at least one
+  if (s.dates && s.dates.length > 0) {
+    const inAnyRange = s.dates.some(d => {
+      if (!d.startDate) return true;
+      const sd = new Date(d.startDate);
+      if (now < sd) return false;
+      if (d.endDate) {
+        const ed = new Date(d.endDate);
+        ed.setHours(23, 59, 59, 999);
+        if (now > ed) return false;
+      }
+      return true;
+    });
+    if (!inAnyRange) return false;
   }
 
   return true;
@@ -208,11 +241,24 @@ function isVideo(name) {
 /* BUILD ELEMENTS */
 function build() {
   const frame = document.getElementById("frame");
+  frame.style.setProperty("--transition-ms", `${transitionMs}ms`);
+  frame.classList.remove("effect-cut", "effect-fade", "effect-zoom");
+  frame.classList.add(`effect-${transitionEffect}`);
 
   frame.querySelectorAll(".slide").forEach(el => el.remove());
   elements = [];
 
-  const visible = slides.filter(isVisible);
+  let visible = slides.filter(isVisible);
+
+  // Emergency override: if enabled and applicable to this display, play only that slide.
+  if (emergency.enabled && emergency.slide) {
+    const emTowers = (emergency.towers || "").split(",").filter(Boolean);
+    const applies = !towerParam || emTowers.some(a => a === towerParam || a.startsWith(towerParam));
+    if (applies) {
+      const em = slides.find(s => s.name === emergency.slide);
+      if (em) visible = [em];
+    }
+  }
   document.getElementById("empty").style.display = visible.length ? "none" : "flex";
 
   visible.forEach(s => {

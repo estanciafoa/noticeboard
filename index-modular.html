@@ -29,11 +29,32 @@
   <div class="topbar">
     <div class="topbar-left">
       <button onclick="insertAtIndex=-1; fileInput.click()">Upload</button>
+      <button onclick="insertAtIndex=-1; bulkFileInput.click()">Bulk Upload</button>
       <button onclick="saveConfig()">Save</button>
+    </div>
+    <div class="topbar-mid">
+      <label for="thumbFilter">Filter</label>
+      <select id="thumbFilter">
+        <option value="all">All</option>
+        <option value="__disabled">Disabled</option>
+      </select>
+
+      <label for="transitionEffect">Transition</label>
+      <select id="transitionEffect">
+        <option value="cut">Cut</option>
+        <option value="fade" selected>Fade</option>
+        <option value="zoom">Zoom</option>
+      </select>
+    </div>
+    <div class="topbar-right emergency-controls">
+      <button class="danger-lite" onclick="activateEmergencyFromSelected()">Emergency ON</button>
+      <button onclick="clearEmergencyOverride()">Emergency OFF</button>
+      <span id="emergencyStatus">Emergency: OFF</span>
     </div>
   </div>
 
-  <input type="file" id="fileInput" multiple style="display:none">
+  <input type="file" id="fileInput" style="display:none">
+  <input type="file" id="bulkFileInput" multiple style="display:none">
 
   <!-- UPLOAD PREVIEW MODAL -->
   <div id="uploadModal" class="modal" style="display:none">
@@ -76,13 +97,27 @@
       </div>
     </div>
     <div class="right">
+      <div id="multiSelectBar" style="display:none" class="multi-select-bar">
+        <span class="multi-count"></span>
+        <button class="primary" onclick="applyToMultiSelected()">Apply to all</button>
+        <button onclick="multiSelected.clear(); updateMultiSelectBar(); render()">Clear</button>
+      </div>
       <h3 id="titleEl">Slide</h3>
 
       <div class="field"><label>Duration</label><input id="duration" placeholder="seconds (e.g. 10)"></div>
-      <div class="field"><label>Start time</label><input type="time" id="startTime"></div>
-      <div class="field"><label>End time</label><input type="time" id="endTime"></div>
-      <div class="field"><label>Start date</label><input type="date" id="startDate"></div>
-      <div class="field"><label>End date</label><input type="date" id="endDate"></div>
+
+      <div class="field">
+        <label>Time slots</label>
+        <div id="timeSlotsContainer" class="slots-container"></div>
+        <button class="slot-add-btn" type="button" onclick="addTimeSlot()">+ Add time slot</button>
+      </div>
+
+      <div class="field">
+        <label>Date ranges</label>
+        <div id="dateRangesContainer" class="slots-container"></div>
+        <button class="slot-add-btn" type="button" onclick="addDateRange()">+ Add date range</button>
+      </div>
+
       <div class="field"><label>Expiry</label><input id="expiry" placeholder="e.g. 2h, 7d"></div>
 
       <div class="field location-field">

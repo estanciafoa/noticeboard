@@ -8,4 +8,6 @@ async function start() {
 
   buildLocationPicker();
   await load();
+  buildThumbFilterOptions();
+  applyTopbarSettingsFromConfig();
 }

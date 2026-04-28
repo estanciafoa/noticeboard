@@ -1,8 +1,8 @@
 let newFiles = [];
 
 /* FILE PICKER → SHOW MODAL WITH PREVIEW */
-fileInput.onchange = e => {
-  newFiles = [...e.target.files];
+function handlePickedFiles(fileList) {
+  newFiles = [...fileList];
   if (!newFiles.length) return;
 
   uploadPreview.innerHTML = "";
@@ -38,8 +38,18 @@ fileInput.onchange = e => {
 
   // Reset the file input so picking the same file again retriggers onchange
   fileInput.value = "";
+  if (typeof bulkFileInput !== "undefined") bulkFileInput.value = "";
 
   openUploadModal();
+}
+
+fileInput.onchange = e => {
+  handlePickedFiles(e.target.files);
+};
+
+bulkFileInput.onchange = e => {
+  insertAtIndex = -1; // bulk upload always appends at the end
+  handlePickedFiles(e.target.files);
 };
 
 /* MODAL CONTROLS */

@@ -108,6 +108,51 @@ body {
   gap: 10px;
 }
 
+.topbar-mid,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-mid label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.topbar select {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.topbar-right #emergencyStatus {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 130px;
+}
+
+.topbar-right #emergencyStatus.on {
+  color: #fb7185;
+  font-weight: 700;
+}
+
+.topbar button.danger-lite {
+  border-color: rgba(244, 63, 94, 0.5);
+  color: #fda4af;
+}
+
+.topbar button.danger-lite:hover {
+  background: rgba(244, 63, 94, 0.15);
+  border-color: #f43f5e;
+  color: #fecdd3;
+}
+
 .topbar button {
   margin: 0;
   padding: 8px 18px;
@@ -166,6 +211,29 @@ body {
 .thumb.active {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent), 0 0 16px rgba(34, 211, 238, 0.4);
+}
+
+.thumb.multi-selected {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 1px #a78bfa, 0 0 12px rgba(167, 139, 250, 0.35);
+}
+
+/* MULTI-SELECT BAR */
+.multi-select-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e1b3a;
+  border: 1px solid #a78bfa;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #c4b5fd;
+}
+.multi-select-bar .multi-count {
+  flex: 1;
+  font-weight: 600;
 }
 
 .thumb img, .thumb video { 
@@ -551,6 +619,59 @@ body {
   color: var(--muted);
   text-transform: uppercase;
 }
+
+/* MULTI-SLOT ROWS */
+.slots-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.slot-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slot-input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+}
+
+.slot-sep {
+  color: var(--muted);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.slot-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.slot-remove:hover { color: #f87171; background: rgba(248,113,113,0.12); }
+
+.slot-add-btn {
+  background: none;
+  border: 1px dashed var(--line);
+  color: var(--accent);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 2px;
+}
+.slot-add-btn:hover { background: rgba(34,211,238,0.08); }
 
 input[type="text"],
 input:not([type]),

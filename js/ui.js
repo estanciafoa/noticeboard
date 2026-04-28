@@ -1,5 +1,7 @@
 let selected = null;
+let multiSelected = new Set();
 let dragIndex;
+let thumbFilterValue = "all";
 
 /* Local blob URLs for just-uploaded files (used until GitHub Pages catches up) */
 const localBlobs = {};        // { fileName: blobUrl }
@@ -44,6 +46,91 @@ function buildLocationPicker() {
     label.appendChild(document.createTextNode(loc.label));
     picker.appendChild(label);
   });
+}
+
+/* BUILD THUMB FILTER OPTIONS */
+function buildThumbFilterOptions() {
+  const sel = document.getElementById("thumbFilter");
+  if (!sel) return;
+
+  // Preserve first two static options (All + Disabled)
+  const staticOptions = [
+    `<option value="all">All</option>`,
+    `<option value="__disabled">Disabled</option>`
+  ];
+
+  const locOptions = LOCATIONS.map(loc => `<option value="${loc.id}">${loc.label}</option>`);
+  sel.innerHTML = staticOptions.concat(locOptions).join("");
+  sel.value = thumbFilterValue;
+  sel.onchange = () => {
+    thumbFilterValue = sel.value;
+    render();
+  };
+}
+
+/* INIT TOPBAR SETTINGS FROM appConfig */
+function applyTopbarSettingsFromConfig() {
+  const transitionSel = document.getElementById("transitionEffect");
+  if (transitionSel) {
+    transitionSel.value = appConfig.transitionEffect || "fade";
+    transitionSel.onchange = () => {
+      appConfig.transitionEffect = transitionSel.value;
+    };
+  }
+
+  updateEmergencyStatus();
+}
+
+function updateEmergencyStatus() {
+  const status = document.getElementById("emergencyStatus");
+  if (!status) return;
+  const e = appConfig.emergency || { enabled: false, slide: "" };
+  status.textContent = e.enabled ? `Emergency: ON (${e.slide || "Unknown"})` : "Emergency: OFF";
+  status.className = e.enabled ? "on" : "";
+}
+
+async function activateEmergencyFromSelected() {
+  if (!selected) {
+    alert("Select a slide first.");
+    return;
+  }
+
+  appConfig.emergency = {
+    enabled: true,
+    slide: selected,
+    towers: (config[selected]?.towers || defaultTowers())
+  };
+
+  updateEmergencyStatus();
+  try {
+    await saveConfig({ silent: true });
+  } catch (e) {
+    alert("Failed to enable emergency override: " + e.message);
+  }
+}
+
+async function clearEmergencyOverride() {
+  appConfig.emergency = {
+    enabled: false,
+    slide: "",
+    towers: ""
+  };
+
+  updateEmergencyStatus();
+  try {
+    await saveConfig({ silent: true });
+  } catch (e) {
+    alert("Failed to clear emergency override: " + e.message);
+  }
+}
+
+function matchesThumbFilter(name) {
+  if (thumbFilterValue === "all") return true;
+  if (thumbFilterValue === "__disabled") return !config[name];
+
+  const towers = config[name]?.towers || "";
+  if (!towers) return false;
+  return towers.split(",").includes(thumbFilterValue);
 }
 
 /* SELECT / CLEAR ALL LOCATIONS */
@@ -101,13 +188,16 @@ const ICON_REFRESH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
 function render() {
   thumbList.innerHTML = "";
 
+  const visibleFiles = files.filter(matchesThumbFilter);
+
   // leading insert button
   thumbList.appendChild(createInsertBtn(0));
 
-  files.forEach((name, i) => {
+  visibleFiles.forEach((name, i) => {
     const div = document.createElement("div");
     div.className = "thumb";
     if (name === selected) div.classList.add("active");
+    if (multiSelected.has(name)) div.classList.add("multi-selected");
     const enabledNow = !!config[name];
     if (!enabledNow) div.classList.add("disabled");
 
@@ -175,7 +265,20 @@ function render() {
       div.appendChild(tagBar);
     }
 
-    div.onclick = () => selectSlide(name);
+    div.onclick = (e) => {
+      if (e.shiftKey && selected) {
+        if (multiSelected.has(name)) {
+          multiSelected.delete(name);
+        } else {
+          multiSelected.add(name);
+        }
+        updateMultiSelectBar();
+        render();
+      } else {
+        multiSelected.clear();
+        selectSlide(name);
+      }
+    };
 
     // drag
     div.draggable = true;
@@ -215,10 +318,8 @@ async function toggleEnable(name) {
   } else {
     config[name] = {
       duration: "",
-      start: "",
-      end: "",
-      startDate: "",
-      endDate: "",
+      times: [],
+      dates: [],
       expiry: "",
       towers: defaultTowers()
     };
@@ -260,9 +361,117 @@ function reorder(i) {
   render();
 }
 
+/* TIME SLOT BUILDER */
+function buildTimeSlotsUI(name) {
+  const container = document.getElementById("timeSlotsContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  const c = config[name];
+  if (!c) return;
+  if (!c.times) c.times = [];
+  c.times.forEach((slot, i) => {
+    container.appendChild(makeSlotRow(
+      [
+        { type: "time", val: slot.start, placeholder: "Start", onchange: v => { c.times[i].start = v; } },
+        { type: "label", text: "to" },
+        { type: "time", val: slot.end, placeholder: "End", onchange: v => { c.times[i].end = v; } }
+      ],
+      () => { c.times.splice(i, 1); buildTimeSlotsUI(name); }
+    ));
+  });
+}
+
+function addTimeSlot() {
+  if (!selected || !config[selected]) return;
+  if (!config[selected].times) config[selected].times = [];
+  config[selected].times.push({ start: "", end: "" });
+  buildTimeSlotsUI(selected);
+}
+
+/* DATE RANGE BUILDER */
+function buildDateRangesUI(name) {
+  const container = document.getElementById("dateRangesContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  const c = config[name];
+  if (!c) return;
+  if (!c.dates) c.dates = [];
+  c.dates.forEach((range, i) => {
+    container.appendChild(makeSlotRow(
+      [
+        { type: "date", val: range.startDate, placeholder: "Start date", onchange: v => { c.dates[i].startDate = v; } },
+        { type: "label", text: "–" },
+        { type: "date", val: range.endDate, placeholder: "End date", onchange: v => { c.dates[i].endDate = v; } }
+      ],
+      () => { c.dates.splice(i, 1); buildDateRangesUI(name); }
+    ));
+  });
+}
+
+function addDateRange() {
+  if (!selected || !config[selected]) return;
+  if (!config[selected].dates) config[selected].dates = [];
+  config[selected].dates.push({ startDate: "", endDate: "" });
+  buildDateRangesUI(selected);
+}
+
+/* BUILD A SLOT ROW from a field spec array */
+function makeSlotRow(fields, onRemove) {
+  const row = document.createElement("div");
+  row.className = "slot-row";
+  fields.forEach(f => {
+    if (f.type === "label") {
+      const span = document.createElement("span");
+      span.className = "slot-sep";
+      span.textContent = f.text;
+      row.appendChild(span);
+    } else {
+      const inp = document.createElement("input");
+      inp.type = f.type;
+      inp.value = f.val || "";
+      inp.className = "slot-input";
+      inp.onchange = () => f.onchange(inp.value);
+      row.appendChild(inp);
+    }
+  });
+  const del = document.createElement("button");
+  del.type = "button";
+  del.className = "slot-remove";
+  del.textContent = "×";
+  del.title = "Remove";
+  del.onclick = onRemove;
+  row.appendChild(del);
+  return row;
+}
+
+/* UPDATE MULTI-SELECT BAR */
+function updateMultiSelectBar() {
+  const bar = document.getElementById("multiSelectBar");
+  if (!bar) return;
+  if (multiSelected.size >= 2) {
+    bar.style.display = "";
+    bar.querySelector(".multi-count").textContent = `${multiSelected.size} slides selected`;
+  } else {
+    bar.style.display = "none";
+  }
+}
+
+/* APPLY SETTINGS TO ALL MULTI-SELECTED SLIDES */
+function applyToMultiSelected() {
+  if (multiSelected.size < 2) return;
+  const towers = [...document.querySelectorAll("#locationPicker input:checked")].map(cb => cb.value).join(",");
+  multiSelected.forEach(name => {
+    if (!config[name]) config[name] = { duration: "", times: [], dates: [], expiry: "", towers: "" };
+    if (duration.value !== "") config[name].duration = duration.value;
+    config[name].towers = towers;
+  });
+  render();
+}
+
 /* SELECT SLIDE */
 function selectSlide(name) {
   selected = name;
+  updateMultiSelectBar();
   render();
 
   screenEl.innerHTML = "";
@@ -278,11 +487,10 @@ function selectSlide(name) {
   if (counter) counter.textContent = `${idx + 1} / ${files.length}`;
 
   duration.value = c.duration || "";
-  startTime.value = c.start || "";
-  endTime.value = c.end || "";
-  startDate.value = c.startDate || "";
-  endDate.value = c.endDate || "";
   expiry.value = c.expiry || "";
+
+  buildTimeSlotsUI(name);
+  buildDateRangesUI(name);
 
   // populate location checkboxes
   const activeTowers = (c.towers || "").split(",").filter(Boolean);
@@ -299,26 +507,15 @@ function navSlide(dir) {
   selectSlide(files[next]);
 }
 
-/* UPDATE CONFIG ON INPUT */
-document.querySelectorAll(".right input").forEach(el => {
-  el.oninput = () => {
-    if (!selected) return;
-
-    if (!config[selected]) {
-      config[selected] = {};
-    }
-
-    config[selected] = {
-      duration: duration.value,
-      start: startTime.value,
-      end: endTime.value,
-      startDate: startDate.value,
-      endDate: endDate.value,
-      expiry: expiry.value,
-      towers: [...document.querySelectorAll("#locationPicker input:checked")].map(cb => cb.value).join(",")
-    };
-  };
-});
+/* UPDATE CONFIG ON INPUT (static fields) */
+duration.oninput = () => {
+  if (!selected || !config[selected]) return;
+  config[selected].duration = duration.value;
+};
+expiry.oninput = () => {
+  if (!selected || !config[selected]) return;
+  config[selected].expiry = expiry.value;
+};
 
 /* DELETE SLIDE */
 async function deleteSlide(targetName) {

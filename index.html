@@ -241,10 +241,14 @@ function isVideo(name) {
 function mediaUrls(name) {
   const bust = Date.now();
   const enc = encodeURIComponent(name);
-  return {
-    primary: `https://${repoOwner}.github.io/${repoName}/slides/${enc}?t=${bust}`,
-    fallback: `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${enc}?t=${bust}`
-  };
+  const pages = `https://${repoOwner}.github.io/${repoName}/slides/${enc}?t=${bust}`;
+  const raw   = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${enc}?t=${bust}`;
+  // Videos: prefer raw (Pages often 404s / ORB-blocks large files)
+  // Images: prefer Pages (faster CDN), fallback to raw
+  if (/\.(mp4|webm|ogg|mov|m4v)$/i.test(name)) {
+    return { primary: raw, fallback: pages };
+  }
+  return { primary: pages, fallback: raw };
 }
 
 /* BUILD ELEMENTS */

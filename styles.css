@@ -108,6 +108,21 @@ body {
   gap: 10px;
 }
 
+.upload-plus-btn.upload-plus-btn {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 14px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--bg-1);
+  border: none;
+}
+
+.upload-plus-btn.upload-plus-btn:hover {
+  background: #67e8f9;
+}
+
 .topbar-mid,
 .topbar-right {
   display: flex;
@@ -592,6 +607,27 @@ body {
   padding: 18px 18px 24px; 
   border-left: 1px solid var(--line);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.save-btn {
+  margin-top: auto;
+  padding: 10px 0;
+  width: 100%;
+  background: var(--accent);
+  color: var(--bg-1);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.save-btn:hover {
+  background: #67e8f9;
 }
 
 .right h3 {
@@ -865,6 +901,137 @@ button {
 
 .modal-close:hover {
   color: var(--text);
+}
+
+.upload-options {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-option-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-option-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-right: 6px;
+}
+
+.upload-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.upload-mode-pill input {
+  margin: 0;
+  width: auto;
+}
+
+.upload-mode-pill:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25);
+}
+
+.collage-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upload-option-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.upload-option-row label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.upload-option-row input,
+.upload-option-row select {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.collage-status {
+  grid-column: 1 / -1;
+  min-height: 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.collage-status.error {
+  color: var(--danger);
+}
+
+.collage-status.done {
+  color: #22d3ee;
+}
+
+.collage-panes {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  min-height: 0;
+}
+
+.collage-pane-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.collage-pane-right {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.collage-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.collage-preview-frame {
+  display: flex;
+  justify-content: center;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.collage-preview-frame canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
 }
 
 .modal-box #uploadPreview {

@@ -338,11 +338,11 @@ function createInsertBtn(index) {
   const btn = document.createElement("div");
   btn.className = "thumb-insert";
   const b = document.createElement("button");
-  b.title = "Upload new slide here";
+  b.title = "Upload new slide(s) here";
   b.textContent = "+";
   b.onclick = () => {
     insertAtIndex = index;
-    fileInput.click();
+    bulkFileInput.click();
   };
   btn.appendChild(b);
   return btn;

@@ -28,9 +28,7 @@
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
-      <button onclick="insertAtIndex=-1; fileInput.click()">Upload</button>
-      <button onclick="insertAtIndex=-1; bulkFileInput.click()">Bulk Upload</button>
-      <button onclick="saveConfig()">Save</button>
+      <button class="upload-plus-btn" onclick="insertAtIndex = selected ? files.indexOf(selected) + 1 : -1; bulkFileInput.click()" title="Upload slides">+</button>
     </div>
     <div class="topbar-mid">
       <label for="thumbFilter">Filter</label>
@@ -64,8 +62,59 @@
         <h3>Review uploads</h3>
         <button class="modal-close" onclick="cancelUpload()" title="Cancel">&times;</button>
       </div>
+      <div id="uploadOptions" class="upload-options" style="display:none">
+        <div class="upload-option-group">
+          <span class="upload-option-label">Bulk upload mode</span>
+          <label class="upload-mode-pill">
+            <input type="radio" name="uploadMode" value="individual" checked>
+            <span>Individual slides</span>
+          </label>
+          <label class="upload-mode-pill">
+            <input type="radio" name="uploadMode" value="collage">
+            <span>Single collage slide</span>
+          </label>
+        </div>
+
+        <div id="collagePanes" class="collage-panes" style="display:none">
+          <div class="collage-pane-left">
+            <div id="collageOptions" class="collage-options">
+              <div class="upload-option-row">
+                <label for="collageType">Collage type</label>
+                <select id="collageType">
+                  <option value="g">Gardening</option>
+                  <option value="p">Pest Control</option>
+                  <option value="h">Housekeeping</option>
+                  <option value="m">Maintenance</option>
+                  <option value="x">Generic</option>
+                </select>
+              </div>
+
+              <div id="collageTitleRow" class="upload-option-row" style="display:none">
+                <label for="collageTitle">Custom title</label>
+                <input type="text" id="collageTitle" placeholder="Enter collage title">
+              </div>
+
+              <div class="upload-option-row">
+                <label for="collageFileName">Output filename</label>
+                <input type="text" id="collageFileName" value="gardening-estancia-collage.png">
+              </div>
+
+              <div id="collageStatus" class="collage-status"></div>
+            </div>
+          </div>
+
+          <div class="collage-pane-right">
+            <div id="collagePreviewWrap" class="collage-preview-wrap">
+              <div class="collage-preview-frame">
+                <canvas id="collagePreviewCanvas"></canvas>
+              </div>
+              <button type="button" class="slot-add-btn" onclick="refreshCollagePreview()">↻ Refresh</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="uploadPreview"></div>
-      <div class="modal-footer">
+      <div class="modal-footer" id="defaultModalFooter">
         <button onclick="cancelUpload()">Cancel</button>
         <button id="uploadConfirmBtn" class="primary" onclick="confirmUpload()">Upload</button>
       </div>
@@ -125,6 +174,8 @@
         <p class="loc-hint">No locations selected = slide is disabled</p>
         <div id="locationPicker" class="location-picker"></div>
       </div>
+
+      <button class="save-btn" onclick="saveConfig()">Save</button>
     </div>
 
   </div>

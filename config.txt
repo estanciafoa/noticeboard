@@ -1,7 +1,7 @@
 default | 10
 
 slides:
-gardening1april.png
+gardening1april.png | 5
 firemockdrill.png | 3
 video.mp4
 slide1.jpeg | 10

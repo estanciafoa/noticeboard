@@ -1,0 +1,45 @@
+{
+  "defaultDuration": 3,
+  "slides": [
+    {
+      "name": "firemockdrill.png",
+      "duration": "10",
+      "start": "19:55",
+      "end": "19:56",
+      "startDate": "",
+      "endDate": "",
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "gardening1april.png",
+      "duration": "",
+      "start": "",
+      "end": "",
+      "startDate": "",
+      "endDate": "",
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "video.mp4",
+      "duration": "auto",
+      "start": "",
+      "end": "",
+      "startDate": "",
+      "endDate": "",
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "slide1.jpeg",
+      "duration": "",
+      "start": "",
+      "end": "",
+      "startDate": "",
+      "endDate": "",
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    }
+  ]
+}

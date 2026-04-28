@@ -208,7 +208,7 @@ function createInsertBtn(index) {
   return btn;
 }
 
-/* TOGGLE ENABLED — disabling removes from config.txt; file stays in slides/ */
+/* TOGGLE ENABLED — disabling removes from config.json; file stays in slides/ */
 async function toggleEnable(name) {
   if (config[name]) {
     delete config[name];
@@ -234,7 +234,7 @@ async function toggleEnable(name) {
   try {
     await saveConfig({ silent: true });
   } catch (e) {
-    alert("Failed to update config.txt: " + e.message);
+    alert("Failed to update config.json: " + e.message);
   }
 }
 
@@ -325,7 +325,7 @@ async function deleteSlide(targetName) {
   const name = targetName || selected;
   if (!name) return;
 
-  if (!confirm(`Delete "${name}"?\n\nThis will remove the file from the repo and update config.txt.`)) {
+  if (!confirm(`Delete "${name}"?\n\nThis will remove the file from the repo and update config.json.`)) {
     return;
   }
 
@@ -362,7 +362,7 @@ async function deleteSlide(targetName) {
     }
     render();
 
-    // Persist config.txt so the deleted slide isn't resurrected on next load
+    // Persist config.json so the deleted slide isn't resurrected on next load
     await saveConfig({ silent: true });
 
   } catch (e) {

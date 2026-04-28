@@ -17,44 +17,35 @@ const LOCATIONS = [
   { id: "gate", label: "Main Gate",      short: "GATE" }
 ];
 
-const LEGACY_DEFAULT_TOWERS = LOCATIONS
-  .filter(l => l.id !== "gate")
-  .map(l => l.id)
-  .join(",");
+const DEFAULT_DURATION_SECONDS = 10;
 
 /* LOAD CONFIG */
 async function load() {
-  // config
-  try {
-    const txt = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt`).then(r => r.text());
-    let inSlides = false;
+  files = [];
+  config = {};
 
-    txt.split("\n").forEach(l => {
-      l = l.trim();
-      if (!l || l.startsWith("#")) return;
-      if (l.toLowerCase() === "slides:") {
-        inSlides = true;
-        return;
-      }
-      if (inSlides) {
-        const p = l.split("|").map(x => x.trim());
-        if (!p[0]) return;
-        config[p[0]] = {
-          duration: p[1] || "",
-          start: p[2] || "",
-          end: p[3] || "",
-          startDate: p[4] || "",
-          endDate: p[5] || "",
-          expiry: p[6] || "",
-          // Backward compatibility:
-          // - No towers column (old config) => default to all except gate
-          // - Explicit empty towers column => disabled
-          towers: (p.length >= 8) ? (p[7] || "") : LEGACY_DEFAULT_TOWERS
-        };
-        files.push(p[0]);
-      }
-    });
-  } catch (e) {}
+  const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`);
+  if (!res.ok) throw new Error(`Failed to load config.json (HTTP ${res.status})`);
+
+  const json = await res.json();
+  const slides = Array.isArray(json.slides) ? json.slides : [];
+
+  slides.forEach(s => {
+    if (!s || !s.name) return;
+    const name = String(s.name).trim();
+    if (!name) return;
+
+    config[name] = {
+      duration: s.duration == null ? "" : String(s.duration),
+      start: s.start || "",
+      end: s.end || "",
+      startDate: s.startDate || "",
+      endDate: s.endDate || "",
+      expiry: s.expiry || "",
+      towers: s.towers || ""
+    };
+    files.push(name);
+  });
 
   // files
   const list = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides`);
@@ -69,25 +60,40 @@ async function load() {
 
 /* SAVE CONFIG */
 async function saveConfig({ silent = false } = {}) {
-  let content = "default | 10\n\nslides:\n";
+  const payload = {
+    defaultDuration: DEFAULT_DURATION_SECONDS,
+    slides: files
+      .filter(n => !!config[n])
+      .map(n => {
+        const c = config[n];
+        return {
+          name: n,
+          duration: c.duration || "",
+          start: c.start || "",
+          end: c.end || "",
+          startDate: c.startDate || "",
+          endDate: c.endDate || "",
+          expiry: c.expiry || "",
+          towers: c.towers || ""
+        };
+      })
+  };
 
-  files.forEach(n => {
-    // Skip disabled slides — they are not present in config{}
-    if (!config[n]) return;
+  let existingSha;
+  try {
+    const file = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.json`);
+    existingSha = file.sha;
+  } catch (e) {
+    if (e.status !== 404) throw e;
+  }
 
-    const c = config[n];
-    content += `${n} | ${c.duration || ""} | ${c.start || ""} | ${c.end || ""} | ${c.startDate || ""} | ${c.endDate || ""} | ${c.expiry || ""} | ${c.towers || ""}\n`;
-  });
-
-  const file = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`);
-
-  await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.txt`, {
+  await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.json`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      message: "update config",
-      content: btoa(unescape(encodeURIComponent(content))),
-      sha: file.sha
+      message: "update config.json",
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
+      ...(existingSha ? { sha: existingSha } : {})
     })
   });
 

@@ -125,51 +125,25 @@ function normalizeTowerParam(raw) {
 
 const towerParam = normalizeTowerParam(towerParamRaw);
 
-// For legacy config lines that don't include the towers field yet
-const LEGACY_DEFAULT_TOWERS = [
-  "t1c1", "t1c2", "t2c1", "t2c2", "t3c1", "t3c2", "t4c1", "t4c2", "t5c1", "t5c2", "club"
-].join(",");
-
 /* LOAD CONFIG */
 async function load() {
   try {
-    const res  = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.txt?t=${Date.now()}`);
-    const text = await res.text();
+    const resJson = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`);
+    if (!resJson.ok) throw new Error(`Failed to load config.json (HTTP ${resJson.status})`);
 
-    slides = [];
-    let defaultDuration = DEFAULT_DURATION_MS;
-    let inSlides = false;
+    const data = await resJson.json();
+    const defaultDuration = Number(data.defaultDuration) > 0 ? Number(data.defaultDuration) * 1000 : DEFAULT_DURATION_MS;
 
-    text.split("\n").forEach(line => {
-      line = line.trim();
-      if (!line || line.startsWith("#")) return;
-
-      if (line.toLowerCase() === "slides:") { inSlides = true; return; }
-
-      const p = line.split("|").map(x => x.trim());
-
-      if (!inSlides) {
-        // header section: e.g. "default | 10"
-        if (p[0].toLowerCase() === "default" && p[1]) {
-          defaultDuration = Number(p[1]) * 1000;
-        }
-        return;
-      }
-
-      slides.push({
-        name: p[0],
-        duration: p[1] && !isNaN(Number(p[1])) ? Number(p[1]) * 1000 : defaultDuration,
-        start: p[2] || null,
-        end: p[3] || null,
-        startDate: p[4] || null,
-        endDate: p[5] || null,
-        expiry: p[6] || null,
-        // Backward compatibility:
-        // - No towers column (old config) => default to all except gate
-        // - Explicit empty towers column => disabled
-        towers: (p.length >= 8) ? (p[7] || "") : LEGACY_DEFAULT_TOWERS
-      });
-    });
+    slides = (Array.isArray(data.slides) ? data.slides : []).map(s => ({
+      name: s.name,
+      duration: s.duration && !isNaN(Number(s.duration)) ? Number(s.duration) * 1000 : defaultDuration,
+      start: s.start || null,
+      end: s.end || null,
+      startDate: s.startDate || null,
+      endDate: s.endDate || null,
+      expiry: s.expiry || null,
+      towers: s.towers || ""
+    })).filter(s => !!s.name);
 
     build();
   } catch (e) {

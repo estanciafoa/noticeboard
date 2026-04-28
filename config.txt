@@ -3,3 +3,4 @@ default | 10
 slides:
 firemockdrill.png | 3
 slide1.jpeg | 10
+“Mind controls muscle.”.png

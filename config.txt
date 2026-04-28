@@ -4,4 +4,4 @@ slides:
 firemockdrill.png | 3
 slide1.jpeg | 10
 biceps.png
-gmgmt3.jpeg
+minion.jpg

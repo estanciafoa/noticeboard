@@ -2,6 +2,5 @@ default | 10
 
 slides:
 firemockdrill.png | 3 |  |  |  |  |  | 
-minion.jpg | 3 |  |  |  |  |  | 
 gmgmt3.jpeg |  |  |  |  |  |  | 
 kid.jpg |  |  |  |  |  |  | gate

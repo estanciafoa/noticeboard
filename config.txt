@@ -2,7 +2,7 @@ default | 10
 
 slides:
 gardening1april.png | 5
-firemockdrill.png | 10 | 19:55 | 19:56
+firemockdrill.png | 3
 video.mp4 | auto
 slide1.jpeg | 10
-IMG_4230.JPG | 1
+IMG_4230.JPG | 5

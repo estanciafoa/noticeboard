@@ -11,40 +11,37 @@
     {
       "name": "firemockdrill.png",
       "duration": "10",
-      "start": "19:55",
-      "end": "19:56",
-      "startDate": "",
-      "endDate": "",
+      "times": [
+        {
+          "start": "19:55",
+          "end": "19:56"
+        }
+      ],
+      "dates": [],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2"
     },
     {
       "name": "gardening1april.png",
       "duration": "10",
-      "start": "",
-      "end": "",
-      "startDate": "",
-      "endDate": "",
+      "times": [],
+      "dates": [],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2"
     },
     {
       "name": "slide1.jpeg",
       "duration": "10",
-      "start": "",
-      "end": "",
-      "startDate": "",
-      "endDate": "",
+      "times": [],
+      "dates": [],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2"
     },
     {
       "name": "minion.jpg",
       "duration": "10",
-      "start": "",
-      "end": "",
-      "startDate": "",
-      "endDate": "",
+      "times": [],
+      "dates": [],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2"
     }

@@ -92,6 +92,11 @@ async function load() {
   });
 
   render();
+
+  // Auto-select the first slide so the preview isn't empty
+  if (files.length && !selected) {
+    selectSlide(files[0]);
+  }
 }
 
 /* SAVE CONFIG */

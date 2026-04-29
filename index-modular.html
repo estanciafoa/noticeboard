@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Estancia Admin</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 
 <body>
@@ -23,6 +23,7 @@
   <!-- HEADER BAND -->
   <div class="header-band">
     <h1>Estancia Noticeboard <span class="accent">Admin Configuration</span></h1>
+    <div class="theme-picker" id="themeDots"></div>
   </div>
 
   <!-- TOPBAR -->
@@ -43,6 +44,7 @@
         <option value="fade" selected>Fade</option>
         <option value="zoom">Zoom</option>
       </select>
+
     </div>
     <div class="topbar-right emergency-controls">
       <button class="danger-lite" onclick="activateEmergencyFromSelected()">Emergency ON</button>
@@ -180,6 +182,54 @@
 
   </div>
 </div>
+
+<!-- THEME INIT (before other scripts to avoid flash) -->
+<script>
+(function() {
+  var THEMES = [
+    { name: "dark",     color: "#0b0f17", label: "Neon Blue" },
+    { name: "neonpink", color: "#120b14", label: "Neon Pink" },
+    { name: "sand",     color: "#f2ede5", label: "Sand" },
+    { name: "green",    color: "#eef3eb", label: "Green" },
+    { name: "lavender", color: "#f0ecf6", label: "Lavender" }
+  ];
+
+  function applyTheme(name) {
+    var valid = THEMES.find(function(t) { return t.name === name; });
+    var theme = valid ? valid.name : "dark";
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem("admin-theme", theme); } catch(e) {}
+    document.querySelectorAll(".theme-dot").forEach(function(d) {
+      d.classList.toggle("active", d.dataset.theme === theme);
+    });
+  }
+
+  function buildDots() {
+    var container = document.getElementById("themeDots");
+    if (!container) return;
+    container.style.display = "flex";
+    container.style.gap = "5px";
+    THEMES.forEach(function(t) {
+      var dot = document.createElement("div");
+      dot.className = "theme-dot";
+      dot.dataset.theme = t.name;
+      dot.style.background = t.color;
+      dot.title = t.label;
+      dot.addEventListener("click", function() { applyTheme(t.name); });
+      container.appendChild(dot);
+    });
+  }
+
+  var saved = "dark";
+  try { saved = localStorage.getItem("admin-theme") || "dark"; } catch(e) {}
+  applyTheme(saved);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", buildDots);
+  } else {
+    buildDots();
+  }
+})();
+</script>
 
 <!-- SCRIPTS - Load in dependency order -->
 <script src="js/github.js"></script>

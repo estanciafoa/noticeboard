@@ -12,6 +12,120 @@
   --danger: #f43f5e;
 }
 
+/* --- DARK THEMES --- */
+[data-theme="neonpink"] {
+  --bg-0: #120b14; --bg-1: #1a1020; --bg-2: #24182e; --bg-3: #2f213a;
+  --line: #3d2a4a; --text: #e5e0eb; --muted: #a89ab8;
+  --accent: #f472b6; --accent-2: #e879f9;
+  --accent-soft: rgba(244, 114, 182, 0.15); --danger: #f43f5e;
+}
+
+/* --- LIGHT THEMES --- */
+[data-theme="green"] {
+  --bg-0: #eef3eb; --bg-1: #f5f9f3; --bg-2: #dce6d6; --bg-3: #c8d6c0;
+  --line: #b3c4aa; --text: #2d3b28; --muted: #5e7256;
+  --accent: #2d8a4e; --accent-2: #6b8e23;
+  --accent-soft: rgba(45, 138, 78, 0.1); --danger: #c0392b;
+}
+[data-theme="lavender"] {
+  --bg-0: #f0ecf6; --bg-1: #f8f5fc; --bg-2: #e4ddf0; --bg-3: #d4cae4;
+  --line: #c2b5d6; --text: #352952; --muted: #7a6b96;
+  --accent: #7c3aed; --accent-2: #a855f7;
+  --accent-soft: rgba(124, 58, 237, 0.1); --danger: #dc2626;
+}
+[data-theme="sand"] {
+  --bg-0: #f2ede5; --bg-1: #faf7f2; --bg-2: #e6dfd4; --bg-3: #d6cdbf;
+  --line: #c4baa8; --text: #3e3628; --muted: #7e7262;
+  --accent: #a0522d; --accent-2: #8b6914;
+  --accent-soft: rgba(160, 82, 45, 0.1); --danger: #c0392b;
+}
+
+/* Light theme overrides for elements with hardcoded colors */
+[data-theme="green"] body,
+[data-theme="lavender"] body,
+[data-theme="sand"] body {
+  background: var(--bg-0);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) #login {
+  background: radial-gradient(circle at center, var(--bg-1) 0%, var(--bg-0) 80%);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .header-band {
+  background: linear-gradient(90deg, var(--bg-0) 0%, var(--bg-1) 50%, var(--bg-0) 100%);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .center {
+  background: var(--bg-0);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-bezel {
+  background: linear-gradient(180deg, #ccc 0%, #bbb 2%, #aaa 98%, #ccc 100%);
+  box-shadow:
+    inset 0 0 0 1px #ddd,
+    inset 0 0 8px rgba(0,0,0,0.15),
+    0 0 0 1px #999,
+    0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-bezel::before {
+  display: none;
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-bezel::after {
+  background: var(--accent);
+  box-shadow: 0 0 4px var(--accent);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-brand {
+  color: #999;
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-stand-neck {
+  background: linear-gradient(180deg, #bbb, #ccc, #bbb);
+  border-color: #ddd;
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-stand-base {
+  background: linear-gradient(180deg, #ccc, #bbb);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .loc-tag {
+  background: rgba(var(--accent), 0.85);
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) input[type="date"]::-webkit-calendar-picker-indicator,
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) #loginBox {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+
+/* THEME PICKER in header band */
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theme-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.theme-dot:hover { transform: scale(1.2); border-color: rgba(255,255,255,0.5); }
+.theme-dot.active {
+  border-color: var(--accent);
+  transform: scale(1.15);
+  box-shadow: 0 0 6px var(--accent-soft);
+}
+
 * { box-sizing: border-box; }
 
 body { 
@@ -66,6 +180,9 @@ body {
   border-bottom: 1px solid var(--line);
   padding: 14px 24px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header-band::after {

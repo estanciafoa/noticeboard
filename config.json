@@ -23,14 +23,6 @@
       "dates": [],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2"
-    },
-    {
-      "name": "minion.jpg",
-      "duration": "10",
-      "times": [],
-      "dates": [],
-      "expiry": "",
-      "towers": "t1c1,t1c2"
     }
   ]
 }

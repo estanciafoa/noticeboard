@@ -1,6 +1,6 @@
 {
   "defaultDuration": 10,
-  "transitionEffect": "fade",
+  "transitionEffect": "cut",
   "transitionMs": 700,
   "emergency": {
     "enabled": false,

@@ -1,6 +1,6 @@
 {
   "defaultDuration": 10,
-  "transitionEffect": "cut",
+  "transitionEffect": "zoom",
   "transitionMs": 700,
   "emergency": {
     "enabled": false,

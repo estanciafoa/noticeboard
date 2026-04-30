@@ -3,9 +3,9 @@
   "transitionEffect": "fade",
   "transitionMs": 700,
   "emergency": {
-    "enabled": false,
-    "slide": "",
-    "towers": ""
+    "enabled": true,
+    "slide": "ClubHouse.png",
+    "towers": "club"
   },
   "slides": [
     {

@@ -7,14 +7,5 @@
     "slide": "",
     "towers": ""
   },
-  "slides": [
-    {
-      "name": "minion.jpg",
-      "duration": "3",
-      "times": [],
-      "dates": [],
-      "expiry": "",
-      "towers": ""
-    }
-  ]
+  "slides": []
 }

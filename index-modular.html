@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Estancia Admin</title>
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=8">
 </head>
 
 <body>
@@ -47,9 +47,7 @@
 
     </div>
     <div class="topbar-right emergency-controls">
-      <button class="danger-lite" onclick="activateEmergencyFromSelected()">Emergency ON</button>
-      <button onclick="clearEmergencyOverride()">Emergency OFF</button>
-      <span id="emergencyStatus">Emergency: OFF</span>
+      <button id="emergencyToggle" class="emergency-btn" onclick="toggleEmergency()">Emergency OFF</button>
     </div>
   </div>
 
@@ -187,11 +185,11 @@
 <script>
 (function() {
   var THEMES = [
-    { name: "dark",     color: "#0b0f17", label: "Neon Blue" },
-    { name: "neonpink", color: "#120b14", label: "Neon Pink" },
-    { name: "sand",     color: "#f2ede5", label: "Sand" },
-    { name: "green",    color: "#eef3eb", label: "Green" },
-    { name: "lavender", color: "#f0ecf6", label: "Lavender" }
+    { name: "dark",     bg: "#0b0f17", accent: "#22d3ee", label: "Neon Blue" },
+    { name: "neonpink", bg: "#120b14", accent: "#f472b6", label: "Neon Pink" },
+    { name: "sand",     bg: "#f2ede5", accent: "#a0522d", label: "Sand" },
+    { name: "green",    bg: "#eef3eb", accent: "#2d8a4e", label: "Green" },
+    { name: "lavender", bg: "#f0ecf6", accent: "#7c3aed", label: "Lavender" }
   ];
 
   function applyTheme(name) {
@@ -213,7 +211,7 @@
       var dot = document.createElement("div");
       dot.className = "theme-dot";
       dot.dataset.theme = t.name;
-      dot.style.background = t.color;
+      dot.style.background = "linear-gradient(to right, " + t.bg + " 50%, " + t.accent + " 50%)";
       dot.title = t.label;
       dot.addEventListener("click", function() { applyTheme(t.name); });
       container.appendChild(dot);

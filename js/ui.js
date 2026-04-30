@@ -82,45 +82,42 @@ function applyTopbarSettingsFromConfig() {
 }
 
 function updateEmergencyStatus() {
-  const status = document.getElementById("emergencyStatus");
-  if (!status) return;
+  const btn = document.getElementById("emergencyToggle");
+  if (!btn) return;
   const e = appConfig.emergency || { enabled: false, slide: "" };
-  status.textContent = e.enabled ? `Emergency: ON (${e.slide || "Unknown"})` : "Emergency: OFF";
-  status.className = e.enabled ? "on" : "";
+  if (e.enabled) {
+    btn.textContent = `Emergency ON (${e.slide || "Unknown"})`;
+    btn.classList.add("on");
+  } else {
+    btn.textContent = "Emergency OFF";
+    btn.classList.remove("on");
+  }
 }
 
-async function activateEmergencyFromSelected() {
-  if (!selected) {
-    alert("Select a slide first.");
-    return;
+async function toggleEmergency() {
+  const isOn = appConfig.emergency?.enabled;
+  if (!isOn) {
+    if (!selected) {
+      alert("Select a slide first.");
+      return;
+    }
+    appConfig.emergency = {
+      enabled: true,
+      slide: selected,
+      towers: (config[selected]?.towers || defaultTowers())
+    };
+  } else {
+    appConfig.emergency = {
+      enabled: false,
+      slide: "",
+      towers: ""
+    };
   }
-
-  appConfig.emergency = {
-    enabled: true,
-    slide: selected,
-    towers: (config[selected]?.towers || defaultTowers())
-  };
-
   updateEmergencyStatus();
   try {
     await saveConfig({ silent: true });
   } catch (e) {
-    alert("Failed to enable emergency override: " + e.message);
-  }
-}
-
-async function clearEmergencyOverride() {
-  appConfig.emergency = {
-    enabled: false,
-    slide: "",
-    towers: ""
-  };
-
-  updateEmergencyStatus();
-  try {
-    await saveConfig({ silent: true });
-  } catch (e) {
-    alert("Failed to clear emergency override: " + e.message);
+    alert("Failed to update emergency override: " + e.message);
   }
 }
 

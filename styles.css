@@ -59,35 +59,8 @@
   background: var(--bg-0);
 }
 
-:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-bezel {
-  background: linear-gradient(180deg, #ccc 0%, #bbb 2%, #aaa 98%, #ccc 100%);
-  box-shadow:
-    inset 0 0 0 1px #ddd,
-    inset 0 0 8px rgba(0,0,0,0.15),
-    0 0 0 1px #999,
-    0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
 :is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-bezel::before {
   display: none;
-}
-
-:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-bezel::after {
-  background: var(--accent);
-  box-shadow: 0 0 4px var(--accent);
-}
-
-:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-brand {
-  color: #999;
-}
-
-:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-stand-neck {
-  background: linear-gradient(180deg, #bbb, #ccc, #bbb);
-  border-color: #ddd;
-}
-
-:is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .tv-stand-base {
-  background: linear-gradient(180deg, #ccc, #bbb);
 }
 
 :is([data-theme="green"],[data-theme="lavender"],[data-theme="sand"]) .loc-tag {
@@ -114,12 +87,12 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.25);
+  border: 2px solid var(--muted);
   cursor: pointer;
   transition: transform 0.15s, border-color 0.15s;
   flex-shrink: 0;
 }
-.theme-dot:hover { transform: scale(1.2); border-color: rgba(255,255,255,0.5); }
+.theme-dot:hover { transform: scale(1.2); border-color: var(--text); }
 .theme-dot.active {
   border-color: var(--accent);
   transform: scale(1.15);
@@ -263,26 +236,31 @@ body {
   font-size: 12px;
 }
 
-.topbar-right #emergencyStatus {
-  font-size: 12px;
-  color: var(--muted);
-  min-width: 130px;
-}
-
-.topbar-right #emergencyStatus.on {
-  color: #fb7185;
+.topbar button.emergency-btn {
+  background: #dc2626 !important;
+  color: #fff !important;
+  border: 2px solid #dc2626 !important;
   font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 13px;
 }
 
-.topbar button.danger-lite {
-  border-color: rgba(244, 63, 94, 0.5);
-  color: #fda4af;
+.topbar button.emergency-btn:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
 }
 
-.topbar button.danger-lite:hover {
-  background: rgba(244, 63, 94, 0.15);
-  border-color: #f43f5e;
-  color: #fecdd3;
+.topbar button.emergency-btn.on {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+  50% { box-shadow: 0 0 12px 4px rgba(239,68,68,0.4); }
 }
 
 .topbar button {

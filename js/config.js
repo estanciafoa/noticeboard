@@ -37,10 +37,11 @@ async function load() {
   files = [];
   config = {};
 
-  const res = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`);
-  if (!res.ok) throw new Error(`Failed to load config.json (HTTP ${res.status})`);
-
-  const json = await res.json();
+  /* Use the API endpoint (not raw.githubusercontent) so we always get the
+     latest committed version — raw.githubusercontent has aggressive CDN
+     caching that can serve stale data for several minutes. */
+  const meta = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.json`);
+  const json = JSON.parse(atob(meta.content));
   const slides = Array.isArray(json.slides) ? json.slides : [];
 
   appConfig.defaultDuration = Number(json.defaultDuration) > 0 ? Number(json.defaultDuration) : DEFAULT_DURATION_SECONDS;

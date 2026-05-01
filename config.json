@@ -10,7 +10,7 @@
   "slides": [
     {
       "name": "ClubHouse.png",
-      "duration": "",
+      "duration": "10",
       "times": [],
       "dates": [],
       "expiry": "",
@@ -30,7 +30,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "club"
     },
     {
       "name": "Garbage Yard.jpg",
@@ -50,6 +50,14 @@
     },
     {
       "name": "collage (11).png",
+      "duration": "",
+      "times": [],
+      "dates": [],
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "WhatsApp Image 2026-05-01 at 7.46.36 AM.jpeg",
       "duration": "",
       "times": [],
       "dates": [],

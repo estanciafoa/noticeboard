@@ -68,7 +68,7 @@ function isVisible(s) {
   if (!s.towers) return false;
   if (towerParam) {
     const assigned = s.towers.split(",").map(t => t.trim());
-    const match = assigned.some(a => a === towerParam || a.startsWith(towerParam));
+    const match = assigned.some(a => a === towerParam || towerParam.startsWith(a));
     if (!match) return false;
   }
 
@@ -98,6 +98,17 @@ function isVisible(s) {
       return true;
     });
     if (!inAnyRange) return false;
+  }
+
+  // Expiry: hide slide if it was uploaded more than expiry-duration ago
+  // Expiry is relative to the slide's start date (or config upload time isn't tracked,
+  // so we use startDate of first date range if available)
+  if (s.expiry) {
+    const ms = parseExpiry(s.expiry);
+    if (ms > 0 && s.dates && s.dates.length > 0 && s.dates[0].startDate) {
+      const start = new Date(s.dates[0].startDate);
+      if (now.getTime() - start.getTime() > ms) return false;
+    }
   }
 
   return true;
@@ -144,7 +155,7 @@ function build() {
   // Emergency override
   if (emergency.enabled && emergency.slide) {
     const emTowers = (emergency.towers || "").split(",").filter(Boolean);
-    const applies = !towerParam || emTowers.some(a => a === towerParam || a.startsWith(towerParam));
+    const applies = !towerParam || emTowers.some(a => a === towerParam || towerParam.startsWith(a));
     if (applies) {
       const em = slides.find(s => s.name === emergency.slide);
       if (em) visible = [em];

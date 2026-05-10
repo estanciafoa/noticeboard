@@ -147,8 +147,18 @@
     {
       "name": "Flush LIne - Interruption Notice.png",
       "duration": "",
-      "times": [],
-      "dates": [],
+      "times": [
+        {
+          "start": "13:00",
+          "end": "18:00"
+        }
+      ],
+      "dates": [
+        {
+          "startDate": "2026-05-10",
+          "endDate": "2026-05-10"
+        }
+      ],
       "expiry": "",
       "towers": "t2c2"
     },

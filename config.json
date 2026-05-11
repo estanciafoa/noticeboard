@@ -145,24 +145,6 @@
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
-      "name": "Flush LIne - Interruption Notice.png",
-      "duration": "",
-      "times": [
-        {
-          "start": "13:00",
-          "end": "18:00"
-        }
-      ],
-      "dates": [
-        {
-          "startDate": "2026-05-10",
-          "endDate": "2026-05-10"
-        }
-      ],
-      "expiry": "",
-      "towers": "t2c2"
-    },
-    {
       "name": "Gemini_Generated_Image_lemazxlemazxlema.png",
       "duration": "",
       "times": [],

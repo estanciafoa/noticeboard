@@ -1188,7 +1188,6 @@ button {
   flex-direction: column;
   gap: 6px;
 }
-
 .previewCard img,
 .previewCard video {
   width: 100%;

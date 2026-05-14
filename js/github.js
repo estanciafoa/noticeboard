@@ -5,13 +5,24 @@ let token = "";
 
 /* GITHUB FETCH */
 async function githubFetch(url, options = {}) {
-  const res = await fetch(url, {
+  const method = (options.method || "GET").toUpperCase();
+  const baseHeaders = { ...(options.headers || {}) };
+  const headersWithAuth = token
+    ? { ...baseHeaders, Authorization: `Bearer ${token}` }
+    : baseHeaders;
+
+  let res = await fetch(url, {
     ...options,
-    headers: {
-      ...(options.headers || {}),
-      Authorization: `Bearer ${token}`
-    }
+    headers: headersWithAuth
   });
+
+  // If token is invalid/expired, allow public GET fallback for read-only flows.
+  if (res.status === 401 && token && method === "GET") {
+    res = await fetch(url, {
+      ...options,
+      headers: baseHeaders
+    });
+  }
 
   if (!res.ok) {
     let msg = res.statusText;

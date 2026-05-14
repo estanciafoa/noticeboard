@@ -4,12 +4,14 @@ const repoName  = "noticeboard";
 const DEFAULT_DURATION_MS = 10000;
 const DEFAULT_REFRESH_INTERVAL_MS = 15 * 60 * 1000;  // default: fetch slides every 15 min
 const REBUILD_INTERVAL_MS = 60 * 1000;                // re-evaluate visibility rules every minute
+const OFFLINE_RETRY_INTERVAL_MS = 60 * 1000;          // retry internet every minute when offline
 const OFFLINE_NOTICE = "⚠️ Internet Not Working. Please report to Admin office";
 
 let slides   = [];
 let elements = [];
 let refreshIntervalMs = DEFAULT_REFRESH_INTERVAL_MS;
 let refreshIntervalTimer = null;
+let offlineRetryTimer = null;
 let index    = 0;
 let timer    = null;
 let transitionEffect = "fade";
@@ -68,10 +70,7 @@ async function load({ showError = true } = {}) {
     
     // Update refresh interval if configured (value is in minutes, convert to milliseconds)
     const newRefreshInterval = Number(data.refreshIntervalMs) > 0 ? Number(data.refreshIntervalMs) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
-    if (newRefreshInterval !== refreshIntervalMs) {
-      refreshIntervalMs = newRefreshInterval;
-      setupRefreshInterval();
-    }
+    refreshIntervalMs = newRefreshInterval;
     
     emergency = {
       enabled: !!data.emergency?.enabled,
@@ -106,11 +105,15 @@ async function refreshIfOnline() {
   const online = await isInternetAvailable();
   if (!online) {
     setNetworkStatus(OFFLINE_NOTICE);
+    stopRefreshInterval();
+    setupOfflineRetry();
     return;
   }
 
   setNetworkStatus("");
+  stopOfflineRetry();
   await load({ showError: false });
+  setupRefreshInterval();
 }
 
 /* VISIBILITY RULES */
@@ -323,6 +326,23 @@ function setupRefreshInterval() {
   refreshIntervalTimer = setInterval(refreshIfOnline, refreshIntervalMs);
 }
 
+function stopRefreshInterval() {
+  if (!refreshIntervalTimer) return;
+  clearInterval(refreshIntervalTimer);
+  refreshIntervalTimer = null;
+}
+
+function setupOfflineRetry() {
+  if (offlineRetryTimer) return;
+  offlineRetryTimer = setInterval(refreshIfOnline, OFFLINE_RETRY_INTERVAL_MS);
+}
+
+function stopOfflineRetry() {
+  if (!offlineRetryTimer) return;
+  clearInterval(offlineRetryTimer);
+  offlineRetryTimer = null;
+}
+
 /* PERIODIC REBUILD (re-evaluate time-based visibility) */
 setInterval(() => {
   const currentNames = elements
@@ -332,16 +352,16 @@ setInterval(() => {
   if (currentNames !== visibleNames) build();
 }, REBUILD_INTERVAL_MS);
 
-/* PERIODIC NETWORK-AWARE SYNC (pick up new uploads / config edits) */
-setupRefreshInterval();
-
 window.addEventListener("online", () => {
   setNetworkStatus("");
+  stopOfflineRetry();
   refreshIfOnline();
 });
 
 window.addEventListener("offline", () => {
   setNetworkStatus(OFFLINE_NOTICE);
+  stopRefreshInterval();
+  setupOfflineRetry();
 });
 
 /* INIT */

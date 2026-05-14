@@ -4,7 +4,7 @@ const repoName  = "noticeboard";
 const DEFAULT_DURATION_MS = 10000;
 const RELOAD_INTERVAL_MS  = 5 * 60 * 1000;   // full reload every 5 min to pick up new slides
 const REBUILD_INTERVAL_MS = 60 * 1000;       // re-evaluate visibility rules every minute
-const OFFLINE_NOTICE = "Internet Not Working. Please report to Admin office";
+const OFFLINE_NOTICE = "⚠️ Internet Not Working. Please report to Admin office";
 
 let slides   = [];
 let elements = [];

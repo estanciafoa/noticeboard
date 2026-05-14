@@ -4,6 +4,7 @@ const repoName  = "noticeboard";
 const DEFAULT_DURATION_MS = 10000;
 const RELOAD_INTERVAL_MS  = 5 * 60 * 1000;   // full reload every 5 min to pick up new slides
 const REBUILD_INTERVAL_MS = 60 * 1000;       // re-evaluate visibility rules every minute
+const OFFLINE_NOTICE = "Internet Not Working. Please report to Admin office";
 
 let slides   = [];
 let elements = [];
@@ -27,8 +28,33 @@ function normalizeTowerParam(raw) {
 
 const towerParam = normalizeTowerParam(towerParamRaw);
 
+function setNetworkStatus(message) {
+  const el = document.getElementById("networkStatus");
+  if (!el) return;
+  el.textContent = message || "";
+  el.style.display = message ? "block" : "none";
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
+  ]);
+}
+
+async function isInternetAvailable() {
+  if (!navigator.onLine) return false;
+  try {
+    const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`;
+    const res = await withTimeout(fetch(url, { cache: "no-store" }), 5000);
+    return !!res && res.ok;
+  } catch (_) {
+    return false;
+  }
+}
+
 /* LOAD CONFIG */
-async function load() {
+async function load({ showError = true } = {}) {
   try {
     const resJson = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`);
     if (!resJson.ok) throw new Error(`Failed to load config.json (HTTP ${resJson.status})`);
@@ -55,10 +81,26 @@ async function load() {
     })).filter(s => !!s.name);
 
     build();
+    setNetworkStatus("");
+    return true;
   } catch (e) {
     console.error("Failed to load config:", e);
-    document.getElementById("empty").innerText = "Failed to load slides";
+    if (showError && !elements.length) {
+      document.getElementById("empty").innerText = "Failed to load slides";
+    }
+    return false;
   }
+}
+
+async function refreshIfOnline() {
+  const online = await isInternetAvailable();
+  if (!online) {
+    setNetworkStatus(OFFLINE_NOTICE);
+    return;
+  }
+
+  setNetworkStatus("");
+  await load({ showError: false });
 }
 
 /* VISIBILITY RULES */
@@ -274,8 +316,17 @@ setInterval(() => {
   if (currentNames !== visibleNames) build();
 }, REBUILD_INTERVAL_MS);
 
-/* PERIODIC FULL RELOAD (pick up new uploads / config edits) */
-setInterval(() => location.reload(), RELOAD_INTERVAL_MS);
+/* PERIODIC NETWORK-AWARE SYNC (pick up new uploads / config edits) */
+setInterval(refreshIfOnline, RELOAD_INTERVAL_MS);
+
+window.addEventListener("online", () => {
+  setNetworkStatus("");
+  refreshIfOnline();
+});
+
+window.addEventListener("offline", () => {
+  setNetworkStatus(OFFLINE_NOTICE);
+});
 
 /* INIT */
-load();
+refreshIfOnline();

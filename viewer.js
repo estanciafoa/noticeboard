@@ -66,8 +66,8 @@ async function load({ showError = true } = {}) {
     transitionEffect = data.transitionEffect || "fade";
     transitionMs = Number(data.transitionMs) > 0 ? Number(data.transitionMs) : 700;
     
-    // Update refresh interval if configured
-    const newRefreshInterval = Number(data.refreshIntervalMs) > 0 ? Number(data.refreshIntervalMs) : DEFAULT_REFRESH_INTERVAL_MS;
+    // Update refresh interval if configured (value is in minutes, convert to milliseconds)
+    const newRefreshInterval = Number(data.refreshIntervalMs) > 0 ? Number(data.refreshIntervalMs) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
     if (newRefreshInterval !== refreshIntervalMs) {
       refreshIntervalMs = newRefreshInterval;
       setupRefreshInterval();

@@ -2,6 +2,7 @@
   "defaultDuration": 10,
   "transitionEffect": "zoom",
   "transitionMs": 700,
+  "refreshIntervalMs": 900000,
   "emergency": {
     "enabled": false,
     "slide": "",

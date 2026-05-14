@@ -2,12 +2,14 @@ const repoOwner = "estanciafoa";
 const repoName  = "noticeboard";
 
 const DEFAULT_DURATION_MS = 10000;
-const RELOAD_INTERVAL_MS  = 5 * 60 * 1000;   // full reload every 5 min to pick up new slides
-const REBUILD_INTERVAL_MS = 60 * 1000;       // re-evaluate visibility rules every minute
+const DEFAULT_REFRESH_INTERVAL_MS = 15 * 60 * 1000;  // default: fetch slides every 15 min
+const REBUILD_INTERVAL_MS = 60 * 1000;                // re-evaluate visibility rules every minute
 const OFFLINE_NOTICE = "⚠️ Internet Not Working. Please report to Admin office";
 
 let slides   = [];
 let elements = [];
+let refreshIntervalMs = DEFAULT_REFRESH_INTERVAL_MS;
+let refreshIntervalTimer = null;
 let index    = 0;
 let timer    = null;
 let transitionEffect = "fade";
@@ -63,6 +65,14 @@ async function load({ showError = true } = {}) {
     const defaultDuration = Number(data.defaultDuration) > 0 ? Number(data.defaultDuration) * 1000 : DEFAULT_DURATION_MS;
     transitionEffect = data.transitionEffect || "fade";
     transitionMs = Number(data.transitionMs) > 0 ? Number(data.transitionMs) : 700;
+    
+    // Update refresh interval if configured
+    const newRefreshInterval = Number(data.refreshIntervalMs) > 0 ? Number(data.refreshIntervalMs) : DEFAULT_REFRESH_INTERVAL_MS;
+    if (newRefreshInterval !== refreshIntervalMs) {
+      refreshIntervalMs = newRefreshInterval;
+      setupRefreshInterval();
+    }
+    
     emergency = {
       enabled: !!data.emergency?.enabled,
       slide: data.emergency?.slide || "",
@@ -307,6 +317,12 @@ function next() {
   show(index);
 }
 
+/* SETUP REFRESH INTERVAL - called on init and when config changes */
+function setupRefreshInterval() {
+  if (refreshIntervalTimer) clearInterval(refreshIntervalTimer);
+  refreshIntervalTimer = setInterval(refreshIfOnline, refreshIntervalMs);
+}
+
 /* PERIODIC REBUILD (re-evaluate time-based visibility) */
 setInterval(() => {
   const currentNames = elements
@@ -317,7 +333,7 @@ setInterval(() => {
 }, REBUILD_INTERVAL_MS);
 
 /* PERIODIC NETWORK-AWARE SYNC (pick up new uploads / config edits) */
-setInterval(refreshIfOnline, RELOAD_INTERVAL_MS);
+setupRefreshInterval();
 
 window.addEventListener("online", () => {
   setNetworkStatus("");

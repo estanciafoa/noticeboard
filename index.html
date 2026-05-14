@@ -73,6 +73,7 @@ html, body {
   background: #000;
   color: #fff;
   z-index: 10;
+  overflow: visible;
 }
 @keyframes blink {
   0%, 49% { opacity: 1; }
@@ -88,22 +89,24 @@ html, body {
 }
 .bottom-bar .network-status {
   position: absolute;
-  left: 6px;
-  bottom: 4px;
-  max-width: 75%;
-  font-size: 12px;
+  left: 5px;
+  bottom: 7px;
+  max-width: calc(100% - 110px);
+  font-size: 11px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.3;
   color: white;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   display: none;
   z-index: 20;
   background: #dc2626;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 5px 11px;
+  border-radius: 18px;
   white-space: nowrap;
   animation: blink 1.2s infinite;
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .bottom-bar img {
   height: 80px;

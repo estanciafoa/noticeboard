@@ -5,14 +5,9 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
-    "towerTexts": {
-      "t1c1": "Domestic water will not be available on floors 10-14 from 12 pm -3 pm"
-    },
-    "image": "",
-    "towerExpiries": {
-      "t1c1": 1778874719546
-    },
-    "attentionText": "EMERGENCY WATER SHUTDOWN NOTICE !"
+    "towerTexts": {},
+    "towerExpiries": {},
+    "towerAttentionTexts": {}
   },
   "emergency": {
     "enabled": false,

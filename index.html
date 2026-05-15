@@ -93,8 +93,8 @@ html, body {
   position: absolute;
   top: -14px;
   left: 12px;
-  background: #111;
-  color: #fff;
+  background: #f5c518;
+  color: #000;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -103,10 +103,23 @@ html, body {
   transform: skewX(-12deg);
   z-index: 11;
   line-height: 1.4;
-  border: 1px solid #fff;
+  border: 1px solid #000000;
+  border-radius: 5px;
 }
 .bottom-bar.flash-news .attention-tag {
   display: block;
+  animation: attention-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes attention-pulse {
+  0%, 100% {
+    filter: brightness(1);
+    box-shadow: 0 0 0 rgba(245, 197, 24, 0);
+  }
+  50% {
+    filter: brightness(1.18);
+    box-shadow: 0 0 10px rgba(245, 197, 24, 0.85);
+  }
 }
 
 @keyframes blink {
@@ -132,11 +145,6 @@ html, body {
 .ticker-left span {
   white-space: pre-line;
   word-break: break-word;
-}
-.ticker-left img {
-  height: 100%;
-  max-width: 100%;
-  object-fit: contain;
 }
 
 /* CENTER: rotating ticker text */
@@ -169,6 +177,7 @@ html, body {
 }
 .ticker-center .ticker-scroll-wrap .ticker-text:first-child {
   display: inline;
+  white-space: pre-line;
 }
 .bottom-bar.flash-news .ticker-text {
   font-size: 15px !important;

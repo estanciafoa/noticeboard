@@ -92,72 +92,17 @@ function applyTopbarSettingsFromConfig() {
   updateEmergencyStatus();
 }
 
-/* TICKER PANEL */
-function toggleTickerPanel() {
-  const panel = document.getElementById("tickerPanel");
-  const btn = document.getElementById("tickerPanelToggle");
-  if (panel) {
-    panel.classList.toggle("open");
-    if (btn) btn.innerHTML = panel.classList.contains("open") ? "Ticker &#9664;" : "Ticker &#9654;";
-  }
+/* RIGHT PANEL TABS */
+function switchRightTab(tabId) {
+  document.querySelectorAll(".right-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === tabId);
+  });
+  document.querySelectorAll(".right-tab-content").forEach(panel => {
+    panel.classList.toggle("active", panel.id === tabId);
+  });
 }
 
 function initTickerConfig() {
-  // Ticker image
-  const thumb = document.getElementById("tickerImageThumb");
-  const placeholder = document.getElementById("tickerImagePlaceholder");
-  const fileInput = document.getElementById("tickerImageInput");
-
-  if (appConfig.ticker?.image) {
-    if (thumb) {
-      thumb.src = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${appConfig.ticker.image}?t=${Date.now()}`;
-      thumb.style.display = "block";
-    }
-    if (placeholder) placeholder.style.display = "none";
-  }
-
-  if (fileInput) {
-    fileInput.onchange = async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      try {
-        const base64 = await fileToBase64(file);
-        const path = `images/ticker-banner.png`;
-
-        // Upload to GitHub
-        let sha;
-        try {
-          const existing = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`);
-          sha = existing.sha;
-        } catch (_) {}
-
-        await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: "update ticker banner",
-            content: base64,
-            ...(sha ? { sha } : {})
-          })
-        });
-
-        if (!appConfig.ticker) appConfig.ticker = { commonText: "", towerTexts: {} };
-        appConfig.ticker.image = path;
-
-        if (thumb) {
-          thumb.src = `${path}?t=${Date.now()}`;
-          thumb.style.display = "block";
-        }
-        if (placeholder) placeholder.style.display = "none";
-
-        await saveConfig({ silent: true });
-      } catch (e) {
-        alert("Failed to upload ticker image: " + e.message);
-      }
-      fileInput.value = "";
-    };
-  }
-
   // Common text
   const commonInput = document.getElementById("tickerCommonText");
   if (commonInput) {
@@ -174,47 +119,66 @@ function initTickerConfig() {
 
   const towerTexts = appConfig.ticker?.towerTexts || {};
   const towerExpiries = appConfig.ticker?.towerExpiries || {};
+  const towerAttentionTexts = appConfig.ticker?.towerAttentionTexts || {};
   LOCATIONS.forEach(loc => {
-    const div = document.createElement("div");
-    div.className = "ticker-tower-field";
+    const card = document.createElement("details");
+    card.className = "ticker-tower-card";
 
-    const label = document.createElement("label");
-    label.textContent = loc.short;
-    label.title = loc.label;
+    const summary = document.createElement("summary");
+    summary.className = "ticker-tower-summary";
+    summary.textContent = `${loc.short} - ${loc.label}`;
+    card.appendChild(summary);
 
-    const input = document.createElement("input");
-    input.type = "text";
-    input.placeholder = `Scrolling text for ${loc.label}`;
-    input.value = towerTexts[loc.id] || "";
-    input.style.flex = "1";
+    const body = document.createElement("div");
+    body.className = "ticker-tower-body";
 
-    const tooltip = document.createElement("div");
-    tooltip.className = "ticker-tooltip";
-    tooltip.textContent = input.value;
-    input.addEventListener("mouseenter", () => {
-      if (!input.value) return;
-      tooltip.textContent = input.value;
-      tooltip.style.display = "block";
-      const rect = input.getBoundingClientRect();
-      tooltip.style.left = rect.left + "px";
-      tooltip.style.top = (rect.top - tooltip.offsetHeight - 4) + "px";
-    });
-    input.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
-    document.body.appendChild(tooltip);
+    const textField = document.createElement("div");
+    textField.className = "ticker-tower-field";
+    const textLabel = document.createElement("label");
+    textLabel.textContent = "Text";
+    const textInput = document.createElement("textarea");
+    textInput.rows = 2;
+    textInput.placeholder = `Scrolling text for ${loc.label} (use | for line breaks)`;
+    textInput.value = towerTexts[loc.id] || "";
 
-    input.oninput = () => {
+    textInput.oninput = () => {
       if (!appConfig.ticker) appConfig.ticker = { commonText: "", towerTexts: {} };
       if (!appConfig.ticker.towerTexts) appConfig.ticker.towerTexts = {};
-      appConfig.ticker.towerTexts[loc.id] = input.value;
-      tooltip.textContent = input.value;
+      appConfig.ticker.towerTexts[loc.id] = textInput.value;
     };
+    textField.appendChild(textLabel);
+    textField.appendChild(textInput);
 
+    const attentionField = document.createElement("div");
+    attentionField.className = "ticker-tower-field";
+    const attentionLabel = document.createElement("label");
+    attentionLabel.textContent = "Attention";
+    const attentionInput = document.createElement("input");
+    attentionInput.type = "text";
+    attentionInput.placeholder = `Attention tag for ${loc.short}`;
+    attentionInput.value = towerAttentionTexts[loc.id] || "";
+
+    attentionInput.oninput = () => {
+      if (!appConfig.ticker) appConfig.ticker = { commonText: "", towerTexts: {} };
+      if (!appConfig.ticker.towerAttentionTexts) appConfig.ticker.towerAttentionTexts = {};
+      if (attentionInput.value.trim()) {
+        appConfig.ticker.towerAttentionTexts[loc.id] = attentionInput.value;
+      } else {
+        delete appConfig.ticker.towerAttentionTexts[loc.id];
+      }
+    };
+    attentionField.appendChild(attentionLabel);
+    attentionField.appendChild(attentionInput);
+
+    const expiryField = document.createElement("div");
+    expiryField.className = "ticker-tower-field";
+    const expiryLabel = document.createElement("label");
+    expiryLabel.textContent = "Expiry (hrs)";
     const expiryInput = document.createElement("input");
     expiryInput.type = "text";
     expiryInput.className = "ticker-expiry";
     expiryInput.placeholder = "hrs";
     expiryInput.title = "Expiry in hours (leave empty = no expiry)";
-    expiryInput.style.width = "20px";
     const existing = towerExpiries[loc.id];
     if (existing && existing > Date.now()) {
       const hrsLeft = Math.round((existing - Date.now()) / 3600000 * 10) / 10;
@@ -241,20 +205,33 @@ function initTickerConfig() {
       }
     };
 
-    div.appendChild(label);
-    div.appendChild(input);
-    div.appendChild(expiryInput);
-    container.appendChild(div);
-  });
-}
+    expiryField.appendChild(expiryLabel);
+    expiryField.appendChild(expiryInput);
 
-function removeTickerImage() {
-  if (!appConfig.ticker) return;
-  appConfig.ticker.image = "";
-  const thumb = document.getElementById("tickerImageThumb");
-  const placeholder = document.getElementById("tickerImagePlaceholder");
-  if (thumb) { thumb.style.display = "none"; thumb.src = ""; }
-  if (placeholder) placeholder.style.display = "";
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.className = "tower-clear-btn";
+    clearBtn.textContent = "Clear";
+    clearBtn.title = "Clear all ticker data for this tower";
+    clearBtn.onclick = async () => {
+      if (!appConfig.ticker) return;
+      if (appConfig.ticker.towerTexts) delete appConfig.ticker.towerTexts[loc.id];
+      if (appConfig.ticker.towerAttentionTexts) delete appConfig.ticker.towerAttentionTexts[loc.id];
+      if (appConfig.ticker.towerExpiries) delete appConfig.ticker.towerExpiries[loc.id];
+      textInput.value = "";
+      attentionInput.value = "";
+      expiryInput.value = "";
+      expiryInput.placeholder = "hrs";
+      await saveConfig({ silent: true });
+    };
+
+    body.appendChild(textField);
+    body.appendChild(attentionField);
+    body.appendChild(expiryField);
+    body.appendChild(clearBtn);
+    card.appendChild(body);
+    container.appendChild(card);
+  });
 }
 
 function fileToBase64(file) {
@@ -271,10 +248,10 @@ function updateEmergencyStatus() {
   if (!btn) return;
   const e = appConfig.emergency || { enabled: false, slide: "" };
   if (e.enabled) {
-    btn.textContent = `Emergency ON (${e.slide || "Unknown"})`;
+    btn.title = `Emergency ON (${e.slide || "Unknown"}) — click to turn off`;
     btn.classList.add("on");
   } else {
-    btn.textContent = "Emergency OFF";
+    btn.title = "Emergency OFF — click to activate";
     btn.classList.remove("on");
   }
 }
@@ -510,6 +487,13 @@ function render() {
     // insert button after each thumbnail
     thumbList.appendChild(createInsertBtn(i + 1));
   });
+}
+
+/* PREVIEW SLIDE — open viewer in new tab */
+function previewSlide() {
+  const local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const url = local ? 'index.html' : `https://${repoOwner}.github.io/${repoName}/index.html`;
+  window.open(url, '_blank');
 }
 
 /* INSERT POSITION for uploads triggered by + button */

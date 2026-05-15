@@ -89,8 +89,8 @@ async function load({ showError = true } = {}) {
     ticker = {
       commonText: data.ticker?.commonText || "",
       towerTexts: data.ticker?.towerTexts || {},
-      image: data.ticker?.image || "",
-      towerExpiries: data.ticker?.towerExpiries || {}
+      towerExpiries: data.ticker?.towerExpiries || {},
+      towerAttentionTexts: data.ticker?.towerAttentionTexts || {}
     };
     applyTicker();
 
@@ -236,28 +236,18 @@ function applyTicker() {
   const scrollEl = document.getElementById("tickerScroll");
   if (!leftEl || !scrollEl) return;
 
-  // Left section: image or text
+  // Left section: common text
   leftEl.innerHTML = "";
-  if (ticker.image) {
-    const img = document.createElement("img");
-    const bust = Date.now();
-    img.src = isLocal
-      ? `${ticker.image}?t=${bust}`
-      : `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${ticker.image}?t=${bust}`;
-    img.alt = "Info";
-    leftEl.appendChild(img);
-  } else {
-    const span = document.createElement("span");
-    span.textContent = (ticker.commonText || "").split("|").map(s => s.trim()).join("\n");
-    leftEl.appendChild(span);
-    fitTextToContainer(leftEl, span);
-  }
+  const span = document.createElement("span");
+  span.textContent = (ticker.commonText || "").split("|").map(s => s.trim()).join("\n");
+  leftEl.appendChild(span);
+  fitTextToContainer(leftEl, span);
 
   // Find the best matching text for this tower param
   let text = "";
+  let matchKey = towerParam || "";
   if (towerParam && ticker.towerTexts) {
     // Exact match first (e.g. "t1c1"), then tower prefix (e.g. "t1")
-    let matchKey = towerParam;
     text = ticker.towerTexts[towerParam] || "";
     if (!text) {
       const towerPrefix = towerParam.replace(/c\d+$/, "");
@@ -272,7 +262,7 @@ function applyTicker() {
       text = "";
     }
   }
-  const displayText = text ? "" + text : "";
+  const displayText = text ? "" + text.split("|").map(s => s.trim()).join("\n") : "";
   scrollEl.textContent = displayText;
   const scrollEl2 = document.getElementById("tickerScroll2");
   if (scrollEl2) scrollEl2.textContent = displayText;
@@ -286,6 +276,13 @@ function applyTicker() {
     } else {
       bar.classList.remove("flash-news");
     }
+  }
+
+  // Update attention tag text
+  const attTag = document.querySelector(".attention-tag");
+  if (attTag) {
+    const perTowerAttention = ticker.towerAttentionTexts?.[matchKey] || "";
+    attTag.textContent = perTowerAttention || "Attention !";
   }
 
   // Randomly alternate animations each cycle

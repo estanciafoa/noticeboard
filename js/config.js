@@ -29,7 +29,9 @@ let appConfig = {
   refreshInterval: DEFAULT_REFRESH_INTERVAL,
   ticker: {
     commonText: "",
-    towerTexts: {}
+    towerTexts: {},
+    towerExpiries: {},
+    towerAttentionTexts: {}
   },
   emergency: {
     enabled: false,
@@ -57,8 +59,8 @@ async function load() {
   appConfig.ticker = {
     commonText: json.ticker?.commonText || "",
     towerTexts: json.ticker?.towerTexts || {},
-    image: json.ticker?.image || "",
-    towerExpiries: json.ticker?.towerExpiries || {}
+    towerExpiries: json.ticker?.towerExpiries || {},
+    towerAttentionTexts: json.ticker?.towerAttentionTexts || {}
   };
   appConfig.emergency = {
     enabled: !!json.emergency?.enabled,
@@ -131,8 +133,8 @@ async function saveConfig({ silent = false } = {}) {
     ticker: {
       commonText: appConfig.ticker?.commonText || "",
       towerTexts: appConfig.ticker?.towerTexts || {},
-      image: appConfig.ticker?.image || "",
-      towerExpiries: appConfig.ticker?.towerExpiries || {}
+      towerExpiries: appConfig.ticker?.towerExpiries || {},
+      towerAttentionTexts: appConfig.ticker?.towerAttentionTexts || {}
     },
     emergency: {
       enabled: !!appConfig.emergency?.enabled,

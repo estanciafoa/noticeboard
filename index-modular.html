@@ -51,8 +51,9 @@
 
     </div>
     <div class="topbar-right emergency-controls">
-      <button id="tickerPanelToggle" class="ticker-topbar-btn" onclick="toggleTickerPanel()" title="Ticker Settings">Ticker &#9654;</button>
-      <button id="emergencyToggle" class="emergency-btn" onclick="toggleEmergency()">Emergency OFF</button>
+      <button class="preview-btn" onclick="previewSlide()" title="Preview slideshow"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="6,3 20,12 6,21"/></svg></button>
+      <button class="save-btn" onclick="saveConfig()">Save</button>
+      <button id="emergencyToggle" class="emergency-btn" onclick="toggleEmergency()" title="Emergency OFF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
     </div>
   </div>
 
@@ -151,56 +152,45 @@
       </div>
     </div>
     <div class="right">
-      <div id="multiSelectBar" style="display:none" class="multi-select-bar">
-        <span class="multi-count"></span>
-        <button class="primary" onclick="applyToMultiSelected()">Apply to all</button>
-        <button onclick="multiSelected.clear(); updateMultiSelectBar(); render()">Clear</button>
-      </div>
-      <h3 id="titleEl">Slide</h3>
-
-      <div class="field"><label>Duration</label><input id="duration" placeholder="seconds (e.g. 10)"></div>
-
-      <div class="field">
-        <label>Time slots</label>
-        <div id="timeSlotsContainer" class="slots-container"></div>
-        <button class="slot-add-btn" type="button" onclick="addTimeSlot()">+ Add time slot</button>
+      <div class="right-tabs">
+        <button class="right-tab active" data-tab="slideTab" onclick="switchRightTab('slideTab')">Slide Settings</button>
+        <button class="right-tab" data-tab="tickerTab" onclick="switchRightTab('tickerTab')">Ticker Settings</button>
       </div>
 
-      <div class="field">
-        <label>Date ranges</label>
-        <div id="dateRangesContainer" class="slots-container"></div>
-        <button class="slot-add-btn" type="button" onclick="addDateRange()">+ Add date range</button>
-      </div>
+      <!-- SLIDE SETTINGS TAB -->
+      <div class="right-tab-content active" id="slideTab">
+        <div id="multiSelectBar" style="display:none" class="multi-select-bar">
+          <span class="multi-count"></span>
+          <button class="primary" onclick="applyToMultiSelected()">Apply to all</button>
+          <button onclick="multiSelected.clear(); updateMultiSelectBar(); render()">Clear</button>
+        </div>
+        <h3 id="titleEl">Slide</h3>
 
-      <div class="field"><label>Expiry</label><input id="expiry" placeholder="e.g. 2h, 7d"></div>
-
-      <div class="field location-field">
-        <label>Locations</label>
-        <p class="loc-hint">No locations selected = slide is disabled</p>
-        <div id="locationPicker" class="location-picker"></div>
-      </div>
-
-      <button class="save-btn" onclick="saveConfig()">Save</button>
-    </div>
-
-    <!-- TICKER PANEL (collapsible to the right) -->
-    <div class="ticker-panel" id="tickerPanel">
-      <div class="ticker-panel-content" id="tickerPanelContent">
-        <h3>Ticker Settings</h3>
+        <div class="field"><label>Duration</label><input id="duration" placeholder="seconds (e.g. 10)"></div>
 
         <div class="field">
-          <label>Ticker Image (left section)</label>
-          <div class="ticker-image-preview" id="tickerImagePreview">
-            <span class="ticker-image-placeholder" id="tickerImagePlaceholder">No image</span>
-            <img id="tickerImageThumb" style="display:none" alt="Ticker image">
-          </div>
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <button class="slot-add-btn" type="button" onclick="tickerImageInput.click()">Upload</button>
-            <button class="slot-add-btn" type="button" onclick="removeTickerImage()">Remove</button>
-          </div>
-          <input type="file" id="tickerImageInput" accept="image/*" style="display:none">
+          <label>Time slots</label>
+          <div id="timeSlotsContainer" class="slots-container"></div>
+          <button class="slot-add-btn" type="button" onclick="addTimeSlot()">+ Add time slot</button>
         </div>
 
+        <div class="field">
+          <label>Date ranges</label>
+          <div id="dateRangesContainer" class="slots-container"></div>
+          <button class="slot-add-btn" type="button" onclick="addDateRange()">+ Add date range</button>
+        </div>
+
+        <div class="field"><label>Expiry</label><input id="expiry" placeholder="e.g. 2h, 7d"></div>
+
+        <div class="field location-field">
+          <label>Locations</label>
+          <p class="loc-hint">No locations selected = slide is disabled</p>
+          <div id="locationPicker" class="location-picker"></div>
+        </div>
+      </div>
+
+      <!-- TICKER SETTINGS TAB -->
+      <div class="right-tab-content" id="tickerTab">
         <div class="field">
           <label for="tickerCommonText">Common Text (all towers)</label>
           <textarea id="tickerCommonText" rows="3" placeholder="e.g. Security: 9876543210&#10;Office: 9123456789" style="width:100%;resize:vertical;"></textarea>

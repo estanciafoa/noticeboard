@@ -237,23 +237,30 @@ body {
 }
 
 .topbar button.emergency-btn {
-  background: #dc2626 !important;
-  color: #fff !important;
-  border: 2px solid #dc2626 !important;
-  font-weight: 700;
+  background: var(--bg-3) !important;
+  color: #dc2626 !important;
+  border: 1px solid var(--line) !important;
   cursor: pointer;
   border-radius: 6px;
-  padding: 8px 18px;
-  font-size: 13px;
+  padding: 5px 8px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.topbar button.emergency-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .topbar button.emergency-btn:hover {
-  background: #b91c1c !important;
-  border-color: #b91c1c !important;
+  background: #dc2626 !important;
+  color: #fff !important;
+  border-color: #dc2626 !important;
 }
 
 .topbar button.emergency-btn.on {
   background: #ef4444 !important;
+  color: #fff !important;
   border-color: #ef4444 !important;
   animation: pulse-red 1.5s infinite;
 }
@@ -699,7 +706,6 @@ body {
 .right { 
   width: 300px;
   background: var(--bg-1); 
-  padding: 18px 18px 24px; 
   border-left: 1px solid var(--line);
   overflow-y: auto;
   display: flex;
@@ -707,23 +713,83 @@ body {
   flex-direction: column;
 }
 
+.right-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--line);
+  flex-shrink: 0;
+}
+.right-tab {
+  flex: 1;
+  padding: 10px 8px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.right-tab:hover {
+  color: var(--text);
+}
+.right-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.right-tab-content {
+  display: none;
+  padding: 18px 18px 24px;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.right-tab-content.active {
+  display: flex;
+}
+
+/* Preview button */
+.preview-btn {
+  background: var(--bg-3) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 6px;
+  padding: 5px 8px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.preview-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.preview-btn:hover {
+  background: var(--accent) !important;
+  color: var(--bg-0) !important;
+  border-color: var(--accent) !important;
+}
+
 .save-btn {
-  margin-top: auto;
-  padding: 10px 0;
-  width: 100%;
+  padding: 6px 18px;
   background: var(--accent);
   color: var(--bg-1);
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+  text-transform: uppercase;
 }
 
 .save-btn:hover {
   background: #67e8f9;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.6);
 }
 
 .right h3 {
@@ -1189,6 +1255,7 @@ button {
   flex-direction: column;
   gap: 6px;
 }
+
 .previewCard img,
 .previewCard video {
   width: 100%;
@@ -1213,50 +1280,7 @@ button {
 .previewCard .status.error { color: var(--danger); }
 .previewCard .status.done  { color: #22d3ee; }
 
-/* TICKER TOPBAR BUTTON */
-.ticker-topbar-btn {
-  padding: 5px 10px;
-  background: var(--bg-2);
-  color: var(--accent);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.ticker-topbar-btn:hover {
-  background: var(--bg-3);
-}
 
-/* TICKER PANEL (collapsible right) */
-.ticker-panel {
-  width: 0;
-  background: var(--bg-1);
-  border-left: 1px solid var(--line);
-  transition: width 0.25s ease;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.ticker-panel.open {
-  width: 280px;
-}
-.ticker-panel-content {
-  width: 280px;
-  padding: 14px 16px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
-  box-sizing: border-box;
-}
-.ticker-panel-content h3 {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent);
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 10px;
-}
 .ticker-image-preview {
   width: 100%;
   height: 40px;
@@ -1281,35 +1305,75 @@ button {
   grid-template-columns: 1fr;
   gap: 6px;
 }
+.ticker-tower-card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg-2);
+  overflow: hidden;
+}
+.ticker-tower-summary {
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  user-select: none;
+}
+.ticker-tower-summary:hover {
+  background: var(--accent-soft);
+}
+.ticker-tower-body {
+  padding: 8px 10px 10px;
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+}
 .ticker-tower-field {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  display: grid;
+  gap: 4px;
 }
 .ticker-tower-field label {
   font-size: 11px;
   font-weight: 600;
-  min-width: 44px;
-  color: var(--fg);
+  color: var(--text);
 }
-.ticker-tower-field input[type="text"] {
-  flex: 1;
+.ticker-tower-field input[type="text"],
+.ticker-tower-field textarea {
+  width: 100%;
   font-size: 12px;
-  padding: 4px 8px;
+  padding: 6px 8px;
   border-radius: 4px;
   border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--bg-1);
+  color: var(--text);
+}
+.ticker-tower-field textarea {
+  resize: vertical;
+  min-height: 46px;
 }
 .ticker-tower-field input.ticker-expiry {
-  width: 20px;
-  flex: none;
-  font-size: 10px;
-  padding: 4px 2px;
+  width: 84px;
+  font-size: 11px;
+  padding: 6px 8px;
   border-radius: 4px;
   border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--bg-1);
+  color: var(--text);
+}
+.tower-clear-btn {
+  justify-self: end;
+  padding: 4px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #c44;
+  border-radius: 4px;
+  background: transparent;
+  color: #c44;
+  cursor: pointer;
+}
+.tower-clear-btn:hover {
+  background: #c44;
+  color: #fff;
 }
 
 .ticker-tooltip {

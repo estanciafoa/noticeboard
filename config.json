@@ -4,7 +4,7 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "Security \nMain Ingate: 9848578392",
+    "commonText": "Security \nMaingate:9848578392",
     "towerTexts": {
       "t1c1": "",
       "club": "TESTING THE TICKER FEATURE"

@@ -6,11 +6,13 @@
   "ticker": {
     "commonText": "Security: 9840856676 | Main: 9848578392",
     "towerTexts": {
-      "t1c1": "testing the ticker feature in tower 1 core 2. thanks"
+      "t1c1": "",
+      "club": "TESTING THE TICKER FEATURE"
     },
     "image": "",
     "towerExpiries": {
-      "t1c1": 1778862669216
+      "t1c1": 1778862669216,
+      "club": 1778849197860
     }
   },
   "emergency": {

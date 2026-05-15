@@ -6,16 +6,14 @@
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
     "towerTexts": {
-      "t1c1": "Domestic water will not be available on floors 10-14 from | 12 pm - 3 pm"
+      "t1c1": ""
     },
     "image": "",
     "towerExpiries": {
       "t1c1": 1778874719546
     },
     "attentionText": "Attention !",
-    "towerAttentionTexts": {
-      "t1c1": "Attention !"
-    }
+    "towerAttentionTexts": {}
   },
   "emergency": {
     "enabled": false,

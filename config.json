@@ -5,11 +5,15 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
-    "towerTexts": {},
+    "towerTexts": {
+      "t1c1": "Testing Ticker feature"
+    },
     "image": "",
     "towerExpiries": {},
     "attentionText": "Attention !",
-    "towerAttentionTexts": {}
+    "towerAttentionTexts": {
+      "t1c1": "Shutdown Notice !"
+    }
   },
   "emergency": {
     "enabled": false,

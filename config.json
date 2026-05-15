@@ -8,7 +8,10 @@
     "towerTexts": {
       "t1c1": "Testing ticker in tower1 core1"
     },
-    "image": ""
+    "image": "",
+    "towerExpiries": {
+      "t1c1": 1778862669216
+    }
   },
   "emergency": {
     "enabled": false,

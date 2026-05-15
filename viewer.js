@@ -17,6 +17,7 @@ let timer    = null;
 let transitionEffect = "fade";
 let transitionMs = 700;
 let emergency = { enabled: false, slide: "", towers: "" };
+let ticker = { commonText: "", towerTexts: {} };
 
 /* TOWER FILTER — read from ?t= in URL */
 const towerParamRaw = new URLSearchParams(location.search).get("t");
@@ -49,7 +50,9 @@ function withTimeout(promise, ms) {
 async function isInternetAvailable() {
   if (!navigator.onLine) return false;
   try {
-    const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`;
+    const url = isLocal
+      ? `config.json?t=${Date.now()}`
+      : `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`;
     const res = await withTimeout(fetch(url, { cache: "no-store" }), 5000);
     return !!res && res.ok;
   } catch (_) {
@@ -58,9 +61,14 @@ async function isInternetAvailable() {
 }
 
 /* LOAD CONFIG */
+const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+
 async function load({ showError = true } = {}) {
   try {
-    const resJson = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`);
+    const configUrl = isLocal
+      ? `config.json?t=${Date.now()}`
+      : `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/config.json?t=${Date.now()}`;
+    const resJson = await fetch(configUrl);
     if (!resJson.ok) throw new Error(`Failed to load config.json (HTTP ${resJson.status})`);
 
     const data = await resJson.json();
@@ -69,7 +77,7 @@ async function load({ showError = true } = {}) {
     transitionMs = Number(data.transitionMs) > 0 ? Number(data.transitionMs) : 700;
     
     // Update refresh interval if configured (value is in minutes, convert to milliseconds)
-    const newRefreshInterval = Number(data.refreshIntervalMs) > 0 ? Number(data.refreshIntervalMs) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
+    const newRefreshInterval = Number(data.refreshInterval) > 0 ? Number(data.refreshInterval) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
     refreshIntervalMs = newRefreshInterval;
     
     emergency = {
@@ -77,6 +85,14 @@ async function load({ showError = true } = {}) {
       slide: data.emergency?.slide || "",
       towers: data.emergency?.towers || ""
     };
+
+    ticker = {
+      commonText: data.ticker?.commonText || "",
+      towerTexts: data.ticker?.towerTexts || {},
+      image: data.ticker?.image || "",
+      towerExpiries: data.ticker?.towerExpiries || {}
+    };
+    applyTicker();
 
     slides = (Array.isArray(data.slides) ? data.slides : []).map(s => ({
       name: s.name,
@@ -185,6 +201,10 @@ function isVideo(name) {
 function mediaUrls(name) {
   const bust = Date.now();
   const enc = encodeURIComponent(name);
+  if (isLocal) {
+    const local = `slides/${enc}?t=${bust}`;
+    return { primary: local, fallback: local };
+  }
   const pages = `https://${repoOwner}.github.io/${repoName}/slides/${enc}?t=${bust}`;
   const raw   = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${enc}?t=${bust}`;
   // Videos: prefer raw (Pages often 404s / ORB-blocks large files)
@@ -193,6 +213,73 @@ function mediaUrls(name) {
     return { primary: raw, fallback: pages };
   }
   return { primary: pages, fallback: raw };
+}
+
+/* TICKER */
+function fitTextToContainer(container, span) {
+  const origOverflow = container.style.overflow;
+  container.style.overflow = "visible";
+  let size = 9;
+  span.style.fontSize = size + "px";
+  span.style.lineHeight = "1.15";
+  const maxH = container.clientHeight;
+  const maxW = container.clientWidth;
+  while (size > 3 && (span.offsetHeight > maxH || span.offsetWidth > maxW)) {
+    size -= 0.5;
+    span.style.fontSize = size + "px";
+  }
+  container.style.overflow = origOverflow || "hidden";
+}
+
+function applyTicker() {
+  const leftEl = document.getElementById("tickerLeft");
+  const scrollEl = document.getElementById("tickerScroll");
+  if (!leftEl || !scrollEl) return;
+
+  // Left section: image or text
+  leftEl.innerHTML = "";
+  if (ticker.image) {
+    const img = document.createElement("img");
+    const bust = Date.now();
+    img.src = isLocal
+      ? `${ticker.image}?t=${bust}`
+      : `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${ticker.image}?t=${bust}`;
+    img.alt = "Info";
+    leftEl.appendChild(img);
+  } else {
+    const span = document.createElement("span");
+    span.textContent = (ticker.commonText || "").split("|").map(s => s.trim()).join("\n");
+    leftEl.appendChild(span);
+    fitTextToContainer(leftEl, span);
+  }
+
+  // Find the best matching text for this tower param
+  let text = "";
+  if (towerParam && ticker.towerTexts) {
+    // Exact match first (e.g. "t1c1"), then tower prefix (e.g. "t1")
+    let matchKey = towerParam;
+    text = ticker.towerTexts[towerParam] || "";
+    if (!text) {
+      const towerPrefix = towerParam.replace(/c\d+$/, "");
+      if (towerPrefix !== towerParam) {
+        text = ticker.towerTexts[towerPrefix] || "";
+        matchKey = towerPrefix;
+      }
+    }
+    // Check per-tower expiry
+    const expiry = ticker.towerExpiries?.[matchKey];
+    if (expiry && Date.now() > expiry) {
+      text = "";
+    }
+  }
+  scrollEl.textContent = text ? "ℹ️  " + text : "";
+
+  // Adjust animation speed based on text length
+  if (text) {
+    const duration = Math.max(10, text.length * 0.3);
+    scrollEl.style.setProperty("--ticker-duration", `${duration}s`);
+    scrollEl.style.animationDuration = `${duration}s`;
+  }
 }
 
 /* BUILD ELEMENTS */

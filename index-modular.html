@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Estancia Admin</title>
-<link rel="stylesheet" href="styles.css?v=8">
+<link rel="stylesheet" href="styles.css?v=9">
 </head>
 
 <body>
@@ -45,8 +45,13 @@
         <option value="zoom">Zoom</option>
       </select>
 
+      <label for="refreshInterval">Refresh</label>
+      <input type="number" id="refreshInterval" min="1" max="120" value="15" style="width:50px" title="Sync interval in minutes"><!--
+      --><span style="font-size:.75rem;opacity:.6">min</span>
+
     </div>
     <div class="topbar-right emergency-controls">
+      <button id="tickerPanelToggle" class="ticker-topbar-btn" onclick="toggleTickerPanel()" title="Ticker Settings">Ticker &#9654;</button>
       <button id="emergencyToggle" class="emergency-btn" onclick="toggleEmergency()">Emergency OFF</button>
     </div>
   </div>
@@ -176,6 +181,36 @@
       </div>
 
       <button class="save-btn" onclick="saveConfig()">Save</button>
+    </div>
+
+    <!-- TICKER PANEL (collapsible to the right) -->
+    <div class="ticker-panel" id="tickerPanel">
+      <div class="ticker-panel-content" id="tickerPanelContent">
+        <h3>Ticker Settings</h3>
+
+        <div class="field">
+          <label>Ticker Image (left section)</label>
+          <div class="ticker-image-preview" id="tickerImagePreview">
+            <span class="ticker-image-placeholder" id="tickerImagePlaceholder">No image</span>
+            <img id="tickerImageThumb" style="display:none" alt="Ticker image">
+          </div>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="slot-add-btn" type="button" onclick="tickerImageInput.click()">Upload</button>
+            <button class="slot-add-btn" type="button" onclick="removeTickerImage()">Remove</button>
+          </div>
+          <input type="file" id="tickerImageInput" accept="image/*" style="display:none">
+        </div>
+
+        <div class="field">
+          <label for="tickerCommonText">Common Text (all towers)</label>
+          <textarea id="tickerCommonText" rows="3" placeholder="e.g. Security: 9876543210&#10;Office: 9123456789" style="width:100%;resize:vertical;"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Scrolling Text (per tower/core)</label>
+          <div id="tickerTowerTexts" class="ticker-tower-fields"></div>
+        </div>
+      </div>
     </div>
 
   </div>

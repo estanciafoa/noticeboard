@@ -697,12 +697,13 @@ body {
 
 /* RIGHT */
 .right { 
-  width: 300px; 
+  width: 300px;
   background: var(--bg-1); 
   padding: 18px 18px 24px; 
   border-left: 1px solid var(--line);
   overflow-y: auto;
   display: flex;
+  flex-shrink: 0;
   flex-direction: column;
 }
 
@@ -1211,3 +1212,118 @@ button {
 
 .previewCard .status.error { color: var(--danger); }
 .previewCard .status.done  { color: #22d3ee; }
+
+/* TICKER TOPBAR BUTTON */
+.ticker-topbar-btn {
+  padding: 5px 10px;
+  background: var(--bg-2);
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ticker-topbar-btn:hover {
+  background: var(--bg-3);
+}
+
+/* TICKER PANEL (collapsible right) */
+.ticker-panel {
+  width: 0;
+  background: var(--bg-1);
+  border-left: 1px solid var(--line);
+  transition: width 0.25s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.ticker-panel.open {
+  width: 280px;
+}
+.ticker-panel-content {
+  width: 280px;
+  padding: 14px 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  box-sizing: border-box;
+}
+.ticker-panel-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+.ticker-image-preview {
+  width: 100%;
+  height: 40px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.ticker-image-preview img {
+  height: 100%;
+  object-fit: contain;
+}
+.ticker-image-placeholder {
+  font-size: 11px;
+  color: var(--muted);
+}
+.ticker-tower-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+.ticker-tower-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ticker-tower-field label {
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 44px;
+  color: var(--fg);
+}
+.ticker-tower-field input[type="text"] {
+  flex: 1;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+}
+.ticker-tower-field input.ticker-expiry {
+  width: 20px;
+  flex: none;
+  font-size: 10px;
+  padding: 4px 2px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.ticker-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  background: #222;
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  max-width: 350px;
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  pointer-events: none;
+}

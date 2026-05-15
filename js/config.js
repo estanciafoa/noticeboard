@@ -20,11 +20,17 @@ const LOCATIONS = [
 const DEFAULT_DURATION_SECONDS = 10;
 const DEFAULT_TRANSITION_EFFECT = "fade";
 const DEFAULT_TRANSITION_MS = 700;
+const DEFAULT_REFRESH_INTERVAL = 15; /* in minutes */
 
 let appConfig = {
   defaultDuration: DEFAULT_DURATION_SECONDS,
   transitionEffect: DEFAULT_TRANSITION_EFFECT,
   transitionMs: DEFAULT_TRANSITION_MS,
+  refreshInterval: DEFAULT_REFRESH_INTERVAL,
+  ticker: {
+    commonText: "",
+    towerTexts: {}
+  },
   emergency: {
     enabled: false,
     slide: "",
@@ -47,6 +53,13 @@ async function load() {
   appConfig.defaultDuration = Number(json.defaultDuration) > 0 ? Number(json.defaultDuration) : DEFAULT_DURATION_SECONDS;
   appConfig.transitionEffect = json.transitionEffect || DEFAULT_TRANSITION_EFFECT;
   appConfig.transitionMs = Number(json.transitionMs) > 0 ? Number(json.transitionMs) : DEFAULT_TRANSITION_MS;
+  appConfig.refreshInterval = Number(json.refreshInterval) > 0 ? Number(json.refreshInterval) : DEFAULT_REFRESH_INTERVAL;
+  appConfig.ticker = {
+    commonText: json.ticker?.commonText || "",
+    towerTexts: json.ticker?.towerTexts || {},
+    image: json.ticker?.image || "",
+    towerExpiries: json.ticker?.towerExpiries || {}
+  };
   appConfig.emergency = {
     enabled: !!json.emergency?.enabled,
     slide: json.emergency?.slide || "",
@@ -102,10 +115,25 @@ async function load() {
 
 /* SAVE CONFIG */
 async function saveConfig({ silent = false } = {}) {
+  let existingSha;
+  try {
+    const file = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.json`);
+    existingSha = file.sha;
+  } catch (e) {
+    if (e.status !== 404) throw e;
+  }
+
   const payload = {
     defaultDuration: appConfig.defaultDuration,
     transitionEffect: appConfig.transitionEffect,
     transitionMs: appConfig.transitionMs,
+    refreshInterval: appConfig.refreshInterval,
+    ticker: {
+      commonText: appConfig.ticker?.commonText || "",
+      towerTexts: appConfig.ticker?.towerTexts || {},
+      image: appConfig.ticker?.image || "",
+      towerExpiries: appConfig.ticker?.towerExpiries || {}
+    },
     emergency: {
       enabled: !!appConfig.emergency?.enabled,
       slide: appConfig.emergency?.slide || "",
@@ -125,14 +153,6 @@ async function saveConfig({ silent = false } = {}) {
         };
       })
   };
-
-  let existingSha;
-  try {
-    const file = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.json`);
-    existingSha = file.sha;
-  } catch (e) {
-    if (e.status !== 404) throw e;
-  }
 
   await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/config.json`, {
     method: "PUT",

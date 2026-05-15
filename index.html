@@ -74,19 +74,82 @@ html, body {
   color: #fff;
   z-index: 10;
   overflow: visible;
+  display: flex;
+  align-items: center;
 }
 @keyframes blink {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0.4; }
 }
 
-.bottom-bar .label {
-  position: absolute;
-  font-size: 6px;
-  font-style: italic;
-  right: 4px;
-  top: 26px;
+/* LEFT: fixed common info (20%) */
+.ticker-left {
+  width: calc(20% + 20px);
+  min-width: 0;
+  padding: 2px 6px;
+  font-size: 8px;
+  line-height: 1.2;
+  color: #ccc;
+  overflow: hidden;
+  border-right: 1px solid #333;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
+.ticker-left span {
+  white-space: pre-line;
+  word-break: break-word;
+}
+.ticker-left img {
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* CENTER: scrolling tower-specific text */
+.ticker-center {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.ticker-center .ticker-scroll {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  padding-left: 100%;
+  animation: ticker-scroll-anim var(--ticker-duration, 20s) linear infinite;
+}
+@keyframes ticker-scroll-anim {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* RIGHT: logo area */
+.ticker-right {
+  flex-shrink: 0;
+  width: 80px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-sizing: border-box;
+}
+.ticker-right .label {
+  display: none;
+}
+.ticker-right img {
+  height: 32px;
+  object-fit: contain;
+}
+
 .bottom-bar .network-status {
   position: absolute;
   left: 5px;
@@ -108,12 +171,6 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.bottom-bar img {
-  height: 80px;
-  position: absolute;
-  right: 3px;
-  top: -26px;
-}
 
 /* EMPTY STATE */
 #empty {
@@ -134,14 +191,21 @@ html, body {
   <div id="empty">Loading…</div>
   <div class="bottom-bar">
     <div id="networkStatus" class="network-status"></div>
-    <div class="label">Flat Owners Association</div>
-    <img src="images/estancialogo.png" alt="Estancia">
+    <div class="ticker-left" id="tickerLeft"></div>
+    <div class="ticker-center">
+      <span class="ticker-scroll" id="tickerScroll"></span>
+    </div>
+    <div class="ticker-right">
+      <div class="label">Flat Owners Association</div>
+      <img src="images/estancialogo.png" alt="Estancia">
+    </div>
   </div>
 </div>
 
 <script>
-/* Bootstrap: load viewer.js from raw GitHub (always fresh, bypasses Pages CDN cache) */
+/* Bootstrap: load viewer.js — local on localhost, from raw GitHub in production */
 (function() {
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   var src = 'https://raw.githubusercontent.com/estanciafoa/noticeboard/main/viewer.js?t=' + Date.now();
   var fallbackSrc = 'viewer.js?t=' + Date.now();
 
@@ -150,6 +214,8 @@ html, body {
     s.src = fallbackSrc;
     document.body.appendChild(s);
   }
+
+  if (isLocal) { loadFallback(); return; }
 
   fetch(src)
     .then(function(r) {

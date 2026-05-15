@@ -4,11 +4,14 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "Security: 9840856676 | Main: 9848578392",
+    "commonText": "Security Maingate:\n9848578392",
     "towerTexts": {
       "t1c1": "Testing ticker in tower1 core1"
     },
-    "image": ""
+    "image": "",
+    "towerExpiries": {
+      "t1c1": 1778874077372
+    }
   },
   "emergency": {
     "enabled": false,

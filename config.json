@@ -2,6 +2,7 @@
   "defaultDuration": 10,
   "transitionEffect": "fade",
   "transitionMs": 700,
+  "refreshInterval": 15, /* in minutes */
   "emergency": {
     "enabled": false,
     "slide": "",

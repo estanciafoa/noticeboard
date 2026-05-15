@@ -6,12 +6,12 @@
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
     "towerTexts": {
-      "t1c1": "",
+      "t1c1": "testing ticker feature under progress",
       "club": "TESTING THE TICKER FEATURE"
     },
     "image": "",
     "towerExpiries": {
-      "t1c1": 1778862669216,
+      "t1c1": 1778872212978,
       "club": 1778849197860
     }
   },

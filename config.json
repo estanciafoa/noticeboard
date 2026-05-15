@@ -6,12 +6,13 @@
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
     "towerTexts": {
-      "t1c1": "Testing ticker in tower1 core1"
+      "t1c1": "Domestic water will not be available on floors 10-14 from 12 pm -3 pm"
     },
     "image": "",
     "towerExpiries": {
       "t1c1": 1778874077372
-    }
+    },
+    "attentionText": "EMERGENCY WATER SHUTDOWN NOTICE !"
   },
   "emergency": {
     "enabled": false,

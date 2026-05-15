@@ -4,7 +4,7 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "Security Maingate:\n9848578392",
+    "commonText": "Security: 9848578392\nHelp Dsk: ",
     "towerTexts": {},
     "towerExpiries": {},
     "towerAttentionTexts": {}

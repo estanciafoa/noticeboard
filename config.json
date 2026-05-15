@@ -6,7 +6,7 @@
   "ticker": {
     "commonText": "Security: 9840856676 | Main: 9848578392",
     "towerTexts": {
-      "t1c1": "Water supply will be restored by 3:00 pm today."
+      "t1c1": "Testing ticker in tower1 core1"
     },
     "image": ""
   },

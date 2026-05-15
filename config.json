@@ -4,9 +4,9 @@
   "transitionMs": 700,
   "refreshInterval": 1,
   "ticker": {
-    "commonText": "Security:\n9848578392",
+    "commonText": "Security Maingate:\n9848578392",
     "towerTexts": {
-      "t1c1": "TESTING THE TICKER FEATURE IN TOWER 1 CORE 1. WATER SHUTDOWN NOTICE",
+      "t1c1": "",
       "club": "TESTING THE TICKER FEATURE"
     },
     "image": "",

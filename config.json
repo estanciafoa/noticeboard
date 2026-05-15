@@ -2,7 +2,6 @@
   "defaultDuration": 10,
   "transitionEffect": "fade",
   "transitionMs": 700,
-  "refreshInterval": 15,
   "emergency": {
     "enabled": false,
     "slide": "",
@@ -123,6 +122,14 @@
     },
     {
       "name": "Mr. X.png",
+      "duration": "",
+      "times": [],
+      "dates": [],
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "2.png",
       "duration": "",
       "times": [],
       "dates": [],

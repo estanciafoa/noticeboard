@@ -5,11 +5,13 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
-    "towerTexts": {},
-    "image": "",
+    "towerTexts": {
+      "t1c1": "testing ticker in tower1 core 1"
+    },
     "towerExpiries": {},
-    "attentionText": "Attention !",
-    "towerAttentionTexts": {}
+    "towerAttentionTexts": {
+      "t1c1": "Attentin Residents!"
+    }
   },
   "emergency": {
     "enabled": false,

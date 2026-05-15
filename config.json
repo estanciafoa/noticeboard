@@ -5,9 +5,13 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Security: 9848578392\nHelp Dsk: ",
-    "towerTexts": {},
+    "towerTexts": {
+      "t1c1": "Domestic Water Shutdown | Floor 10-14|\n5pm - 6pm, 15th May"
+    },
     "towerExpiries": {},
-    "towerAttentionTexts": {}
+    "towerAttentionTexts": {
+      "t1c1": "Domestic Water Shutdown Notice!"
+    }
   },
   "emergency": {
     "enabled": false,

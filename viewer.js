@@ -272,14 +272,35 @@ function applyTicker() {
       text = "";
     }
   }
-  scrollEl.textContent = text ? "ℹ️  " + text : "";
+  const displayText = text ? "" + text : "";
+  scrollEl.textContent = displayText;
+  const scrollEl2 = document.getElementById("tickerScroll2");
+  if (scrollEl2) scrollEl2.textContent = displayText;
 
-  // Adjust animation speed based on text length
-  if (text) {
-    const duration = Math.max(10, text.length * 0.3);
-    scrollEl.style.setProperty("--ticker-duration", `${duration}s`);
-    scrollEl.style.animationDuration = `${duration}s`;
+  // Flash news style when scrolling text is active
+  const bar = document.querySelector(".bottom-bar");
+  const wrap = document.getElementById("tickerScrollWrap");
+  if (bar) {
+    if (text) {
+      bar.classList.add("flash-news");
+    } else {
+      bar.classList.remove("flash-news");
+    }
   }
+
+  // Randomly alternate animations each cycle
+  if (text && wrap) {
+    const anims = ["ticker-zoom", "ticker-flip", "ticker-slide-up", "ticker-drop", "ticker-slide-right", "ticker-slide-left"];
+    function pickAnim() {
+      const name = anims[Math.floor(Math.random() * anims.length)];
+      wrap.style.animation = "none";
+      wrap.offsetHeight; // reflow
+      wrap.style.animation = `${name} 7s cubic-bezier(0.16, 1, 0.3, 1) infinite`;
+    }
+    pickAnim();
+    wrap.addEventListener("animationiteration", pickAnim);
+  }
+
 }
 
 /* BUILD ELEMENTS */

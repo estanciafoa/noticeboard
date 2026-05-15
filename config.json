@@ -11,10 +11,6 @@
     "image": "",
     "towerExpiries": {
       "t1c1": 1778874719546
-    },
-    "attentionText": "Attention !",
-    "towerAttentionTexts": {
-      "t1c1": "EMERGENCY WATER SHUTDOWN NOTICE !"
     }
   },
   "emergency": {

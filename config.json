@@ -4,10 +4,11 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "Security: 9840856676, Maintenenace: 9848578392",
+    "commonText": "Security: 9840856676 | Main: 9848578392",
     "towerTexts": {
       "t1c1": "Water supply will be restored by 3:00 pm today."
-    }
+    },
+    "image": ""
   },
   "emergency": {
     "enabled": false,

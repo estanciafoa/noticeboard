@@ -4,13 +4,15 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "Security: 9848578392\nHelp Dsk: ",
+    "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "t1c1": "Domestic Water Shutdown | Floor 10-14|\n5pm - 6pm, 15th May"
+      "club": "Today at 5:30 PM, Tamil Movie – Mr. X will be telecasted at our AV Hall."
     },
-    "towerExpiries": {},
+    "towerExpiries": {
+      "club": 1778946543494
+    },
     "towerAttentionTexts": {
-      "t1c1": "Domestic Water Shutdown Notice!"
+      "club": "FLASH NEWS:"
     }
   },
   "emergency": {
@@ -149,6 +151,22 @@
     },
     {
       "name": "2.png",
+      "duration": "",
+      "times": [],
+      "dates": [],
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "maintenance-estancia.png",
+      "duration": "",
+      "times": [],
+      "dates": [],
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "gardening-estancia.png",
       "duration": "",
       "times": [],
       "dates": [],

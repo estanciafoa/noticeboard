@@ -5,9 +5,15 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
-    "towerTexts": {},
-    "towerExpiries": {},
-    "towerAttentionTexts": {}
+    "towerTexts": {
+      "club": "CHECKING TICKER SETTINGS"
+    },
+    "towerExpiries": {
+      "club": 1778946543494
+    },
+    "towerAttentionTexts": {
+      "club": "FLASH NEWS: TODAY 5 PM - Mr. X - Tamil Movie - Telecasting at our AV Hall"
+    }
   },
   "emergency": {
     "enabled": false,

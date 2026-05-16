@@ -6,13 +6,13 @@
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
     "towerTexts": {
-      "club": "CHECKING TICKER SETTINGS"
+      "club": "TODAY 5.30 PM - Mr. X - Tamil Movie - Telecasting at our AV Hall"
     },
     "towerExpiries": {
       "club": 1778946543494
     },
     "towerAttentionTexts": {
-      "club": "FLASH NEWS: TODAY 5 PM - Mr. X - Tamil Movie - Telecasting at our AV Hall"
+      "club": "FLASH NEWS:"
     }
   },
   "emergency": {

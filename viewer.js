@@ -217,18 +217,7 @@ function mediaUrls(name) {
 
 /* TICKER */
 function fitTextToContainer(container, span) {
-  const origOverflow = container.style.overflow;
-  container.style.overflow = "visible";
-  let size = 9;
-  span.style.fontSize = size + "px";
-  span.style.lineHeight = "1.15";
-  const maxH = container.clientHeight;
-  const maxW = container.clientWidth;
-  while (size > 3 && (span.offsetHeight > maxH || span.offsetWidth > maxW)) {
-    size -= 0.5;
-    span.style.fontSize = size + "px";
-  }
-  container.style.overflow = origOverflow || "hidden";
+  // No dynamic font sizing — use CSS-defined size
 }
 
 function applyTicker() {
@@ -271,6 +260,8 @@ function applyTicker() {
   const bar = document.querySelector(".bottom-bar");
   const wrap = document.getElementById("tickerScrollWrap");
   if (bar) {
+    const hasAnyTicker = !!(text || (ticker.commonText || "").trim());
+    bar.classList.toggle("has-ticker", hasAnyTicker);
     if (text) {
       bar.classList.add("flash-news");
     } else {

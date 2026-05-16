@@ -2,7 +2,7 @@
   "defaultDuration": 10,
   "transitionEffect": "fade",
   "transitionMs": 700,
-  "refreshInterval": 15,
+  "refreshInterval": 1,
   "ticker": {
     "commonText": "Security Maingate:\n9848578392",
     "towerTexts": {

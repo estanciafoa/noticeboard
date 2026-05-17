@@ -6,10 +6,10 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "club": "Today at 5:30 PM, Tamil Movie â Mr. X will be telecasted at our AV Hall."
+      "club": "Today at 5:30 PM, Tamil Movie – Mr. X will be telecasted at our AV Hall."
     },
     "towerExpiries": {
-      "club": 1778959611306
+      "club": 1778946543494
     },
     "towerAttentionTexts": {
       "club": "FLASH NEWS:"
@@ -135,14 +135,6 @@
     },
     {
       "name": "Bhagavad Gita Poster.png",
-      "duration": "",
-      "times": [],
-      "dates": [],
-      "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
-    },
-    {
-      "name": "Mr. X.png",
       "duration": "",
       "times": [],
       "dates": [],

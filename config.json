@@ -6,14 +6,12 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "club": "Today at 5:30 PM, Tamil Movie – Mr. X will be telecasted at our AV Hall."
+      "club": ""
     },
     "towerExpiries": {
       "club": 1779006804881
     },
-    "towerAttentionTexts": {
-      "club": "FLASH NEWS:"
-    }
+    "towerAttentionTexts": {}
   },
   "emergency": {
     "enabled": false,

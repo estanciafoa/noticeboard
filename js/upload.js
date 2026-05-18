@@ -2,6 +2,39 @@ let newFiles = [];
 let uploadSource = "single";
 let collageNameTouched = false;
 
+/* Compress image to fit 1080x1960 display, return compressed File */
+const MAX_WIDTH = 1080;
+const MAX_HEIGHT = 1960;
+const JPEG_QUALITY = 0.75;
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith("image/")) return resolve(file);
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth;
+      let h = img.naturalHeight;
+      // Scale down to fit within MAX_WIDTH x MAX_HEIGHT
+      const ratio = Math.min(MAX_WIDTH / w, MAX_HEIGHT / h, 1);
+      w = Math.round(w * ratio);
+      h = Math.round(h * ratio);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        if (!blob) return resolve(file);
+        const compressed = new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" });
+        // Use compressed only if smaller
+        resolve(compressed.size < file.size ? compressed : file);
+      }, "image/jpeg", JPEG_QUALITY);
+    };
+    img.onerror = () => resolve(file);
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 const COLLAGE_TITLES = {
   g: "Gardening @ Estancia",
   p: "Pest Control @ Estancia",
@@ -350,9 +383,17 @@ async function upload() {
 
     try {
       statusEl.className = entry.statusClass;
-      statusEl.innerText = "Uploading…";
+      statusEl.innerText = "Compressing…";
 
-      const base64 = await toBase64(entry.file);
+      // Compress image (skip videos)
+      const finalFile = isVideo(entry.name) ? entry.file : await compressImage(entry.file);
+      // Update name if compressed to jpg
+      if (finalFile !== entry.file && finalFile.name !== entry.name) {
+        entry.name = entry.name.replace(/\.[^.]+$/, ".jpg");
+      }
+
+      statusEl.innerText = "Uploading…";
+      const base64 = await toBase64(finalFile);
 
       await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${entry.name}`, {
         method: "PUT",
@@ -365,7 +406,7 @@ async function upload() {
       // Click the refresh icon on the thumb later to switch to the repo copy.
       try {
         if (localBlobs[entry.name]) URL.revokeObjectURL(localBlobs[entry.name]);
-        localBlobs[entry.name] = URL.createObjectURL(entry.file);
+        localBlobs[entry.name] = URL.createObjectURL(finalFile);
       } catch (_) {}
 
       if (!files.includes(entry.name)) {

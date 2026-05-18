@@ -6,12 +6,16 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "club": ""
+      "club": "",
+      "t1c1": "Please be informed that the 10P (T1 C1) Service Lift is undergoing maintenance today. Residents and visitors are kindly requested to use the 13P (Big Lift) instead."
     },
     "towerExpiries": {
-      "club": 1779006804881
+      "club": 1779006804881,
+      "t1c1": 1779100327040
     },
-    "towerAttentionTexts": {}
+    "towerAttentionTexts": {
+      "t1c1": "⚠️ Lift Maintenance Update:"
+    }
   },
   "emergency": {
     "enabled": false,

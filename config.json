@@ -8,7 +8,7 @@
     "towerTexts": {
       "club": "",
       "t1c1": "Please be informed that the 10P (T1 C1) Service Lift is undergoing maintenance today. Residents and visitors are kindly requested to use the 13P (Big Lift) instead.",
-      "t1c2": "Please be informed that the 10P (T1 C1) Service Lift is undergoing maintenance today. Residents and visitors are kindly requested to use the 13P (Big Lift) instead.",
+      "t1c2": "",
       "t3c1": ""
     },
     "towerExpiries": {
@@ -18,8 +18,7 @@
       "t3c1": 1779196484286
     },
     "towerAttentionTexts": {
-      "t1c1": "â ï¸ Lift Maintenance:",
-      "t1c2": "⚠️ Lift Maintenance:"
+      "t1c1": "â ï¸ Lift Maintenance:"
     }
   },
   "emergency": {

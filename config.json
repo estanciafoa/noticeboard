@@ -7,14 +7,20 @@
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
       "club": "",
-      "t1c1": "Please be informed that the 10P (T1 C1) Service Lift is undergoing maintenance today. Residents and visitors are kindly requested to use the 13P (Big Lift) instead."
+      "t1c1": "Please be informed that the 10P (T1 C1) Service Lift is undergoing maintenance today. Residents and visitors are kindly requested to use the 13P (Big Lift) instead.",
+      "t1c2": "Please be informed that the 10P (T1 C1) Service Lift is undergoing maintenance today. Residents and visitors are kindly requested to use the 13P (Big Lift) instead.",
+      "t3c1": "Due to maintenance work in the kitchen line, there will be a water interruption for 3rd Series residents today from 4:00 PM to 6:00 PM."
     },
     "towerExpiries": {
       "club": 1779086561664,
-      "t1c1": 1779100327040
+      "t1c1": 1779100327040,
+      "t1c2": 1779188749519,
+      "t3c1": 1779196484286
     },
     "towerAttentionTexts": {
-      "t1c1": "⚠️ Lift Maintenance:"
+      "t1c1": "â ï¸ Lift Maintenance:",
+      "t1c2": "⚠️ Lift Maintenance:",
+      "t3c1": "T3 C1 - 3rd Series Resident"
     }
   },
   "emergency": {

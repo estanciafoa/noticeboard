@@ -6,14 +6,16 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "club": "",
+      "club": "Spl Movie Screening for Sr. Citizen - Kadhalikka Neramillai - Today 4 PM",
       "t3c1": ""
     },
     "towerExpiries": {
       "club": 1779086561664,
       "t3c1": 1779196484286
     },
-    "towerAttentionTexts": {}
+    "towerAttentionTexts": {
+      "club": "Spl. Movie Screening"
+    }
   },
   "emergency": {
     "enabled": false,

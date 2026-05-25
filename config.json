@@ -6,16 +6,14 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "club": "Kaalidas 2 (2026-Tamil) Movie- Today 5.30 PM",
+      "club": "",
       "t3c1": ""
     },
     "towerExpiries": {
       "club": 1779520725072,
       "t3c1": 1779196484286
     },
-    "towerAttentionTexts": {
-      "club": "Spl. Movie Screening"
-    }
+    "towerAttentionTexts": {}
   },
   "emergency": {
     "enabled": false,

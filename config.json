@@ -6,14 +6,16 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "club": "",
+      "club": "MRITHYUNJAY (2026) – Investigative Crime Thriller Movie – Starring Sree Vishnu on Coming Saturday (30th May 2026)",
       "t3c1": ""
     },
     "towerExpiries": {
-      "club": 1779520725072,
+      "club": 1780124669842,
       "t3c1": 1779196484286
     },
-    "towerAttentionTexts": {}
+    "towerAttentionTexts": {
+      "club": "Special Movie Screening"
+    }
   },
   "emergency": {
     "enabled": false,

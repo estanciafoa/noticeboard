@@ -171,8 +171,13 @@
       "name": "EB Bill.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
-      "expiry": "",
+      "dates": [
+        {
+          "startDate": "2026-06-01",
+          "endDate": "2026-06-05"
+        }
+      ],
+      "expiry": "5D",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     }
   ]

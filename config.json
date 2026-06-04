@@ -6,7 +6,7 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "club": "MRITHYUNJAY (2026) - Investigative Crime Thriller Movie - Starring Sree Vishnu on Coming Saturday",
+      "club": "DHURANDHAR 2 - High-Octane Action Thriller Movie - Starring Ranveer Singh on Coming Saturday",
       "t3c1": ""
     },
     "towerExpiries": {
@@ -205,7 +205,12 @@
       "name": "Dhurandhar 2.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-06-04",
+          "endDate": "2026-06-06"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     }

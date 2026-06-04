@@ -7,14 +7,16 @@
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
       "club": "MRITHYUNJAY (2026) - Investigative Crime Thriller Movie - Starring Sree Vishnu on Coming Saturday",
-      "t3c1": ""
+      "t3c1": "",
+      "t5c2": "Please be informed that the 10P (T1 C1) Service Lift is undergoing maintenance today. Residents and visitors are kindly requested to use the 13P (Big Lift) instead."
     },
     "towerExpiries": {
       "club": 1780142131628,
       "t3c1": 1779196484286
     },
     "towerAttentionTexts": {
-      "club": "Special Movie Screening"
+      "club": "Special Movie Screening",
+      "t5c2": "⚠️ Lift Maintenance:"
     }
   },
   "emergency": {
@@ -147,7 +149,12 @@
       "name": "gardening-estancia.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-06-04",
+          "endDate": "2026-06-04"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },

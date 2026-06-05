@@ -27,7 +27,12 @@
       "name": "Club.png",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-06-05",
+          "endDate": "2026-06-05"
+        }
+      ],
       "expiry": "",
       "towers": "club"
     },

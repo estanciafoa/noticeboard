@@ -4,17 +4,45 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "6th and 7th - Estancia Tennis Tournament (2026)",
+    "commonText": "",
     "towerTexts": {
       "club": "DHURANDHAR 2 - High-Octane Action Thriller Movie - Starring Ranveer Singh on Coming Saturday",
-      "t3c1": ""
+      "t3c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t1c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t1c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t2c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t2c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t3c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t4c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t4c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t5c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
+      "t5c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14"
     },
     "towerExpiries": {
-      "club": 1780142131628,
-      "t3c1": 1779196484286
+      "club": 1780755802487,
+      "t3c1": 1780863609521,
+      "t1c1": 1780863553000,
+      "t1c2": 1780863563943,
+      "t2c1": 1780863575872,
+      "t2c2": 1780863592594,
+      "t3c2": 1780863627851,
+      "t4c1": 1780863732098,
+      "t4c2": 1780863741651,
+      "t5c1": 1780863765360,
+      "t5c2": 1780863774908
     },
     "towerAttentionTexts": {
-      "club": "Special Movie Screening"
+      "club": "Special Movie Screening",
+      "t1c1": "Estancia Tennis Tournament (2026)",
+      "t1c2": "Estancia Tennis Tournament (2026)",
+      "t2c1": "Estancia Tennis Tournament (2026)",
+      "t2c2": "Estancia Tennis Tournament (2026)",
+      "t3c1": "Estancia Tennis Tournament (2026)",
+      "t3c2": "Estancia Tennis Tournament (2026)",
+      "t4c1": "Estancia Tennis Tournament (2026)",
+      "t4c2": "Estancia Tennis Tournament (2026)",
+      "t5c1": "Estancia Tennis Tournament (2026)",
+      "t5c2": "Estancia Tennis Tournament (2026)"
     }
   },
   "emergency": {

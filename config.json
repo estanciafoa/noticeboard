@@ -6,17 +6,14 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "t4c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
       "t5c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
       "t5c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14"
     },
     "towerExpiries": {
-      "t4c2": 1780863741651,
       "t5c1": 1780863765360,
       "t5c2": 1780863774908
     },
     "towerAttentionTexts": {
-      "t4c2": "Estancia Tennis Tournament (2026)",
       "t5c1": "Estancia Tennis Tournament (2026)",
       "t5c2": "Estancia Tennis Tournament (2026)"
     }

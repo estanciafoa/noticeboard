@@ -5,15 +5,9 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
-    "towerTexts": {
-      "t5c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14"
-    },
-    "towerExpiries": {
-      "t5c2": 1780863774908
-    },
-    "towerAttentionTexts": {
-      "t5c2": "Estancia Tennis Tournament (2026)"
-    }
+    "towerTexts": {},
+    "towerExpiries": {},
+    "towerAttentionTexts": {}
   },
   "emergency": {
     "enabled": false,

@@ -7,7 +7,6 @@
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
       "t3c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
-      "t1c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
       "t1c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
       "t2c1": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
       "t2c2": "6th Jun - Men's Doubles\n7th Jun - Kids Under 10 and 14",
@@ -19,7 +18,6 @@
     },
     "towerExpiries": {
       "t3c1": 1780863609521,
-      "t1c1": 1780863553000,
       "t1c2": 1780863563943,
       "t2c1": 1780863575872,
       "t2c2": 1780863592594,
@@ -30,7 +28,6 @@
       "t5c2": 1780863774908
     },
     "towerAttentionTexts": {
-      "t1c1": "Estancia Tennis Tournament (2026)",
       "t1c2": "Estancia Tennis Tournament (2026)",
       "t2c1": "Estancia Tennis Tournament (2026)",
       "t2c2": "Estancia Tennis Tournament (2026)",

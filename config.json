@@ -5,9 +5,15 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
-    "towerTexts": {},
-    "towerExpiries": {},
-    "towerAttentionTexts": {}
+    "towerTexts": {
+      "t1c2": "LIFT MAINTENANCE 16th June 10:30am to 3:00pm"
+    },
+    "towerExpiries": {
+      "t1c2": 1781620318930
+    },
+    "towerAttentionTexts": {
+      "t1c2": "LIFT MAINTENANCE"
+    }
   },
   "emergency": {
     "enabled": false,

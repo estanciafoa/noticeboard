@@ -6,7 +6,7 @@
   "ticker": {
     "commonText": "Security Maingate:\n9498312512",
     "towerTexts": {
-      "t1c2": "<- 10P LIFT MAINTENANCE Tomorrow, 16th June 10:30am to 3:00pm"
+      "t1c2": "<--- 10P LIFT MAINTENANCE Tomorrow, 16th June 10:30am to 3:00pm"
     },
     "towerExpiries": {
       "t1c2": 1781620318930

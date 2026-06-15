@@ -4,7 +4,7 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "Security Maingate:\n9498312512",
+    "commonText": "Security Maingate:\n9498312512\nLift Emergency: 8807922309",
     "towerTexts": {
       "t1c2": "<--- 10P LIFT MAINTENANCE Tomorrow, 16th June 10:30am to 3:00pm"
     },
@@ -16,9 +16,9 @@
     }
   },
   "emergency": {
-    "enabled": false,
-    "slide": "",
-    "towers": ""
+    "enabled": true,
+    "slide": "Club.png",
+    "towers": "club"
   },
   "slides": [
     {

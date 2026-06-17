@@ -4,16 +4,14 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "ticker": {
-    "commonText": "Lift Emergency: 8807922309, 7358386494\nHelpdesk : 9384001882",
+    "commonText": "Lift Emergency: 7338745516, 8807922309, 7358386494\nHelpdesk : 9384001882",
     "towerTexts": {
-      "t1c2": "<--- 10P LIFT MAINTENANCE Tomorrow, 16th June 10:30am to 3:00pm"
+      "t1c2": ""
     },
     "towerExpiries": {
       "t1c2": 1781620318930
     },
-    "towerAttentionTexts": {
-      "t1c2": "LIFT MAINTENANCE"
-    }
+    "towerAttentionTexts": {}
   },
   "emergency": {
     "enabled": true,

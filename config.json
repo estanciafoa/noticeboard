@@ -6,12 +6,16 @@
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, 8807922309, 7358386494\nHelpdesk : 9384001882",
     "towerTexts": {
-      "t1c2": ""
+      "t1c2": "",
+      "t1c1": "<-- 10P LIFT MAINTENANCE FROM 10:30PM TO 3PM"
     },
     "towerExpiries": {
-      "t1c2": 1781620318930
+      "t1c2": 1781620318930,
+      "t1c1": 1781712411449
     },
-    "towerAttentionTexts": {}
+    "towerAttentionTexts": {
+      "t1c1": "LIFT MAINENANCE"
+    }
   },
   "emergency": {
     "enabled": true,

@@ -7,14 +7,17 @@
     "commonText": "Lift Emergency: 7338745516, 8807922309, 7358386494\nHelpdesk : 9384001882",
     "towerTexts": {
       "t1c2": "",
-      "t2c1": "<-- 10P LIFT MAINTENANCE TODAY 17TH JUNE, FROM 10:30PM TO 3PM"
+      "t2c1": "<-- 10P LIFT MAINTENANCE TODAY 17TH JUNE, FROM 10:30PM TO 3PM",
+      "t2c2": "<-- 10P LIFT MAINTENANCE ON 18TH JUNE, 10:30AM - 3:00 PM"
     },
     "towerExpiries": {
       "t1c2": 1781620318930,
-      "t2c1": 1781712579094
+      "t2c1": 1781712579094,
+      "t2c2": 1781784752187
     },
     "towerAttentionTexts": {
-      "t2c1": "LIFT MAINTENANCE"
+      "t2c1": "LIFT MAINTENANCE",
+      "t2c2": "LIFT MAINTENANCE"
     }
   },
   "emergency": {

@@ -10,7 +10,8 @@
       "t2c1": "<-- 10P LIFT MAINTENANCE TODAY 17TH JUNE, FROM 10:30PM TO 3PM",
       "t2c2": "<-- 10P LIFT MAINTENANCE ON 18TH JUNE, 10:30AM - 3:00 PM",
       "t3c1": "<-- 10P LIFT MAINTENANCE ON 19TH JUNE, 10:30AM - 3:00 PM",
-      "club": ""
+      "club": "",
+      "t3c2": "Please be informed that the 10P Service Lift is undergoing maintenance tomorrow (22nd Jun). Residents and visitors are kindly requested to use the 13P (Big Lift) instead."
     },
     "towerExpiries": {
       "t1c2": 1781620318930,
@@ -22,7 +23,8 @@
     "towerAttentionTexts": {
       "t2c1": "LIFT MAINTENANCE",
       "t2c2": "LIFT MAINTENANCE",
-      "t3c1": "LIFT SERVICE"
+      "t3c1": "LIFT SERVICE",
+      "t3c2": "⚠️ Lift Maintenance:"
     }
   },
   "emergency": {

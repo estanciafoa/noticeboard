@@ -10,7 +10,7 @@
       "t2c1": "<-- 10P LIFT MAINTENANCE TODAY 17TH JUNE, FROM 10:30PM TO 3PM",
       "t2c2": "<-- 10P LIFT MAINTENANCE ON 18TH JUNE, 10:30AM - 3:00 PM",
       "t3c1": "<-- 10P LIFT MAINTENANCE ON 19TH JUNE, 10:30AM - 3:00 PM",
-      "club": "Karuppu - Tamil Movie - Today 4 PM"
+      "club": ""
     },
     "towerExpiries": {
       "t1c2": 1781620318930,
@@ -22,8 +22,7 @@
     "towerAttentionTexts": {
       "t2c1": "LIFT MAINTENANCE",
       "t2c2": "LIFT MAINTENANCE",
-      "t3c1": "LIFT SERVICE",
-      "club": "Spl Movie Screening"
+      "t3c1": "LIFT SERVICE"
     }
   },
   "emergency": {

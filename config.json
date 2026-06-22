@@ -26,8 +26,8 @@
       "t2c1": "LIFT MAINTENANCE",
       "t2c2": "LIFT MAINTENANCE",
       "t3c1": "LIFT SERVICE",
-      "t3c2": "â ï¸ Lift Maintenance:",
-      "t4c1": "⚠️ Lift Maintenance:"
+      "t3c2": "Ã¢ÂÂ Ã¯Â¸Â Lift Maintenance:",
+      "t4c1": "â ï¸ Lift Maintenance:"
     }
   },
   "emergency": {
@@ -195,6 +195,14 @@
     },
     {
       "name": "Children Playarea Revamp.jpg",
+      "duration": "",
+      "times": [],
+      "dates": [],
+      "expiry": "",
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+    },
+    {
+      "name": "childplayarea.jpg",
       "duration": "",
       "times": [],
       "dates": [],

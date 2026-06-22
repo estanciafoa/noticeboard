@@ -31,9 +31,9 @@
     }
   },
   "emergency": {
-    "enabled": true,
-    "slide": "Club.png",
-    "towers": "club"
+    "enabled": false,
+    "slide": "",
+    "towers": ""
   },
   "slides": [
     {

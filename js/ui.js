@@ -121,6 +121,10 @@ function initTickerConfig() {
   const towerExpiries = appConfig.ticker?.towerExpiries || {};
   const towerAttentionTexts = appConfig.ticker?.towerAttentionTexts || {};
   LOCATIONS.forEach(loc => {
+    // If this entry's timer has already lapsed, show it as empty (cleanup is
+    // persisted in config.load(); this guards a not-yet-saved session too).
+    const isExpired = towerExpiries[loc.id] != null && towerExpiries[loc.id] <= Date.now();
+
     const card = document.createElement("details");
     card.className = "ticker-tower-card";
 
@@ -139,7 +143,7 @@ function initTickerConfig() {
     const textInput = document.createElement("textarea");
     textInput.rows = 2;
     textInput.placeholder = `Scrolling text for ${loc.label} (use | for line breaks)`;
-    textInput.value = towerTexts[loc.id] || "";
+    textInput.value = isExpired ? "" : (towerTexts[loc.id] || "");
 
     textInput.oninput = () => {
       if (!appConfig.ticker) appConfig.ticker = { commonText: "", towerTexts: {} };
@@ -156,7 +160,7 @@ function initTickerConfig() {
     const attentionInput = document.createElement("input");
     attentionInput.type = "text";
     attentionInput.placeholder = `Attention tag for ${loc.short}`;
-    attentionInput.value = towerAttentionTexts[loc.id] || "";
+    attentionInput.value = isExpired ? "" : (towerAttentionTexts[loc.id] || "");
 
     attentionInput.oninput = () => {
       if (!appConfig.ticker) appConfig.ticker = { commonText: "", towerTexts: {} };
@@ -767,5 +771,192 @@ async function deleteSlide(targetName) {
 
   } catch (e) {
     alert("Delete failed: " + e.message);
+  }
+}
+
+/* ============================================================
+   SCHEDULED TICKER EDITOR (ticker.txt)
+   Edits the repo's ticker.txt line by line and commits it.
+   Line format:  location | start | expiry | attention | message
+   ============================================================ */
+const TICKER_FILE = "ticker.txt";
+let tickerFileSha = null;          // sha of ticker.txt for the next commit
+let tickerScheduleHeader = [];     // preserved comment/instruction lines
+
+const DEFAULT_TICKER_HEADER = [
+  "# ESTANCIA NOTICEBOARD — SCHEDULED TICKER",
+  "# location | start | expiry | attention | message",
+  "#   location : t1c1..t5c2, club, gate, or 'all' (comma-separate several)",
+  "#   start/expiry : YYYY-MM-DD HH:MM (blank start = now, blank expiry = never)",
+  "#   message : use | for line breaks. # lines and blanks are ignored.",
+  "# Edited via the Admin panel → Ticker Settings → Schedule."
+];
+
+function tsEsc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// "YYYY-MM-DD HH:MM" -> "YYYY-MM-DDTHH:MM" (for <input type=datetime-local>)
+function tsToInput(s) {
+  if (!s) return "";
+  const m = String(s).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if (!m) return "";
+  const [, y, mo, d, hh, mm] = m;
+  const pad = n => String(n || 0).padStart(2, "0");
+  return `${y}-${pad(mo)}-${pad(d)}T${pad(hh)}:${pad(mm)}`;
+}
+// "YYYY-MM-DDTHH:MM" -> "YYYY-MM-DD HH:MM"
+function tsFromInput(v) {
+  return v ? v.replace("T", " ").slice(0, 16) : "";
+}
+
+// "YYYY-MM-DD HH:MM" -> Date (or null)
+function tsParseDate(s) {
+  if (!s) return null;
+  const m = String(s).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if (!m) return null;
+  const [, y, mo, d, hh, mm] = m;
+  return new Date(+y, +mo - 1, +d, +(hh || 0), +(mm || 0), 0, 0);
+}
+// Date -> "YYYY-MM-DD HH:MM"
+function tsDateToStr(d) {
+  const p = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+// Stored absolute expiry -> duration in hours (relative to start, else now), for display
+function tsExpiryToHours(startStr, expiryStr) {
+  const exp = tsParseDate(expiryStr);
+  if (!exp) return "";
+  const base = tsParseDate(startStr) || new Date();
+  const h = (exp.getTime() - base.getTime()) / 3600000;
+  return h > 0 ? String(Math.round(h * 10) / 10) : "";
+}
+// Hours entered in the editor -> stored absolute expiry datetime (relative to start, else now)
+function tsHoursToExpiry(startStr, hoursStr) {
+  const h = parseFloat(hoursStr);
+  if (!(h > 0)) return "";
+  const base = tsParseDate(startStr) || new Date();
+  return tsDateToStr(new Date(base.getTime() + h * 3600000));
+}
+
+function parseScheduleText(txt) {
+  const header = [], rows = [];
+  (txt || "").split(/\r?\n/).forEach(line => {
+    const t = line.trim();
+    if (t.startsWith("#")) { header.push(line); return; }
+    if (!t) return;
+    const parts = line.split("|");
+    const location = (parts[0] || "").trim();
+    if (!location) return;
+    rows.push({
+      location,
+      start: (parts[1] || "").trim(),
+      expiry: (parts[2] || "").trim(),
+      attention: (parts[3] || "").trim(),
+      message: parts.slice(4).join("|").trim()
+    });
+  });
+  return { header, rows };
+}
+
+function serializeSchedule(rows) {
+  const lines = tickerScheduleHeader.slice();
+  if (lines.length && lines[lines.length - 1].trim() !== "") lines.push("");
+  rows.forEach(r => {
+    if (!r.location || !r.message) return;
+    lines.push(`${r.location} | ${r.start} | ${r.expiry} | ${r.attention} | ${r.message}`);
+  });
+  return lines.join("\n") + "\n";
+}
+
+function buildScheduleRow(r) {
+  const row = document.createElement("div");
+  row.className = "ticker-sched-row";
+  row.innerHTML =
+    `<input class="ts-location" type="text" placeholder="t3c1 / t4c1,t4c2 / all" value="${tsEsc(r.location)}">` +
+    `<input class="ts-start" type="datetime-local" value="${tsToInput(r.start)}">` +
+    `<input class="ts-expiry" type="number" min="0" step="0.5" placeholder="hrs" value="${tsEsc(tsExpiryToHours(r.start, r.expiry))}">` +
+    `<input class="ts-attention" type="text" placeholder="badge" value="${tsEsc(r.attention)}">` +
+    `<input class="ts-message" type="text" placeholder="message (| = line break)" value="${tsEsc(r.message)}">` +
+    `<button type="button" class="ts-del" title="Delete line" onclick="this.closest('.ticker-sched-row').remove()">&times;</button>`;
+  return row;
+}
+
+function renderScheduleRows(rows) {
+  const c = document.getElementById("tickerScheduleRows");
+  c.innerHTML = "";
+  rows.forEach(r => c.appendChild(buildScheduleRow(r)));
+}
+
+function collectScheduleRows() {
+  return Array.from(document.querySelectorAll("#tickerScheduleRows .ticker-sched-row")).map(row => {
+    const start = tsFromInput(row.querySelector(".ts-start").value);
+    return {
+      location: row.querySelector(".ts-location").value.trim(),
+      start,
+      expiry: tsHoursToExpiry(start, row.querySelector(".ts-expiry").value),
+      attention: row.querySelector(".ts-attention").value.trim(),
+      message: row.querySelector(".ts-message").value.trim()
+    };
+  }).filter(r => r.location && r.message);
+}
+
+function addTickerScheduleRow() {
+  document.getElementById("tickerScheduleRows")
+    .appendChild(buildScheduleRow({ location: "", start: "", expiry: "", attention: "", message: "" }));
+}
+
+function closeTickerSchedule() {
+  document.getElementById("tickerScheduleModal").style.display = "none";
+}
+
+async function openTickerSchedule() {
+  const modal = document.getElementById("tickerScheduleModal");
+  const rowsEl = document.getElementById("tickerScheduleRows");
+  rowsEl.innerHTML = "<p style='opacity:.6;padding:8px'>Loading…</p>";
+  modal.style.display = "flex";
+  try {
+    const meta = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${TICKER_FILE}`);
+    tickerFileSha = meta.sha;
+    const text = decodeURIComponent(escape(atob(meta.content)));
+    const { header, rows } = parseScheduleText(text);
+    tickerScheduleHeader = header.length ? header : DEFAULT_TICKER_HEADER.slice();
+    renderScheduleRows(rows);
+  } catch (e) {
+    if (e.status === 404) {            // file doesn't exist yet — start fresh
+      tickerFileSha = null;
+      tickerScheduleHeader = DEFAULT_TICKER_HEADER.slice();
+      renderScheduleRows([]);
+    } else {
+      rowsEl.innerHTML = `<p style='color:#f87171;padding:8px'>Failed to load ${TICKER_FILE}: ${tsEsc(e.message)}</p>`;
+    }
+  }
+}
+
+async function saveTickerSchedule() {
+  const btn = document.getElementById("tickerScheduleSaveBtn");
+  const text = serializeSchedule(collectScheduleRows());
+  const prev = btn.textContent;
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const body = {
+      message: "update ticker.txt",
+      content: btoa(unescape(encodeURIComponent(text)))
+    };
+    if (tickerFileSha) body.sha = tickerFileSha;
+    const res = await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${TICKER_FILE}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    tickerFileSha = res?.content?.sha || tickerFileSha;
+    closeTickerSchedule();
+    alert("Scheduled messages saved.");
+  } catch (e) {
+    alert("Failed to save ticker.txt: " + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = prev;
   }
 }

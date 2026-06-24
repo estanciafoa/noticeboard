@@ -1,0 +1,25 @@
+# ESTANCIA NOTICEBOARD — SCHEDULED TICKER
+# ----------------------------------------
+# One message per line. Fields are separated by a pipe "|":
+#
+#   location | start | expiry | attention | message
+#
+#   location   tower/core id: t1c1 t1c2 t2c1 t2c2 t3c1 t3c2 t4c1 t4c2 t5c1 t5c2
+#              club  gate  — or  all  for every screen.
+#              Put several, comma-separated:  t3c1,t3c2
+#   start      when to START showing — format  YYYY-MM-DD HH:MM  (24-hour, local time).
+#              Leave blank to show immediately.
+#   expiry     when to STOP showing — same format. Leave blank for no expiry.
+#              The message shows while:  start <= now < expiry
+#   attention  optional yellow badge text (defaults to "Attention !" if blank).
+#   message    the scrolling text. Use | (or \n) inside it for line breaks.
+#
+# Lines starting with # are comments and are ignored. Blank lines are ignored.
+# A manual ticker entry set in the Admin panel for the same tower OVERRIDES the
+# matching line here (so admin can override a scheduled message at any time).
+#
+# Examples (remove the leading # to activate):
+#
+#t3c1 |  | 2026-06-24 23:59 | LIFT MAINTENANCE | 10P Lift maintenance today, please use the 13P (Big Lift)
+# t4c1,t4c2 | 2026-06-26 09:00 | 2026-06-26 18:00 | WATER SHUTDOWN | Water supply interrupted 9 AM - 6 PM
+# all | | 2026-07-01 00:00 | NOTICE | Annual General Body Meeting on 30th June, 6 PM at Clubhouse

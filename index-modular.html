@@ -127,6 +127,29 @@
     </div>
   </div>
 
+  <!-- SCHEDULED TICKER MODAL -->
+  <div id="tickerScheduleModal" class="modal" style="display:none">
+    <div class="modal-backdrop" onclick="closeTickerSchedule()"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Scheduled Ticker Messages</h3>
+        <button class="modal-close" onclick="closeTickerSchedule()" title="Close">&times;</button>
+      </div>
+      <div class="ticker-sched-body">
+        <p class="ticker-sched-hint">Each line shows on the chosen tower(s) starting at its start time, for the number of hours in Expiry. Blank start = show now; blank expiry = never expires. A manual ticker entry for the same tower overrides a scheduled one.</p>
+        <div class="ticker-sched-head">
+          <span>Location</span><span>Start</span><span>Expiry (hrs)</span><span>Attention</span><span>Message</span><span></span>
+        </div>
+        <div id="tickerScheduleRows"></div>
+        <button type="button" class="slot-add-btn" onclick="addTickerScheduleRow()">+ Add message</button>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeTickerSchedule()">Cancel</button>
+        <button class="primary" id="tickerScheduleSaveBtn" onclick="saveTickerSchedule()">Save to repo</button>
+      </div>
+    </div>
+  </div>
+
   <!-- CONTAINER (LEFT, CENTER, RIGHT) -->
   <div class="container">
     <!-- LEFT PANE: THUMBNAILS -->
@@ -191,6 +214,13 @@
 
       <!-- TICKER SETTINGS TAB -->
       <div class="right-tab-content" id="tickerTab">
+        <div class="field sched-ticker-field">
+          <label style="margin:0">Scheduled messages</label>
+          <button type="button" class="sched-ticker-btn" onclick="openTickerSchedule()" title="Schedule ticker messages by date &amp; time (saved to ticker.txt)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="12 13 12 16 14 16"/></svg>
+            <span>Schedule</span>
+          </button>
+        </div>
         <div class="field">
           <label for="tickerCommonText">Common Text (all towers)</label>
           <textarea id="tickerCommonText" rows="3" placeholder="e.g. Security: 9876543210&#10;Office: 9123456789" style="width:100%;resize:vertical;"></textarea>

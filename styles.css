@@ -1391,3 +1391,93 @@ button {
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
   pointer-events: none;
 }
+
+/* SCHEDULED TICKER editor */
+.sched-ticker-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sched-ticker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sched-ticker-btn:hover {
+  background: var(--accent);
+  color: var(--bg-0);
+}
+
+.ticker-sched-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+}
+
+.ticker-sched-hint {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.ticker-sched-head,
+.ticker-sched-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1.5fr 0.7fr 0.9fr 2fr 26px;
+  gap: 8px;
+  align-items: center;
+}
+
+.ticker-sched-head {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+  padding: 0 2px 6px;
+}
+
+.ticker-sched-row { margin-bottom: 8px; }
+
+.ticker-sched-row input {
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.ticker-sched-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.ticker-sched-row .ts-del {
+  padding: 0;
+  width: 26px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ticker-sched-row .ts-del:hover {
+  border-color: #f87171;
+  color: #f87171;
+}

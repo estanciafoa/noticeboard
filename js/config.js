@@ -107,12 +107,35 @@ async function load() {
     if (!files.includes(f)) files.push(f);
   });
 
+  // Drop any ticker entries whose timer has already expired, and persist the cleanup.
+  if (pruneExpiredTicker()) {
+    saveConfig({ silent: true }).catch(e => console.error("Failed to persist ticker cleanup:", e));
+  }
+
   render();
 
   // Auto-select the first slide so the preview isn't empty
   if (files.length && !selected) {
     selectSlide(files[0]);
   }
+}
+
+/* Remove ticker entries whose expiry has passed (text, attention, expiry).
+   Returns true if anything was removed. */
+function pruneExpiredTicker() {
+  const expiries = appConfig.ticker?.towerExpiries;
+  if (!expiries) return false;
+  const now = Date.now();
+  let removed = false;
+  Object.keys(expiries).forEach(key => {
+    if (expiries[key] <= now) {
+      delete expiries[key];
+      if (appConfig.ticker.towerTexts) delete appConfig.ticker.towerTexts[key];
+      if (appConfig.ticker.towerAttentionTexts) delete appConfig.ticker.towerAttentionTexts[key];
+      removed = true;
+    }
+  });
+  return removed;
 }
 
 /* SAVE CONFIG */

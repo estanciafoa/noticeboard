@@ -18,6 +18,10 @@ let transitionEffect = "fade";
 let transitionMs = 700;
 let emergency = { enabled: false, slide: "", towers: "" };
 let ticker = { commonText: "", towerTexts: {} };
+let scheduledTickerRows = [];   // parsed from ticker.txt: time-scheduled per-tower messages
+let lastTickerSignature = null; // skip re-render when the resolved ticker is unchanged
+
+const TICKER_FILE = "ticker.txt";
 
 /* TOWER FILTER — read from ?t= in URL */
 const towerParamRaw = new URLSearchParams(location.search).get("t");
@@ -92,6 +96,7 @@ async function load({ showError = true } = {}) {
       towerExpiries: data.ticker?.towerExpiries || {},
       towerAttentionTexts: data.ticker?.towerAttentionTexts || {}
     };
+    await fetchScheduledTicker();
     applyTicker();
 
     slides = (Array.isArray(data.slides) ? data.slides : []).map(s => ({
@@ -220,21 +225,86 @@ function fitTextToContainer(container, span) {
   // No dynamic font sizing — use CSS-defined size
 }
 
+/* SCHEDULED TICKER (ticker.txt) ---------------------------------------------
+   One record per line, pipe-delimited:
+     location | start | expiry | attention | message
+   - location : t1c1..t5c2, club, gate, or "all"; comma-separate for several
+   - start/expiry : YYYY-MM-DD HH:MM (24h, local). Blank start = active now;
+                    blank expiry = never expires. Active when start <= now < expiry.
+   - attention : optional badge text (falls back to "Attention !")
+   - message : may use | (or literal \n) for line breaks
+   Lines starting with # and blank lines are ignored. */
+function parseLocalDateTime(s) {
+  if (!s) return null;
+  const m = String(s).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if (!m) return null;
+  const [, y, mo, d, hh, mm] = m;
+  return new Date(Number(y), Number(mo) - 1, Number(d), Number(hh || 0), Number(mm || 0), 0, 0);
+}
+
+function parseTickerFile(txt) {
+  const rows = [];
+  (txt || "").split(/\r?\n/).forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) return;
+    const parts = line.split("|");
+    const locationStr = (parts[0] || "").trim().toLowerCase();
+    if (!locationStr) return;
+    let message = parts.slice(4).join("|").trim();
+    if (!message) return;
+    message = message.replace(/\\n/g, "|"); // allow literal \n as a line break
+    rows.push({
+      locations: locationStr.split(",").map(s => s.trim()).filter(Boolean),
+      start: parseLocalDateTime((parts[1] || "").trim()),
+      expiry: parseLocalDateTime((parts[2] || "").trim()),
+      attention: (parts[3] || "").trim(),
+      message
+    });
+  });
+  return rows;
+}
+
+async function fetchScheduledTicker() {
+  try {
+    const url = isLocal
+      ? `${TICKER_FILE}?t=${Date.now()}`
+      : `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${TICKER_FILE}?t=${Date.now()}`;
+    const res = await withTimeout(fetch(url, { cache: "no-store" }), 5000);
+    if (!res || !res.ok) { scheduledTickerRows = []; return; }   // missing file is fine
+    scheduledTickerRows = parseTickerFile(await res.text());
+  } catch (_) {
+    scheduledTickerRows = [];   // never let a ticker.txt problem break the viewer
+  }
+}
+
+/* Return the active scheduled row for a tower key (honours start/expiry), or null. */
+function activeScheduledTicker(key) {
+  if (!key || !scheduledTickerRows.length) return null;
+  const now = Date.now();
+  const prefix = key.replace(/c\d+$/, "");
+  const active = scheduledTickerRows.filter(r => {
+    if (!r.locations.some(l => l === "all" || l === key || l === prefix)) return false;
+    if (r.start && now < r.start.getTime()) return false;
+    if (r.expiry && now >= r.expiry.getTime()) return false;
+    return true;
+  });
+  if (!active.length) return null;
+  // If several overlap, the one that started most recently wins.
+  active.sort((a, b) => (a.start ? a.start.getTime() : 0) - (b.start ? b.start.getTime() : 0));
+  return active[active.length - 1];
+}
+
 function applyTicker() {
   const leftEl = document.getElementById("tickerLeft");
   const scrollEl = document.getElementById("tickerScroll");
   if (!leftEl || !scrollEl) return;
 
-  // Left section: common text
-  leftEl.innerHTML = "";
-  const span = document.createElement("span");
-  span.textContent = (ticker.commonText || "").split("|").map(s => s.trim()).join("\n");
-  leftEl.appendChild(span);
-  fitTextToContainer(leftEl, span);
+  const commonText = ticker.commonText || "";
 
   // Find the best matching text for this tower param
   let text = "";
   let matchKey = towerParam || "";
+  let scheduledAttention = "";
   if (towerParam && ticker.towerTexts) {
     // Exact match first (e.g. "t1c1"), then tower prefix (e.g. "t1")
     text = ticker.towerTexts[towerParam] || "";
@@ -251,6 +321,32 @@ function applyTicker() {
       text = "";
     }
   }
+
+  // No (unexpired) manual entry → fall back to the scheduled ticker.txt rows.
+  // A manual config.json entry always wins, so admin can override the sheet.
+  if (!text && towerParam) {
+    const row = activeScheduledTicker(towerParam);
+    if (row) {
+      text = row.message;
+      scheduledAttention = row.attention || "";
+    }
+  }
+
+  const perTowerAttention = scheduledAttention || ticker.towerAttentionTexts?.[matchKey] || "";
+
+  // Idempotent: this runs every minute, so skip all DOM/animation work (which
+  // would otherwise restart the scroll animation) when nothing has changed.
+  const signature = `${commonText} ${text} ${perTowerAttention}`;
+  if (signature === lastTickerSignature) return;
+  lastTickerSignature = signature;
+
+  // Left section: common text
+  leftEl.innerHTML = "";
+  const span = document.createElement("span");
+  span.textContent = commonText.split("|").map(s => s.trim()).join("\n");
+  leftEl.appendChild(span);
+  fitTextToContainer(leftEl, span);
+
   const displayText = text ? "" + text.split("|").map(s => s.trim()).join("\n") : "";
   scrollEl.textContent = displayText;
   const scrollEl2 = document.getElementById("tickerScroll2");
@@ -260,23 +356,19 @@ function applyTicker() {
   const bar = document.querySelector(".bottom-bar");
   const wrap = document.getElementById("tickerScrollWrap");
   if (bar) {
-    const hasAnyTicker = !!(text || (ticker.commonText || "").trim());
+    const hasAnyTicker = !!(text || commonText.trim());
     bar.classList.toggle("has-ticker", hasAnyTicker);
-    if (text) {
-      bar.classList.add("flash-news");
-    } else {
-      bar.classList.remove("flash-news");
-    }
+    bar.classList.toggle("flash-news", !!text);
   }
 
   // Update attention tag text
   const attTag = document.querySelector(".attention-tag");
   if (attTag) {
-    const perTowerAttention = ticker.towerAttentionTexts?.[matchKey] || "";
     attTag.textContent = perTowerAttention || "Attention !";
   }
 
-  // Randomly alternate animations each cycle
+  // Randomly alternate animations each cycle. Use onanimationiteration (a single
+  // handler slot) rather than addEventListener so repeated calls never stack.
   if (text && wrap) {
     const anims = ["ticker-zoom", "ticker-flip", "ticker-slide-up", "ticker-drop", "ticker-slide-right", "ticker-slide-left"];
     function pickAnim() {
@@ -286,9 +378,11 @@ function applyTicker() {
       wrap.style.animation = `${name} 7s cubic-bezier(0.16, 1, 0.3, 1) infinite`;
     }
     pickAnim();
-    wrap.addEventListener("animationiteration", pickAnim);
+    wrap.onanimationiteration = pickAnim;
+  } else if (wrap) {
+    wrap.onanimationiteration = null;
+    wrap.style.animation = "none";
   }
-
 }
 
 /* BUILD ELEMENTS */
@@ -446,6 +540,9 @@ setInterval(() => {
     .join("|");
   const visibleNames = slides.filter(isVisible).map(s => encodeURIComponent(s.name)).join("|");
   if (currentNames !== visibleNames) build();
+  // Re-evaluate scheduled ticker start/expiry times against the clock each minute
+  // (rows themselves are refreshed on the slower config refresh cycle).
+  applyTicker();
 }, REBUILD_INTERVAL_MS);
 
 window.addEventListener("online", () => {

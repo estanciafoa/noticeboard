@@ -8,11 +8,12 @@
     "towerTexts": {
       "t1c2": "",
       "t2c1": "<-- 10P LIFT MAINTENANCE TODAY 17TH JUNE, FROM 10:30PM TO 3PM",
-      "t2c2": "<-- 10P LIFT MAINTENANCE ON 18TH JUNE, 10:30AM - 3:00 PM",
+      "t2c2": "",
       "t3c1": "<-- 10P LIFT MAINTENANCE ON 19TH JUNE, 10:30AM - 3:00 PM",
       "club": "",
       "t3c2": "Today (22/06), the 10P Lift is undergoing maintenance (upto 4PM). Residents and visitors are kindly requested to use the 13P (Big Lift) instead.",
-      "t4c1": "Tomorrow (23/06), the 10P Lift is undergoing maintenance. Residents and visitors are kindly requested to use the 13P (Big Lift) instead."
+      "t4c1": "Tomorrow (23/06), the 10P Lift is undergoing maintenance. Residents and visitors are kindly requested to use the 13P (Big Lift) instead.",
+      "t4c2": "<-- 10P LIFT MAINTENANCE ON 24TH JUNE, 10:30AM - 3:00 PM"
     },
     "towerExpiries": {
       "t1c2": 1781620318930,
@@ -20,14 +21,15 @@
       "t2c2": 1781784752187,
       "t3c1": 1781870670157,
       "club": 1781977635542,
-      "t3c2": 1782124883553
+      "t3c2": 1782124883553,
+      "t4c2": 1782306584892
     },
     "towerAttentionTexts": {
       "t2c1": "LIFT MAINTENANCE",
-      "t2c2": "LIFT MAINTENANCE",
       "t3c1": "LIFT SERVICE",
-      "t3c2": "â ï¸ Lift Maintenance:",
-      "t4c1": "⚠️ Lift Maintenance:"
+      "t3c2": "Ã¢ÂÂ Ã¯Â¸Â Lift Maintenance:",
+      "t4c1": "â ï¸ Lift Maintenance:",
+      "t4c2": "LIFT MAINTENANCE"
     }
   },
   "emergency": {

@@ -9,11 +9,6 @@
     "towerExpiries": {},
     "towerAttentionTexts": {}
   },
-  "emergency": {
-    "enabled": true,
-    "slide": "Club.png",
-    "towers": "club"
-  },
   "slides": [
     {
       "name": "Club.png",

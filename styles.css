@@ -236,40 +236,6 @@ body {
   font-size: 12px;
 }
 
-.topbar button.emergency-btn {
-  background: var(--bg-3) !important;
-  color: #dc2626 !important;
-  border: 1px solid var(--line) !important;
-  cursor: pointer;
-  border-radius: 6px;
-  padding: 5px 8px !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.topbar button.emergency-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-.topbar button.emergency-btn:hover {
-  background: #dc2626 !important;
-  color: #fff !important;
-  border-color: #dc2626 !important;
-}
-
-.topbar button.emergency-btn.on {
-  background: #ef4444 !important;
-  color: #fff !important;
-  border-color: #ef4444 !important;
-  animation: pulse-red 1.5s infinite;
-}
-
-@keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
-  50% { box-shadow: 0 0 12px 4px rgba(239,68,68,0.4); }
-}
-
 .topbar button {
   margin: 0;
   padding: 8px 18px;

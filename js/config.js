@@ -32,11 +32,6 @@ let appConfig = {
     towerTexts: {},
     towerExpiries: {},
     towerAttentionTexts: {}
-  },
-  emergency: {
-    enabled: false,
-    slide: "",
-    towers: ""
   }
 };
 
@@ -61,11 +56,6 @@ async function load() {
     towerTexts: json.ticker?.towerTexts || {},
     towerExpiries: json.ticker?.towerExpiries || {},
     towerAttentionTexts: json.ticker?.towerAttentionTexts || {}
-  };
-  appConfig.emergency = {
-    enabled: !!json.emergency?.enabled,
-    slide: json.emergency?.slide || "",
-    towers: json.emergency?.towers || ""
   };
 
   slides.forEach(s => {
@@ -158,11 +148,6 @@ async function saveConfig({ silent = false } = {}) {
       towerTexts: appConfig.ticker?.towerTexts || {},
       towerExpiries: appConfig.ticker?.towerExpiries || {},
       towerAttentionTexts: appConfig.ticker?.towerAttentionTexts || {}
-    },
-    emergency: {
-      enabled: !!appConfig.emergency?.enabled,
-      slide: appConfig.emergency?.slide || "",
-      towers: appConfig.emergency?.towers || ""
     },
     slides: files
       .filter(n => !!config[n])

@@ -16,7 +16,6 @@ let index    = 0;
 let timer    = null;
 let transitionEffect = "fade";
 let transitionMs = 700;
-let emergency = { enabled: false, slide: "", towers: "" };
 let ticker = { commonText: "", towerTexts: {} };
 let scheduledTickerRows = [];   // parsed from ticker.txt: time-scheduled per-tower messages
 let lastTickerSignature = null; // skip re-render when the resolved ticker is unchanged
@@ -84,12 +83,6 @@ async function load({ showError = true } = {}) {
     const newRefreshInterval = Number(data.refreshInterval) > 0 ? Number(data.refreshInterval) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
     refreshIntervalMs = newRefreshInterval;
     
-    emergency = {
-      enabled: !!data.emergency?.enabled,
-      slide: data.emergency?.slide || "",
-      towers: data.emergency?.towers || ""
-    };
-
     ticker = {
       commonText: data.ticker?.commonText || "",
       towerTexts: data.ticker?.towerTexts || {},
@@ -395,17 +388,8 @@ function build() {
   frame.querySelectorAll(".slide").forEach(el => el.remove());
   elements = [];
 
-  let visible = slides.filter(isVisible);
+  const visible = slides.filter(isVisible);
 
-  // Emergency override
-  if (emergency.enabled && emergency.slide) {
-    const emTowers = (emergency.towers || "").split(",").filter(Boolean);
-    const applies = !towerParam || emTowers.some(a => a === towerParam || towerParam.startsWith(a));
-    if (applies) {
-      const em = slides.find(s => s.name === emergency.slide);
-      if (em) visible = [em];
-    }
-  }
   document.getElementById("empty").style.display = visible.length ? "none" : "flex";
 
   visible.forEach(s => {

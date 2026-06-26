@@ -89,7 +89,6 @@ function applyTopbarSettingsFromConfig() {
   }
 
   initTickerConfig();
-  updateEmergencyStatus();
 }
 
 /* RIGHT PANEL TABS */
@@ -245,46 +244,6 @@ function fileToBase64(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
-}
-
-function updateEmergencyStatus() {
-  const btn = document.getElementById("emergencyToggle");
-  if (!btn) return;
-  const e = appConfig.emergency || { enabled: false, slide: "" };
-  if (e.enabled) {
-    btn.title = `Emergency ON (${e.slide || "Unknown"}) — click to turn off`;
-    btn.classList.add("on");
-  } else {
-    btn.title = "Emergency OFF — click to activate";
-    btn.classList.remove("on");
-  }
-}
-
-async function toggleEmergency() {
-  const isOn = appConfig.emergency?.enabled;
-  if (!isOn) {
-    if (!selected) {
-      alert("Select a slide first.");
-      return;
-    }
-    appConfig.emergency = {
-      enabled: true,
-      slide: selected,
-      towers: (config[selected]?.towers || defaultTowers())
-    };
-  } else {
-    appConfig.emergency = {
-      enabled: false,
-      slide: "",
-      towers: ""
-    };
-  }
-  updateEmergencyStatus();
-  try {
-    await saveConfig({ silent: true });
-  } catch (e) {
-    alert("Failed to update emergency override: " + e.message);
-  }
 }
 
 function matchesThumbFilter(name) {

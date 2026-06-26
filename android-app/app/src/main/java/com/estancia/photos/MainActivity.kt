@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private val io = Executors.newSingleThreadExecutor()
     private val ui = Handler(Looper.getMainLooper())
 
-    private lateinit var teamName: TextView
+    private lateinit var subtitle: TextView
     private lateinit var targetFile: TextView
     private lateinit var photoCount: TextView
     private lateinit var thumbs: LinearLayout
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        teamName = findViewById(R.id.teamName)
+        subtitle = findViewById(R.id.subtitle)
         targetFile = findViewById(R.id.targetFile)
         photoCount = findViewById(R.id.photoCount)
         thumbs = findViewById(R.id.thumbs)
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val team = Prefs.team(this)
-        teamName.text = team.label
+        subtitle.text = getString(R.string.team_updates, team.label)
         targetFile.text = getString(R.string.updates_slide, team.file)
         applyTeamTheme(team)
         if (!Prefs.isConfigured(this)) {
@@ -100,7 +100,12 @@ class MainActivity : AppCompatActivity() {
         val dark = Color.parseColor(team.darkHex)
         findViewById<View>(R.id.header).setBackgroundColor(color)
         window.statusBarColor = dark
-        val tint = ColorStateList.valueOf(color)
+
+        // Team color when enabled, muted grey when disabled (so the upload button
+        // still reads as disabled). Text stays white via @color/btn_text.
+        val disabled = Color.parseColor("#C7CCD1")
+        val states = arrayOf(intArrayOf(android.R.attr.state_enabled), intArrayOf(-android.R.attr.state_enabled))
+        val tint = ColorStateList(states, intArrayOf(color, disabled))
         findViewById<Button>(R.id.takePhotoBtn).backgroundTintList = tint
         uploadBtn.backgroundTintList = tint
     }

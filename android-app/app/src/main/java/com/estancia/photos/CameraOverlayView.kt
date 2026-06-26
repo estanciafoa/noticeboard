@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
@@ -18,44 +19,66 @@ class CameraOverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyle) {
 
     private val grid = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(120, 255, 255, 255)
+        color = Color.argb(110, 255, 255, 255)
         strokeWidth = 2f
         style = Paint.Style.STROKE
     }
-    private val personFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(60, 220, 40, 40)
+    private val centerFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(48, 255, 255, 255)
         style = Paint.Style.FILL
     }
-    private val personStroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(200, 220, 40, 40)
-        strokeWidth = 5f
+    private val centerStroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(200, 255, 255, 255)
+        strokeWidth = 3f
         style = Paint.Style.STROKE
     }
+    private val person = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(70, 255, 255, 255)
+        style = Paint.Style.FILL
+    }
+
+    private val cols = 3
+    private val rows = 6
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val w = width.toFloat()
         val h = height.toFloat()
 
-        // Rule-of-thirds grid
-        canvas.drawLine(w / 3f, 0f, w / 3f, h, grid)
-        canvas.drawLine(2f * w / 3f, 0f, 2f * w / 3f, h, grid)
-        canvas.drawLine(0f, h / 3f, w, h / 3f, grid)
-        canvas.drawLine(0f, 2f * h / 3f, w, 2f * h / 3f, grid)
+        // 6 x 3 grid
+        for (i in 1 until cols) {
+            val x = w * i / cols
+            canvas.drawLine(x, 0f, x, h, grid)
+        }
+        for (j in 1 until rows) {
+            val y = h * j / rows
+            canvas.drawLine(0f, y, w, y, grid)
+        }
 
-        // Centered person guide (head circle + body capsule)
-        val cx = w / 2f
-        val headR = w * 0.085f
-        val headCy = h * 0.34f
-        canvas.drawCircle(cx, headCy, headR, personFill)
-        canvas.drawCircle(cx, headCy, headR, personStroke)
+        // Center zone: middle column x middle 2 rows (where the subject should sit).
+        val left = w * 1f / cols
+        val right = w * 2f / cols
+        val top = h * 2f / rows
+        val bottom = h * 4f / rows
+        val rect = RectF(left, top, right, bottom)
+        canvas.drawRect(rect, centerFill)
+        canvas.drawRect(rect, centerStroke)
 
-        val bodyTop = headCy + headR * 1.1f
-        val bodyBottom = h * 0.82f
-        val bodyHalf = w * 0.16f
-        val body = RectF(cx - bodyHalf, bodyTop, cx + bodyHalf, bodyBottom)
-        val r = w * 0.10f
-        canvas.drawRoundRect(body, r, r, personFill)
-        canvas.drawRoundRect(body, r, r, personStroke)
+        // Translucent person silhouette inside the box.
+        val cx = (left + right) / 2f
+        val boxW = right - left
+        val boxH = bottom - top
+
+        val headR = boxW * 0.17f
+        val headCy = top + boxH * 0.22f
+        canvas.drawCircle(cx, headCy, headR, person)
+
+        val torsoTop = headCy + headR * 1.1f
+        val torsoHalf = boxW * 0.33f
+        val torso = RectF(cx - torsoHalf, torsoTop, cx + torsoHalf, bottom - boxH * 0.05f)
+        // Round only the top (shoulders); square at the bottom of the box.
+        val radii = floatArrayOf(torsoHalf, torsoHalf, torsoHalf, torsoHalf, 0f, 0f, 0f, 0f)
+        val torsoPath = Path().apply { addRoundRect(torso, radii, Path.Direction.CW) }
+        canvas.drawPath(torsoPath, person)
     }
 }

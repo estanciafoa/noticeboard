@@ -1,0 +1,19 @@
+# Android / Gradle build artifacts
+*.iml
+.gradle/
+build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local config (machine-specific)
+local.properties
+
+# Output APKs/bundles
+*.apk
+*.aab
+
+# IDE
+.idea/
+*.DS_Store

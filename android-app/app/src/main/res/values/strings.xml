@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Estancia Photos</string>
+    <string name="admin_title">Admin</string>
+    <string name="admin">Admin</string>
+    <string name="history">History</string>
+    <string name="daily_update">Daily photo update</string>
+    <string name="admin_password_hint">Admin password</string>
+    <string name="wrong_password">Wrong password</string>
+
+    <!-- History -->
+    <string name="history_title">Upload history</string>
+    <string name="loading">Loading…</string>
+    <string name="no_history">No uploads yet.</string>
+    <string name="history_load_error">Could not load history.</string>
+
+    <string name="take_photo">📷 Take photo</string>
+    <string name="pick_photos">Pick photos</string>
+    <string name="no_photos">No photos yet</string>
+    <string name="preview">Preview</string>
+    <string name="upload">Upload to display</string>
+    <string name="clear">Clear</string>
+    <string name="photo_removed">Photo removed</string>
+    <string name="updates_slide">Updates slide: %1$s</string>
+
+    <string name="building">Building collage…</string>
+    <string name="uploading">Uploading to the display…</string>
+    <string name="upload_done">✅ Done! Appears on the displays within ~15 minutes.</string>
+    <string name="no_token_hint">No access token yet — open Admin to add one.</string>
+
+    <!-- Admin -->
+    <string name="team_label">Team</string>
+    <string name="token_label">Access token</string>
+    <string name="token_hint">Paste your GitHub token</string>
+    <string name="token_help">Stored only on this phone. Used to publish this team\'s photos to the notice board.</string>
+    <string name="save_continue">Save</string>
+    <string name="token_required">Paste your access token.</string>
+    <string name="checking_token">Checking token…</string>
+    <string name="token_rejected">Token rejected. Check it and try again.</string>
+    <string name="saved">Saved.</string>
+
+    <plurals name="photo_count">
+        <item quantity="one">%d photo</item>
+        <item quantity="other">%d photos</item>
+    </plurals>
+</resources>

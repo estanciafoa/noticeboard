@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.EstanciaPhotos" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:statusBarColor">@color/green_dark</item>
+    </style>
+
+    <!-- Admin activity keeps an action bar for the up button -->
+    <style name="Theme.EstanciaPhotos.Admin" parent="Theme.Material3.DayNight">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+</resources>

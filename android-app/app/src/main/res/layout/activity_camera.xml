@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.estancia.photos.CameraOverlayView
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Bottom controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#99000000"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/shotCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/shots_zero"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/captureBtn"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:background="@drawable/shutter_bg"
+            android:scaleType="centerInside"
+            android:contentDescription="@string/take_photo" />
+
+        <Button
+            android:id="@+id/doneBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/done"
+            android:textColor="#FFFFFF"
+            style="@style/Widget.Material3.Button.TextButton" />
+    </LinearLayout>
+</FrameLayout>

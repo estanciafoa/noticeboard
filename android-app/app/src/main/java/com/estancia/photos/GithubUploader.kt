@@ -107,7 +107,7 @@ object GithubUploader {
     }
 
     /** Recent commits that touched the slides/ folder (i.e. photo pushes), newest first. */
-    fun fetchHistory(token: String, perPage: Int = 30): List<CommitInfo> {
+    fun fetchHistory(token: String, perPage: Int = 10): List<CommitInfo> {
         val conn = open("$API/commits?path=slides&per_page=$perPage", token, "GET")
         val code = conn.responseCode
         val text = conn.bodyText()

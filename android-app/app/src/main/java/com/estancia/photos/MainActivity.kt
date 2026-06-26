@@ -1,8 +1,10 @@
 package com.estancia.photos
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
@@ -18,7 +20,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import java.io.File
 import java.util.concurrent.Executors
 import kotlin.math.max
@@ -41,11 +42,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var uploadBtn: Button
     private lateinit var status: TextView
 
-    private var cameraFile: File? = null
     private var busy = false
 
-    private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
-        if (ok) cameraFile?.let { addFromFile(it) }
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val paths = result.data?.getStringArrayListExtra(CameraActivity.EXTRA_PATHS)
+            if (!paths.isNullOrEmpty()) {
+                addFromPaths(paths)
+                Toast.makeText(
+                    this, getString(R.string.saved_to_gallery, GallerySaver.albumName()), Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
     private val pickPhotos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         if (!uris.isNullOrEmpty()) addFromUris(uris)
@@ -78,9 +88,21 @@ class MainActivity : AppCompatActivity() {
         val team = Prefs.team(this)
         teamName.text = team.label
         targetFile.text = getString(R.string.updates_slide, team.file)
+        applyTeamTheme(team)
         if (!Prefs.isConfigured(this)) {
             setStatus(getString(R.string.no_token_hint), true)
         }
+    }
+
+    /** Recolor header, status bar, and primary buttons to the selected team's color. */
+    private fun applyTeamTheme(team: Team) {
+        val color = Color.parseColor(team.colorHex)
+        val dark = Color.parseColor(team.darkHex)
+        findViewById<View>(R.id.header).setBackgroundColor(color)
+        window.statusBarColor = dark
+        val tint = ColorStateList.valueOf(color)
+        findViewById<Button>(R.id.takePhotoBtn).backgroundTintList = tint
+        uploadBtn.backgroundTintList = tint
     }
 
     // ---- Admin password gate ----
@@ -105,16 +127,13 @@ class MainActivity : AppCompatActivity() {
 
     // ---- Photo input ----
     private fun launchCamera() {
-        val file = File(cacheDir, "shot_${System.nanoTime()}.jpg")
-        cameraFile = file
-        val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
-        takePhoto.launch(uri)
+        cameraLauncher.launch(Intent(this, CameraActivity::class.java))
     }
 
-    private fun addFromFile(file: File) {
+    private fun addFromPaths(paths: List<String>) {
         io.execute {
-            val bmp = decodeBitmap(Uri.fromFile(file))
-            ui.post { if (bmp != null) { photos.add(bmp); onPhotosChanged() } }
+            val decoded = paths.mapNotNull { decodeBitmap(Uri.fromFile(File(it))) }
+            ui.post { photos.addAll(decoded); onPhotosChanged() }
         }
     }
 

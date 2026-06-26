@@ -39,8 +39,20 @@
     <string name="token_rejected">Token rejected. Check it and try again.</string>
     <string name="saved">Saved.</string>
 
+    <!-- Camera -->
+    <string name="done">Done</string>
+    <string name="shots_zero">0 photos</string>
+    <string name="camera_denied">Camera permission is needed to take photos.</string>
+    <string name="camera_error">Camera error. Try again.</string>
+    <string name="saved_to_gallery">Saved to gallery album %1$s</string>
+
     <plurals name="photo_count">
         <item quantity="one">%d photo</item>
         <item quantity="other">%d photos</item>
+    </plurals>
+
+    <plurals name="shots">
+        <item quantity="one">%d photo taken</item>
+        <item quantity="other">%d photos taken</item>
     </plurals>
 </resources>

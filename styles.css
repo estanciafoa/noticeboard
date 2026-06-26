@@ -347,6 +347,25 @@ body {
   display: flex;
 }
 
+/* STATUS BADGE (expired / scheduled) */
+.thumb-badge {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #fff;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+.thumb-badge.expired { background: #dc2626; }
+.thumb-badge.scheduled { background: #d97706; }
+
 .thumb-disabled-overlay svg {
   width: 38%;
   height: 38%;

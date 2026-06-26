@@ -56,7 +56,8 @@ function buildThumbFilterOptions() {
   // Preserve first two static options (All + Disabled)
   const staticOptions = [
     `<option value="all">All</option>`,
-    `<option value="__disabled">Disabled</option>`
+    `<option value="__disabled">Disabled</option>`,
+    `<option value="__expired">Expired</option>`
   ];
 
   const locOptions = LOCATIONS.map(loc => `<option value="${loc.id}">${loc.label}</option>`);
@@ -249,10 +250,68 @@ function fileToBase64(file) {
 function matchesThumbFilter(name) {
   if (thumbFilterValue === "all") return true;
   if (thumbFilterValue === "__disabled") return !config[name];
+  if (thumbFilterValue === "__expired") return slideStatus(name) === "expired";
 
   const towers = config[name]?.towers || "";
   if (!towers) return false;
   return towers.split(",").includes(thumbFilterValue);
+}
+
+/* SLIDE VISIBILITY STATUS — mirrors viewer.js isVisible (tower-agnostic), so the
+   admin thumbnail reflects what actually shows on the displays.
+   Returns: 'unconfigured' | 'expired' | 'scheduled' | 'live'. */
+function parseExpiryToMs(exp) {
+  const n = parseInt(exp, 10);
+  if (isNaN(n)) return 0;
+  if (/h/i.test(exp)) return n * 3600000;
+  if (/d/i.test(exp)) return n * 86400000;
+  if (/m/i.test(exp)) return n * 60000;
+  return n * 1000;
+}
+
+function slideStatus(name) {
+  const c = config[name];
+  if (!c) return "unconfigured";
+  const now = new Date();
+
+  // Date ranges: expired if all ranges are in the past; scheduled if only future.
+  if (Array.isArray(c.dates) && c.dates.length) {
+    let current = false, future = false;
+    c.dates.forEach(d => {
+      if (!d.startDate) { current = true; return; }
+      const sd = new Date(d.startDate);
+      let ed = null;
+      if (d.endDate) { ed = new Date(d.endDate); ed.setHours(23, 59, 59, 999); }
+      if (now < sd) future = true;
+      else if (ed && now > ed) { /* this range is past */ }
+      else current = true;
+    });
+    if (!current && !future) return "expired";
+    if (!current && future) return "scheduled";
+  }
+
+  // Expiry duration relative to the first start date.
+  if (c.expiry) {
+    const ms = parseExpiryToMs(c.expiry);
+    if (ms > 0 && Array.isArray(c.dates) && c.dates[0] && c.dates[0].startDate) {
+      const start = new Date(c.dates[0].startDate);
+      if (now.getTime() - start.getTime() > ms) return "expired";
+    }
+  }
+
+  // Time-of-day windows: outside all of them → not showing right now.
+  if (Array.isArray(c.times) && c.times.length) {
+    const cur = now.getHours() * 60 + now.getMinutes();
+    const inAny = c.times.some(t => {
+      if (!t.start || !t.end) return true;
+      const [sh, sm] = t.start.split(":").map(Number);
+      const [eh, em] = t.end.split(":").map(Number);
+      return cur >= sh * 60 + sm && cur <= eh * 60 + em;
+    });
+    if (!inAny) return "scheduled";
+  }
+
+  return "live";
 }
 
 /* SELECT / CLEAR ALL LOCATIONS */
@@ -358,7 +417,12 @@ function render() {
     if (name === selected) div.classList.add("active");
     if (multiSelected.has(name)) div.classList.add("multi-selected");
     const enabledNow = !!config[name];
-    if (!enabledNow) div.classList.add("disabled");
+    const status = slideStatus(name);
+    // Dim + hide anything not visible on the displays right now:
+    // unconfigured (no config), expired (past its dates/expiry), or scheduled (future/off-hours).
+    if (status !== "live") div.classList.add("disabled");
+    if (status === "expired") div.classList.add("expired");
+    if (status === "scheduled") div.classList.add("scheduled");
 
     const media = createMedia(name);
     div.appendChild(media);
@@ -368,6 +432,14 @@ function render() {
     overlay.className = "thumb-disabled-overlay";
     overlay.innerHTML = ICON_EYE_OFF;
     div.appendChild(overlay);
+
+    // status badge for configured-but-not-live slides
+    if (status === "expired" || status === "scheduled") {
+      const badge = document.createElement("div");
+      badge.className = "thumb-badge " + status;
+      badge.textContent = status === "expired" ? "EXPIRED" : "SCHEDULED";
+      div.appendChild(badge);
+    }
 
     // action icons (top of thumbnail)
     const actions = document.createElement("div");

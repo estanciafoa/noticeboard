@@ -5,18 +5,9 @@
   "refreshInterval": 15,
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, |8807922309, 7358386494\nHelpdesk : 9384001882",
-    "towerTexts": {
-      "t4c2": "<-- 10P LIFT MAINTENANCE ON 24TH JUNE, 10:30AM - 3:00 PM",
-      "t5c1": "<-- 10P LIFT MAINTENANCE ON 25TH JUNE, 10:30AM - 3:00 PM"
-    },
-    "towerExpiries": {
-      "t4c2": 1782306584892,
-      "t5c1": 1782396638140
-    },
-    "towerAttentionTexts": {
-      "t4c2": "LIFT MAINTENANCE",
-      "t5c1": "LIFT MAINTENANCE"
-    }
+    "towerTexts": {},
+    "towerExpiries": {},
+    "towerAttentionTexts": {}
   },
   "emergency": {
     "enabled": true,

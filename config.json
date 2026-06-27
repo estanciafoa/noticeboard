@@ -9,25 +9,7 @@
     "towerExpiries": {},
     "towerAttentionTexts": {}
   },
-  "emergency": {
-    "enabled": true,
-    "slide": "Club.png",
-    "towers": "club"
-  },
   "slides": [
-    {
-      "name": "Club.png",
-      "duration": "",
-      "times": [],
-      "dates": [
-        {
-          "startDate": "2026-06-05",
-          "endDate": "2026-06-05"
-        }
-      ],
-      "expiry": "",
-      "towers": "club"
-    },
     {
       "name": "t1 c1.png",
       "duration": "",

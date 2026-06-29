@@ -3,7 +3,7 @@
   "transitionEffect": "fade",
   "transitionMs": 700,
   "refreshInterval": 15,
-  "offlineBackup": "T5C2.jpg",
+  "offlineBackup": "Main Ingate.jpg",
   "offlineCacheVersion": "",
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, |8807922309, 7358386494\nHelpdesk : 9384001882",
@@ -18,7 +18,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "gate"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club,gate"
     },
     {
       "name": "Club.png",
@@ -165,7 +165,7 @@
       "towers": "t5c1,t5c2,club"
     },
     {
-      "name": "Parcel.jpg",
+      "name": "maintenance-estancia.jpg",
       "duration": "",
       "times": [],
       "dates": [],
@@ -173,7 +173,7 @@
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
-      "name": "maintenance-estancia.jpg",
+      "name": "Parcel.jpg",
       "duration": "",
       "times": [],
       "dates": [],

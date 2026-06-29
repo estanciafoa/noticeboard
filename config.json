@@ -3,6 +3,8 @@
   "transitionEffect": "fade",
   "transitionMs": 700,
   "refreshInterval": 15,
+  "offlineBackup": "T5C2.jpg",
+  "offlineCacheVersion": "",
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, |8807922309, 7358386494\nHelpdesk : 9384001882",
     "towerTexts": {},
@@ -16,7 +18,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t5c2,gate"
+      "towers": "gate"
     },
     {
       "name": "Club.png",

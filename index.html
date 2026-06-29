@@ -319,6 +319,13 @@ html, body {
 /* Bootstrap: load viewer.js — local on localhost, from raw GitHub in production */
 (function() {
   var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+  /* Register the service worker so the app shell + slide media are cached and
+     the board can boot/display with no internet. */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function() {});
+  }
+
   var src = 'https://raw.githubusercontent.com/estanciafoa/noticeboard/main/viewer.js?t=' + Date.now();
   var fallbackSrc = 'viewer.js?t=' + Date.now();
 

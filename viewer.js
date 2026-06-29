@@ -5,7 +5,7 @@ const DEFAULT_DURATION_MS = 10000;
 const DEFAULT_REFRESH_INTERVAL_MS = 15 * 60 * 1000;  // default: fetch slides every 15 min
 const REBUILD_INTERVAL_MS = 60 * 1000;                // re-evaluate visibility rules every minute
 const OFFLINE_RETRY_INTERVAL_MS = 60 * 1000;          // retry internet every minute when offline
-const OFFLINE_NOTICE = "⚠️ Internet Not Working. Please report to Admin office";
+const OFFLINE_NOTICE = "⚠️ Internet Not Available. Please inform Helpdesk: 9384001882";
 
 let slides   = [];
 let elements = [];
@@ -21,6 +21,19 @@ let scheduledTickerRows = [];   // parsed from ticker.txt: time-scheduled per-to
 let lastTickerSignature = null; // skip re-render when the resolved ticker is unchanged
 
 const TICKER_FILE = "ticker.txt";
+
+/* Keys for the last-known-good config cached in localStorage, so the board can
+   boot even with no internet at startup. */
+const CONFIG_CACHE_KEY = "nb.config";
+const TICKER_CACHE_KEY = "nb.ticker";
+
+/* Offline backup slide: exactly one slide (chosen in the admin console) is
+   downloaded into Cache Storage while online and shown when the board boots
+   with no internet. */
+const BACKUP_CACHE = "nb-backup";
+const BACKUP_KEY = "offline-backup-slide";   // fixed Cache Storage key
+const BACKUP_NAME_KEY = "nb.backupName";     // filename of the cached backup
+const CACHE_VERSION_KEY = "nb.cacheVersion"; // last applied offlineCacheVersion
 
 /* TOWER FILTER — read from ?t= in URL */
 const towerParamRaw = new URLSearchParams(location.search).get("t");
@@ -66,6 +79,45 @@ async function isInternetAvailable() {
 /* LOAD CONFIG */
 const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
+/* Apply the non-slide settings (durations, transition, ticker) from a parsed
+   config object. Shared by the online and offline paths. */
+function applyConfigSettings(data) {
+  transitionEffect = data.transitionEffect || "fade";
+  transitionMs = Number(data.transitionMs) > 0 ? Number(data.transitionMs) : 700;
+
+  // Update refresh interval if configured (value is in minutes, convert to milliseconds)
+  const newRefreshInterval = Number(data.refreshInterval) > 0 ? Number(data.refreshInterval) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
+  refreshIntervalMs = newRefreshInterval;
+
+  ticker = {
+    commonText: data.ticker?.commonText || "",
+    towerTexts: data.ticker?.towerTexts || {},
+    towerExpiries: data.ticker?.towerExpiries || {},
+    towerAttentionTexts: data.ticker?.towerAttentionTexts || {}
+  };
+  applyTicker();
+}
+
+/* Turn a parsed config.json object into live state and rebuild all slides.
+   Used by the online path (load) where every slide image is reachable. */
+function applyConfigData(data) {
+  const defaultDuration = Number(data.defaultDuration) > 0 ? Number(data.defaultDuration) * 1000 : DEFAULT_DURATION_MS;
+  applyConfigSettings(data);
+
+  slides = (Array.isArray(data.slides) ? data.slides : []).map(s => ({
+    name: s.name,
+    duration: s.duration && !isNaN(Number(s.duration)) ? Number(s.duration) * 1000 : defaultDuration,
+    times: Array.isArray(s.times) ? s.times
+         : (s.start && s.end ? [{start: s.start, end: s.end}] : []),
+    dates: Array.isArray(s.dates) ? s.dates
+         : (s.startDate ? [{startDate: s.startDate, endDate: s.endDate || ""}] : []),
+    expiry: s.expiry || null,
+    towers: s.towers || ""
+  })).filter(s => !!s.name);
+
+  build();
+}
+
 async function load({ showError = true } = {}) {
   try {
     const configUrl = isLocal
@@ -75,39 +127,25 @@ async function load({ showError = true } = {}) {
     if (!resJson.ok) throw new Error(`Failed to load config.json (HTTP ${resJson.status})`);
 
     const data = await resJson.json();
-    const defaultDuration = Number(data.defaultDuration) > 0 ? Number(data.defaultDuration) * 1000 : DEFAULT_DURATION_MS;
-    transitionEffect = data.transitionEffect || "fade";
-    transitionMs = Number(data.transitionMs) > 0 ? Number(data.transitionMs) : 700;
-    
-    // Update refresh interval if configured (value is in minutes, convert to milliseconds)
-    const newRefreshInterval = Number(data.refreshInterval) > 0 ? Number(data.refreshInterval) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
-    refreshIntervalMs = newRefreshInterval;
-    
-    ticker = {
-      commonText: data.ticker?.commonText || "",
-      towerTexts: data.ticker?.towerTexts || {},
-      towerExpiries: data.ticker?.towerExpiries || {},
-      towerAttentionTexts: data.ticker?.towerAttentionTexts || {}
-    };
+
+    // Honor a forced cache clear from the admin console BEFORE we re-populate.
+    await applyCacheClear(data);
+
     await fetchScheduledTicker();
-    applyTicker();
+    applyConfigData(data);
 
-    slides = (Array.isArray(data.slides) ? data.slides : []).map(s => ({
-      name: s.name,
-      duration: s.duration && !isNaN(Number(s.duration)) ? Number(s.duration) * 1000 : defaultDuration,
-      times: Array.isArray(s.times) ? s.times
-           : (s.start && s.end ? [{start: s.start, end: s.end}] : []),
-      dates: Array.isArray(s.dates) ? s.dates
-           : (s.startDate ? [{startDate: s.startDate, endDate: s.endDate || ""}] : []),
-      expiry: s.expiry || null,
-      towers: s.towers || ""
-    })).filter(s => !!s.name);
+    // Persist this good config + the chosen backup slide so the next boot can
+    // start offline.
+    try { localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify(data)); } catch (_) {}
+    await cacheBackupSlide(data.offlineBackup || "");
 
-    build();
     setNetworkStatus("");
     return true;
   } catch (e) {
     console.error("Failed to load config:", e);
+    // Network failed — show the cached offline backup slide so the screen is
+    // never blank just because the internet is down.
+    if (!elements.length && await showOfflineBackup()) return true;
     if (showError && !elements.length) {
       document.getElementById("empty").innerText = "Failed to load slides";
     }
@@ -115,10 +153,135 @@ async function load({ showError = true } = {}) {
   }
 }
 
+/* ---- OFFLINE BACKUP SLIDE ------------------------------------------------ */
+
+/* Download the single admin-chosen backup slide into Cache Storage so it can be
+   shown on a later offline boot. Passing "" drops any previously cached one. */
+async function cacheBackupSlide(name) {
+  try {
+    if (!window.caches) return;
+    if (!name) {
+      try { localStorage.removeItem(BACKUP_NAME_KEY); } catch (_) {}
+      try { await caches.delete(BACKUP_CACHE); } catch (_) {}
+      return;
+    }
+    const { primary, fallback } = mediaUrls(name);
+    let res = null;
+    try { const r = await fetch(primary, { cache: "reload" }); if (r && r.ok) res = r; } catch (_) {}
+    if (!res) { try { const r = await fetch(fallback, { cache: "reload" }); if (r && r.ok) res = r; } catch (_) {} }
+    if (!res) return;   // couldn't fetch — keep whatever was cached before
+    const cache = await caches.open(BACKUP_CACHE);
+    await cache.put(BACKUP_KEY, res.clone());
+    try { localStorage.setItem(BACKUP_NAME_KEY, name); } catch (_) {}
+  } catch (e) {
+    console.error("Failed to cache backup slide:", e);
+  }
+}
+
+/* Restore settings/ticker from localStorage and show ONLY the cached backup
+   slide (the other slides' images aren't available offline). Returns true if a
+   backup slide was actually shown. */
+async function showOfflineBackup() {
+  try {
+    const raw = localStorage.getItem(CONFIG_CACHE_KEY);
+    if (raw) {
+      loadCachedScheduledTicker();
+      applyConfigSettings(JSON.parse(raw));
+    }
+  } catch (_) {}
+
+  let name = "";
+  try { name = localStorage.getItem(BACKUP_NAME_KEY) || ""; } catch (_) {}
+
+  let blobUrl = null;
+  if (name && window.caches) {
+    try {
+      const cache = await caches.open(BACKUP_CACHE);
+      const res = await cache.match(BACKUP_KEY);
+      if (res) blobUrl = URL.createObjectURL(await res.blob());
+    } catch (_) {}
+  }
+
+  buildSingle(name, blobUrl);
+  return !!blobUrl;
+}
+
+/* Build the frame with a single slide sourced from a local blob URL. */
+function buildSingle(name, blobUrl) {
+  const frame = document.getElementById("frame");
+  frame.style.setProperty("--transition-ms", `${transitionMs}ms`);
+  frame.classList.remove("effect-cut", "effect-fade", "effect-zoom");
+  frame.classList.add(`effect-${transitionEffect}`);
+  frame.querySelectorAll(".slide").forEach(el => el.remove());
+  elements = [];
+
+  if (!blobUrl) {
+    document.getElementById("empty").style.display = "flex";
+    return;
+  }
+  document.getElementById("empty").style.display = "none";
+
+  const div = document.createElement("div");
+  div.className = "slide";
+  div.dataset.duration = DEFAULT_DURATION_MS;
+
+  if (isVideo(name)) {
+    const video = document.createElement("video");
+    video.autoplay = true;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.loop = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.src = blobUrl;
+    div.appendChild(video);
+  } else {
+    const img = document.createElement("img");
+    img.src = blobUrl;
+    div.appendChild(img);
+  }
+
+  frame.appendChild(div);
+  elements.push(div);
+  index = 0;
+  show(0);
+}
+
+/* If the admin bumped offlineCacheVersion, wipe ALL local caches (shell, backup
+   slide, cached config) so the displays re-download everything fresh. */
+async function applyCacheClear(data) {
+  const wantVersion = String(data.offlineCacheVersion || "");
+  let haveVersion = "";
+  try { haveVersion = localStorage.getItem(CACHE_VERSION_KEY) || ""; } catch (_) {}
+  if (wantVersion === haveVersion) return;
+
+  await clearOfflineCaches();
+  try { localStorage.setItem(CACHE_VERSION_KEY, wantVersion); } catch (_) {}
+}
+
+async function clearOfflineCaches() {
+  try {
+    if (window.caches) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch (_) {}
+  try {
+    localStorage.removeItem(CONFIG_CACHE_KEY);
+    localStorage.removeItem(TICKER_CACHE_KEY);
+    localStorage.removeItem(BACKUP_NAME_KEY);
+  } catch (_) {}
+}
+
 async function refreshIfOnline() {
   const online = await isInternetAvailable();
   if (!online) {
     setNetworkStatus(OFFLINE_NOTICE);
+    // Cold boot with no internet: show the cached offline backup slide instead
+    // of leaving the screen blank. (If slides are already on screen — internet
+    // dropped mid-run — keep showing them.)
+    if (!elements.length) await showOfflineBackup();
     stopRefreshInterval();
     setupOfflineRetry();
     return;
@@ -264,9 +427,21 @@ async function fetchScheduledTicker() {
       : `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${TICKER_FILE}?t=${Date.now()}`;
     const res = await withTimeout(fetch(url, { cache: "no-store" }), 5000);
     if (!res || !res.ok) { scheduledTickerRows = []; return; }   // missing file is fine
-    scheduledTickerRows = parseTickerFile(await res.text());
+    const txt = await res.text();
+    scheduledTickerRows = parseTickerFile(txt);
+    try { localStorage.setItem(TICKER_CACHE_KEY, txt); } catch (_) {}
   } catch (_) {
     scheduledTickerRows = [];   // never let a ticker.txt problem break the viewer
+  }
+}
+
+/* Restore the scheduled ticker rows from the last cached ticker.txt text. */
+function loadCachedScheduledTicker() {
+  try {
+    const txt = localStorage.getItem(TICKER_CACHE_KEY);
+    scheduledTickerRows = txt ? parseTickerFile(txt) : [];
+  } catch (_) {
+    scheduledTickerRows = [];
   }
 }
 

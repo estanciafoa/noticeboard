@@ -27,6 +27,8 @@ let appConfig = {
   transitionEffect: DEFAULT_TRANSITION_EFFECT,
   transitionMs: DEFAULT_TRANSITION_MS,
   refreshInterval: DEFAULT_REFRESH_INTERVAL,
+  offlineBackup: "",        // filename of the slide cached for offline display
+  offlineCacheVersion: "",  // bump to force displays to clear their offline cache
   ticker: {
     commonText: "",
     towerTexts: {},
@@ -51,6 +53,8 @@ async function load() {
   appConfig.transitionEffect = json.transitionEffect || DEFAULT_TRANSITION_EFFECT;
   appConfig.transitionMs = Number(json.transitionMs) > 0 ? Number(json.transitionMs) : DEFAULT_TRANSITION_MS;
   appConfig.refreshInterval = Number(json.refreshInterval) > 0 ? Number(json.refreshInterval) : DEFAULT_REFRESH_INTERVAL;
+  appConfig.offlineBackup = json.offlineBackup || "";
+  appConfig.offlineCacheVersion = json.offlineCacheVersion || "";
   appConfig.ticker = {
     commonText: json.ticker?.commonText || "",
     towerTexts: json.ticker?.towerTexts || {},
@@ -143,6 +147,8 @@ async function saveConfig({ silent = false } = {}) {
     transitionEffect: appConfig.transitionEffect,
     transitionMs: appConfig.transitionMs,
     refreshInterval: appConfig.refreshInterval,
+    offlineBackup: appConfig.offlineBackup || "",
+    offlineCacheVersion: appConfig.offlineCacheVersion || "",
     ticker: {
       commonText: appConfig.ticker?.commonText || "",
       towerTexts: appConfig.ticker?.towerTexts || {},

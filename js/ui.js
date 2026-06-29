@@ -441,6 +441,15 @@ function render() {
       div.appendChild(badge);
     }
 
+    // offline backup marker
+    if (appConfig.offlineBackup === name) {
+      const badge = document.createElement("div");
+      badge.className = "thumb-badge offline-backup";
+      badge.textContent = "OFFLINE";
+      badge.title = "Shown on displays when there is no internet at startup";
+      div.appendChild(badge);
+    }
+
     // action icons (top of thumbnail)
     const actions = document.createElement("div");
     actions.className = "thumb-actions";
@@ -735,6 +744,30 @@ function selectSlide(name) {
   document.querySelectorAll("#locationPicker input").forEach(cb => {
     cb.checked = activeTowers.includes(cb.value);
   });
+
+  // offline backup checkbox (only one slide can be the backup)
+  const backupCb = document.getElementById("offlineBackup");
+  if (backupCb) {
+    backupCb.checked = appConfig.offlineBackup === name;
+    backupCb.onchange = () => {
+      if (backupCb.checked) appConfig.offlineBackup = name;
+      else if (appConfig.offlineBackup === name) appConfig.offlineBackup = "";
+      render();
+    };
+  }
+}
+
+/* Force every display to clear its offline cache (shell + backup slide) and
+   re-download on its next successful connection. Bumps offlineCacheVersion. */
+async function clearOfflineCacheOnDisplays() {
+  if (!confirm("Force all displays to clear their offline cache and re-download on the next connection?")) return;
+  appConfig.offlineCacheVersion = String(Date.now());
+  try {
+    await saveConfig({ silent: true });
+    alert("Done. Each display will clear its offline cache the next time it connects.");
+  } catch (e) {
+    alert("Failed to update config.json: " + e.message);
+  }
 }
 
 /* NAVIGATE SLIDES (prev/next) */

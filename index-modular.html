@@ -51,6 +51,7 @@
 
     </div>
     <div class="topbar-right">
+      <button class="preview-btn" onclick="clearOfflineCacheOnDisplays()" title="Force displays to clear their offline cache on next connection">Clear Offline Cache</button>
       <button class="preview-btn" onclick="previewSlide()" title="Preview slideshow"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="6,3 20,12 6,21"/></svg></button>
       <button class="save-btn" onclick="saveConfig()">Save</button>
     </div>
@@ -208,6 +209,11 @@
           <label>Locations</label>
           <p class="loc-hint">No locations selected = slide is disabled</p>
           <div id="locationPicker" class="location-picker"></div>
+        </div>
+
+        <div class="field">
+          <label><input type="checkbox" id="offlineBackup" style="width:auto"> Offline backup slide</label>
+          <p class="loc-hint">Cached on the displays and shown when there is no internet at startup. Only one slide can be the backup.</p>
         </div>
       </div>
 

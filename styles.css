@@ -365,6 +365,13 @@ body {
 }
 .thumb-badge.expired { background: #dc2626; }
 .thumb-badge.scheduled { background: #d97706; }
+/* Offline backup marker sits in the top-left corner so it never collides with
+   the centered expired/scheduled status badge. */
+.thumb-badge.offline-backup {
+  left: 6px;
+  transform: none;
+  background: #0891b2;
+}
 
 .thumb-disabled-overlay svg {
   width: 38%;

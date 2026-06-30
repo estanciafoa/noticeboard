@@ -106,6 +106,83 @@ object GithubUploader {
         }
     }
 
+    // ---- config.json (slide → tower mapping) --------------------------------
+
+    private const val CONFIG_PATH = "config.json"
+
+    /** The parsed config.json object and the blob sha needed to update it. */
+    private fun fetchConfig(token: String): Pair<JSONObject, String> {
+        val conn = open("$API/contents/$CONFIG_PATH?ref=$BRANCH", token, "GET")
+        val code = conn.responseCode
+        val text = conn.bodyText()
+        conn.disconnect()
+        if (code != 200) throw UploadException("Could not read config.json (HTTP $code).")
+        val meta = JSONObject(text)
+        val sha = meta.optString("sha")
+        val decoded = String(Base64.decode(meta.optString("content"), Base64.DEFAULT), Charsets.UTF_8)
+        return Pair(JSONObject(decoded), sha)
+    }
+
+    private fun putConfig(token: String, config: JSONObject, sha: String, message: String) {
+        val conn = open("$API/contents/$CONFIG_PATH", token, "PUT")
+        conn.doOutput = true
+        conn.setRequestProperty("Content-Type", "application/json")
+        val content = Base64.encodeToString(config.toString(2).toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+        val payload = JSONObject().apply {
+            put("message", message)
+            put("content", content)
+            put("branch", BRANCH)
+            put("sha", sha)
+        }
+        conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
+        val code = conn.responseCode
+        if (code !in 200..299) {
+            val detail = try { JSONObject(conn.bodyText()).optString("message") } catch (_: Exception) { "" }
+            conn.disconnect()
+            throw UploadException("Config update failed (HTTP $code)${if (detail.isNotBlank()) ": $detail" else ""}")
+        }
+        conn.disconnect()
+    }
+
+    /**
+     * Set the `towers` (display locations) of the config.json slide named [file],
+     * adding the slide entry if it's missing. Retries once on a sha conflict.
+     */
+    fun setSlideTowers(token: String, file: String, towers: String, message: String) {
+        if (token.isBlank()) throw UploadException("No access token.")
+        try {
+            applyTowers(token, file, towers, message)
+        } catch (e: UploadException) {
+            // Stale sha (someone else saved config) — re-read once and retry.
+            applyTowers(token, file, towers, message)
+        }
+    }
+
+    private fun applyTowers(token: String, file: String, towers: String, message: String) {
+        val (config, sha) = fetchConfig(token)
+        val slides = config.optJSONArray("slides") ?: JSONArray().also { config.put("slides", it) }
+        var found = false
+        for (i in 0 until slides.length()) {
+            val s = slides.optJSONObject(i) ?: continue
+            if (s.optString("name") == file) {
+                s.put("towers", towers)
+                found = true
+                break
+            }
+        }
+        if (!found) {
+            slides.put(JSONObject().apply {
+                put("name", file)
+                put("duration", "")
+                put("times", JSONArray())
+                put("dates", JSONArray())
+                put("expiry", "")
+                put("towers", towers)
+            })
+        }
+        putConfig(token, config, sha, message)
+    }
+
     /** Recent commits that touched the slides/ folder (i.e. photo pushes), newest first. */
     fun fetchHistory(token: String, perPage: Int = 10): List<CommitInfo> {
         val conn = open("$API/commits?path=slides&per_page=$perPage", token, "GET")

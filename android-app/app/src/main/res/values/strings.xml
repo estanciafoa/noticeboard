@@ -21,6 +21,9 @@
     <string name="no_photos">No photos yet</string>
     <string name="preview">Preview</string>
     <string name="upload">Upload to display</string>
+    <string name="upload_mygate">📩 Upload MyGate notice</string>
+    <string name="mygate_pick_title">Show MyGate notice on</string>
+    <string name="mygate_pick_required">Select at least one location.</string>
     <string name="clear">Clear</string>
     <string name="photo_removed">Photo removed</string>
     <string name="updates_slide">Updates slide: %1$s</string>

@@ -161,6 +161,16 @@
                     android:text="@string/upload" />
 
                 <Button
+                    android:id="@+id/mygateBtn"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:enabled="false"
+                    app:cornerRadius="14dp"
+                    android:text="@string/upload_mygate" />
+
+                <Button
                     android:id="@+id/clearBtn"
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="match_parent"

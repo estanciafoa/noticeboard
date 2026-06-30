@@ -28,6 +28,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val ADMIN_PASSWORD = "Admin2026"
+
+        // Dedicated slide published outside the normal team flow. Must
+        // byte-match the slide name in the board's config.json.
+        private const val MYGATE_FILE = "mygate-estancia.jpg"
     }
 
     private val photos = mutableListOf<Bitmap>()
@@ -40,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var thumbs: LinearLayout
     private lateinit var preview: ImageView
     private lateinit var uploadBtn: Button
+    private lateinit var mygateBtn: Button
     private lateinit var status: TextView
 
     private var busy = false
@@ -71,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         thumbs = findViewById(R.id.thumbs)
         preview = findViewById(R.id.preview)
         uploadBtn = findViewById(R.id.uploadBtn)
+        mygateBtn = findViewById(R.id.mygateBtn)
         status = findViewById(R.id.status)
 
         findViewById<View>(R.id.adminBtn).setOnClickListener { promptAdminPassword() }
@@ -81,6 +87,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.pickBtn).setOnClickListener { pickPhotos.launch("image/*") }
         findViewById<Button>(R.id.clearBtn).setOnClickListener { clearPhotos() }
         uploadBtn.setOnClickListener { doUpload() }
+
+        // MyGate notice: pick display locations, then upload the first photo
+        // as-is (no title) and point the slide at those towers/cores.
+        mygateBtn.setOnClickListener { promptMygateLocations() }
     }
 
     override fun onResume() {
@@ -160,7 +170,14 @@ class MainActivity : AppCompatActivity() {
             else resources.getQuantityString(R.plurals.photo_count, photos.size, photos.size)
         renderThumbs()
         refreshPreview()
-        uploadBtn.isEnabled = photos.isNotEmpty() && !busy
+        updateActionButtons()
+    }
+
+    /** Enable the upload actions only when there's at least one photo and we're idle. */
+    private fun updateActionButtons() {
+        val ready = photos.isNotEmpty() && !busy
+        uploadBtn.isEnabled = ready
+        mygateBtn.isEnabled = ready
     }
 
     private fun renderThumbs() {
@@ -195,9 +212,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---- Upload ----
+    /** Normal team update: a collage titled "<Team> @ Estancia" → the team's slide. */
     private fun doUpload() {
-        if (photos.isEmpty() || busy) return
         val team = Prefs.team(this)
+        publish(team.file, team.title, singleAsIs = false, message = "${team.label} collage update")
+    }
+
+    /** Ask which towers/cores the MyGate notice should appear on, then publish. */
+    private fun promptMygateLocations() {
+        if (photos.isEmpty() || busy) return
+        val labels = Locations.ALL.map { it.label }.toTypedArray()
+        val checked = BooleanArray(Locations.ALL.size)
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.mygate_pick_title)
+            .setMultiChoiceItems(labels, checked) { _, which, isChecked -> checked[which] = isChecked }
+            .setPositiveButton(R.string.upload) { _, _ ->
+                val selected = Locations.ALL.filterIndexed { i, _ -> checked[i] }.map { it.id }
+                if (selected.isEmpty()) {
+                    Toast.makeText(this, R.string.mygate_pick_required, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                publish(MYGATE_FILE, title = "", singleAsIs = true, message = "MyGate notice update", towers = selected)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * Publish the current photos to [file] on the board.
+     *
+     * @param title banner text drawn on the collage; pass "" for no banner.
+     * @param singleAsIs when true, upload the first photo as-is (no collage, no
+     *   title) — used for MyGate notification screenshots.
+     * @param towers when non-null, also point this slide at these location keys
+     *   in config.json so it shows on exactly those towers/cores.
+     */
+    private fun publish(
+        file: String,
+        title: String,
+        singleAsIs: Boolean,
+        message: String,
+        towers: List<String>? = null,
+    ) {
+        if (photos.isEmpty() || busy) return
         val token = Prefs.token(this)
         if (token.isBlank()) {
             setStatus(getString(R.string.no_token_hint), true)
@@ -209,10 +266,16 @@ class MainActivity : AppCompatActivity() {
         val snapshot = photos.toList()
         io.execute {
             try {
-                val collage = CollageRenderer.render(snapshot, team.title)
-                val bytes = CollageRenderer.toJpegBytes(collage)
+                val bytes = if (singleAsIs) {
+                    CollageRenderer.toJpegBytes(snapshot.first())
+                } else {
+                    CollageRenderer.toJpegBytes(CollageRenderer.render(snapshot, title))
+                }
                 ui.post { setStatus(getString(R.string.uploading), false) }
-                GithubUploader.uploadSlide(token, team.file, bytes, "${team.label} collage update")
+                GithubUploader.uploadSlide(token, file, bytes, message)
+                if (towers != null) {
+                    GithubUploader.setSlideTowers(token, file, towers.joinToString(","), "$message: set display locations")
+                }
                 ui.post {
                     // Clear first (clearPhotos resets the status), then show success.
                     clearPhotos()
@@ -231,7 +294,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setBusy(b: Boolean) {
         busy = b
-        uploadBtn.isEnabled = !b && photos.isNotEmpty()
+        updateActionButtons()
     }
 
     private fun setStatus(msg: String, error: Boolean) {

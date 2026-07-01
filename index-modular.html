@@ -141,7 +141,10 @@
           <span>Location</span><span>Start</span><span>Expiry (hrs)</span><span>Attention</span><span>Message</span><span></span>
         </div>
         <div id="tickerScheduleRows"></div>
-        <button type="button" class="slot-add-btn" onclick="addTickerScheduleRow()">+ Add message</button>
+        <div class="ticker-sched-actions">
+          <button type="button" class="slot-add-btn" onclick="addTickerScheduleRow()">+ Add message</button>
+          <button type="button" class="slot-add-btn" onclick="importTickerFromClipboard()" title="Paste lift-maintenance lines (e.g. 1 L-C1872 T1/C1/13P 01/06/2026) and convert them to schedule rows">📋 Import lift maintenance</button>
+        </div>
       </div>
       <div class="modal-footer">
         <button onclick="closeTickerSchedule()">Cancel</button>

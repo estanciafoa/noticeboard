@@ -972,6 +972,81 @@ function addTickerScheduleRow() {
     .appendChild(buildScheduleRow({ location: "", start: "", expiry: "", attention: "", message: "" }));
 }
 
+/* ---- Lift-maintenance import from clipboard --------------------------------
+   Converts pasted lift-maintenance lines into schedule rows.
+   Input line (whitespace-separated; leading serial / lift code are ignored):
+     <serial> <lift-code> T<tower>/C<core>/<capacity>P <DD/MM/YYYY>
+   e.g.  "1 L-C1872 T1/C1/13P 01/06/2026"
+   becomes:
+     location : t1c1
+     start    : (maintenance date − 1 day) 09:00
+     expiry   : 30 hours
+     attention: LIFT MAINTENANCE
+     message  : "13 Passenger Lift will be in maintenance on 01/06/2026, 10:30am to 3pm"
+   The constants below are the fixed values agreed for this format. */
+const LIFT_IMPORT = {
+  startTime: "09:00",          // start time of day
+  startOffsetDays: 1,          // start = maintenance date − this many days
+  expiryHours: "30",           // ticker visible for this many hours
+  attention: "LIFT MAINTENANCE",
+  window: "10:30am to 3pm"      // maintenance window shown in the message
+};
+
+function parseLiftLine(line) {
+  const loc = line.match(/T\s*(\d+)\s*\/\s*C\s*(\d+)\s*\/\s*(\d+)\s*P/i);
+  const date = line.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!loc || !date) return null;
+
+  const pad = n => String(n).padStart(2, "0");
+  const tower = +loc[1], core = +loc[2], capacity = loc[3];
+  const dd = +date[1], mm = +date[2], yyyy = +date[3];
+  const maintStr = `${pad(dd)}/${pad(mm)}/${yyyy}`;   // keep DD/MM/YYYY in the message
+
+  const startDate = new Date(yyyy, mm - 1, dd);
+  startDate.setDate(startDate.getDate() - LIFT_IMPORT.startOffsetDays);
+  const start = `${startDate.getFullYear()}-${pad(startDate.getMonth() + 1)}-${pad(startDate.getDate())} ${LIFT_IMPORT.startTime}`;
+
+  return {
+    location: `t${tower}c${core}`,
+    start,
+    expiry: tsHoursToExpiry(start, LIFT_IMPORT.expiryHours),   // stored as absolute datetime
+    attention: LIFT_IMPORT.attention,
+    message: `${capacity} Passenger Lift will be in maintenance on ${maintStr}, ${LIFT_IMPORT.window}`
+  };
+}
+
+async function importTickerFromClipboard() {
+  let text = "";
+  try {
+    text = await navigator.clipboard.readText();
+  } catch (e) {
+    alert("Couldn't read the clipboard. Grant clipboard permission (the site must be HTTPS) and try again.\n\n" + e.message);
+    return;
+  }
+  if (!text || !text.trim()) { alert("Clipboard is empty."); return; }
+
+  const rows = [], skipped = [];
+  text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(l => {
+    const r = parseLiftLine(l);
+    if (r) rows.push(r); else skipped.push(l);
+  });
+
+  if (!rows.length) {
+    alert("No lift-maintenance lines recognised.\nExpected e.g.:  1 L-C1872 T1/C1/13P 01/06/2026");
+    return;
+  }
+
+  const container = document.getElementById("tickerScheduleRows");
+  rows.forEach(r => container.appendChild(buildScheduleRow(r)));
+
+  let msg = `Imported ${rows.length} row${rows.length === 1 ? "" : "s"}. Review them, then click “Save to repo”.`;
+  if (skipped.length) {
+    msg += `\n\nSkipped ${skipped.length} unrecognised line${skipped.length === 1 ? "" : "s"}:\n• `
+         + skipped.slice(0, 5).join("\n• ") + (skipped.length > 5 ? "\n• …" : "");
+  }
+  alert(msg);
+}
+
 function closeTickerSchedule() {
   document.getElementById("tickerScheduleModal").style.display = "none";
 }

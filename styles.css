@@ -1441,6 +1441,13 @@ button {
 
 .ticker-sched-row { margin-bottom: 8px; }
 
+.ticker-sched-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 .ticker-sched-row input {
   width: 100%;
   padding: 7px 8px;

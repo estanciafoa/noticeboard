@@ -33,6 +33,40 @@
     <string name="upload_done">✅ Done! Appears on the displays within ~15 minutes.</string>
     <string name="no_token_hint">No access token yet — open Admin to add one.</string>
 
+    <!-- Lift maintenance (schedule-only portfolio) -->
+    <string name="lift_subtitle">Add lift maintenance to the ticker</string>
+    <string name="lift_form_title">New lift-maintenance schedule entry</string>
+    <string name="lift_location">Location (tower / core)</string>
+    <string name="lift_capacity">Capacity</string>
+    <string name="lift_maint_date">Maintenance date</string>
+    <string name="lift_select_date">Select date</string>
+    <string name="lift_add">Add to schedule</string>
+    <string name="lift_adding">Adding to schedule…</string>
+    <string name="lift_added">✅ Added. Appears on the displays within ~15 minutes.</string>
+    <string name="lift_date_required">Pick the maintenance date.</string>
+    <string name="lift_note">Auto-filled: starts 9:00am the day before, shows for 30 hours, message reads \"&lt;n&gt; Passenger Lift will be in maintenance on &lt;date&gt;, 10:30am to 3pm\". Fine-tune in the web admin if needed.</string>
+    <string name="lift_date_label">Maintenance date: %1$s</string>
+    <string name="lift_current">Current schedules</string>
+    <string name="lift_refresh">↻ Refresh</string>
+    <string name="lift_loading">Loading schedules…</string>
+    <string name="lift_none">No scheduled messages yet.</string>
+    <string name="lift_load_error">Couldn\'t load schedules: %1$s</string>
+    <string name="lift_count">%1$d scheduled message(s)</string>
+    <string name="lift_edit">Edit</string>
+    <string name="lift_delete">Delete</string>
+    <string name="lift_delete_confirm">Delete this scheduled message?</string>
+    <string name="lift_deleted">Schedule deleted.</string>
+    <string name="lift_saved">Schedule saved.</string>
+    <string name="lift_saving">Saving…</string>
+    <string name="lift_edit_title">Edit schedule</string>
+    <string name="lift_reloaded">Schedules changed on the server — reloaded. Please redo your change.</string>
+    <string name="lift_f_location">Location (e.g. t1c1, t1c1,t1c2, all)</string>
+    <string name="lift_f_start">Start (YYYY-MM-DD HH:MM, blank = now)</string>
+    <string name="lift_f_expiry">Expiry (YYYY-MM-DD HH:MM, blank = never)</string>
+    <string name="lift_f_attention">Attention badge</string>
+    <string name="lift_f_message">Message (use | for line breaks)</string>
+    <string name="lift_field_required">Location and message are required.</string>
+
     <!-- Admin -->
     <string name="team_label">Team</string>
     <string name="token_label">Access token</string>

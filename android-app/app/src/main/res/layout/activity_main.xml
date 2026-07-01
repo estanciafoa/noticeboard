@@ -81,6 +81,7 @@
 
             <!-- Card -->
             <LinearLayout
+                android:id="@+id/photoCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -193,6 +194,137 @@
                     android:layout_marginTop="4dp"
                     android:textColor="@color/muted"
                     android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Lift maintenance form (shown only for the Lift portfolio) -->
+            <LinearLayout
+                android:id="@+id/liftCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_bg"
+                android:elevation="2dp"
+                android:padding="18dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lift_form_title"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/lift_location"
+                    android:textColor="@color/muted"
+                    android:textStyle="bold" />
+                <Spinner
+                    android:id="@+id/liftLocationSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/lift_capacity"
+                    android:textColor="@color/muted"
+                    android:textStyle="bold" />
+                <Spinner
+                    android:id="@+id/liftCapacitySpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/lift_maint_date"
+                    android:textColor="@color/muted"
+                    android:textStyle="bold" />
+                <Button
+                    android:id="@+id/liftDateBtn"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    app:cornerRadius="12dp"
+                    android:text="@string/lift_select_date" />
+
+                <Button
+                    android:id="@+id/liftAddBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="18dp"
+                    app:cornerRadius="14dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/btn_text"
+                    android:text="@string/lift_add" />
+
+                <TextView
+                    android:id="@+id/liftStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:minHeight="20dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/lift_note"
+                    android:textColor="@color/muted"
+                    android:textSize="12sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="18dp"
+                    android:background="#E0E3E8" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/lift_current"
+                        android:textStyle="bold"
+                        android:textSize="15sp" />
+                    <Button
+                        android:id="@+id/liftRefreshBtn"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="0dp"
+                        android:text="@string/lift_refresh" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/liftListStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/muted"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:id="@+id/liftScheduleList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="vertical" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

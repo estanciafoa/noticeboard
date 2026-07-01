@@ -7,20 +7,25 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
 import android.media.ExifInterface
+import android.app.DatePickerDialog
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import java.io.File
+import java.util.Calendar
 import java.util.concurrent.Executors
 import kotlin.math.max
 
@@ -32,6 +37,9 @@ class MainActivity : AppCompatActivity() {
         // Dedicated slide published outside the normal team flow. Must
         // byte-match the slide name in the board's config.json.
         private const val MYGATE_FILE = "mygate-estancia.jpg"
+
+        // The only two lift passenger capacities in the community.
+        private val LIFT_CAPACITIES = listOf("13", "10")
     }
 
     private val photos = mutableListOf<Bitmap>()
@@ -46,6 +54,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var uploadBtn: Button
     private lateinit var mygateBtn: Button
     private lateinit var status: TextView
+
+    // Lift portfolio (schedule-only) views
+    private lateinit var photoCard: View
+    private lateinit var liftCard: View
+    private lateinit var liftLocationSpinner: Spinner
+    private lateinit var liftCapacitySpinner: Spinner
+    private lateinit var liftDateBtn: Button
+    private lateinit var liftAddBtn: Button
+    private lateinit var liftStatus: TextView
+    private lateinit var liftRefreshBtn: Button
+    private lateinit var liftListStatus: TextView
+    private lateinit var liftScheduleList: LinearLayout
+    private var liftDate: Calendar? = null
+    private var tickerFile: GithubUploader.TickerFile? = null
 
     private var busy = false
 
@@ -79,6 +101,26 @@ class MainActivity : AppCompatActivity() {
         mygateBtn = findViewById(R.id.mygateBtn)
         status = findViewById(R.id.status)
 
+        photoCard = findViewById(R.id.photoCard)
+        liftCard = findViewById(R.id.liftCard)
+        liftLocationSpinner = findViewById(R.id.liftLocationSpinner)
+        liftCapacitySpinner = findViewById(R.id.liftCapacitySpinner)
+        liftDateBtn = findViewById(R.id.liftDateBtn)
+        liftAddBtn = findViewById(R.id.liftAddBtn)
+        liftStatus = findViewById(R.id.liftStatus)
+        liftRefreshBtn = findViewById(R.id.liftRefreshBtn)
+        liftListStatus = findViewById(R.id.liftListStatus)
+        liftScheduleList = findViewById(R.id.liftScheduleList)
+        liftLocationSpinner.adapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_dropdown_item, Locations.ALL.map { it.label }
+        )
+        liftCapacitySpinner.adapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_dropdown_item, LIFT_CAPACITIES.map { "$it passengers" }
+        )
+        liftDateBtn.setOnClickListener { pickLiftDate() }
+        liftAddBtn.setOnClickListener { submitLift() }
+        liftRefreshBtn.setOnClickListener { loadSchedules() }
+
         findViewById<View>(R.id.adminBtn).setOnClickListener { promptAdminPassword() }
         findViewById<View>(R.id.historyBtn).setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
@@ -96,11 +138,23 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val team = Prefs.team(this)
-        subtitle.text = getString(R.string.team_updates, team.label)
-        targetFile.text = getString(R.string.updates_slide, team.file)
         applyTeamTheme(team)
+
+        // Lift is schedule-only: swap the photo card for the lift-entry form.
+        val lift = team.scheduleOnly
+        photoCard.visibility = if (lift) View.GONE else View.VISIBLE
+        liftCard.visibility = if (lift) View.VISIBLE else View.GONE
+
+        if (lift) {
+            subtitle.text = getString(R.string.lift_subtitle)
+            if (Prefs.isConfigured(this)) loadSchedules()
+        } else {
+            subtitle.text = getString(R.string.team_updates, team.label)
+            targetFile.text = getString(R.string.updates_slide, team.file)
+        }
         if (!Prefs.isConfigured(this)) {
             setStatus(getString(R.string.no_token_hint), true)
+            if (lift) setLiftStatus(getString(R.string.no_token_hint), true)
         }
     }
 
@@ -118,6 +172,7 @@ class MainActivity : AppCompatActivity() {
         val tint = ColorStateList(states, intArrayOf(color, disabled))
         findViewById<Button>(R.id.takePhotoBtn).backgroundTintList = tint
         uploadBtn.backgroundTintList = tint
+        liftAddBtn.backgroundTintList = tint
     }
 
     // ---- Admin password gate ----
@@ -300,6 +355,255 @@ class MainActivity : AppCompatActivity() {
     private fun setStatus(msg: String, error: Boolean) {
         status.text = msg
         status.setTextColor(getColor(if (error) R.color.red else R.color.green_dark))
+    }
+
+    // ---- Lift maintenance (schedule-only portfolio) ----
+    private fun pickLiftDate() {
+        val c = liftDate ?: Calendar.getInstance()
+        DatePickerDialog(
+            this,
+            { _, y, m, d ->
+                liftDate = Calendar.getInstance().apply { clear(); set(y, m, d) }
+                val label = "%02d/%02d/%04d".format(d, m + 1, y)
+                liftDateBtn.text = getString(R.string.lift_date_label, label)
+            },
+            c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    /**
+     * Add a lift-maintenance schedule row:
+     *   <loc> | <date-1> 09:00 | <date-1> 09:00 +30h | LIFT MAINTENANCE |
+     *   "<cap> Passenger Lift will be in maintenance on <DD/MM/YYYY>, 10:30am to 3pm"
+     */
+    private fun submitLift() {
+        if (busy) return
+        val capacity = LIFT_CAPACITIES[liftCapacitySpinner.selectedItemPosition]
+        val maint = liftDate
+        if (maint == null) { setLiftStatus(getString(R.string.lift_date_required), true); return }
+
+        val location = Locations.ALL[liftLocationSpinner.selectedItemPosition].id
+        val maintStr = "%02d/%02d/%04d".format(
+            maint.get(Calendar.DAY_OF_MONTH), maint.get(Calendar.MONTH) + 1, maint.get(Calendar.YEAR)
+        )
+        // Start at 09:00 the day before the maintenance date.
+        val start = (maint.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -1); set(Calendar.HOUR_OF_DAY, 9); set(Calendar.MINUTE, 0) }
+        val expiry = (start.clone() as Calendar).apply { add(Calendar.HOUR_OF_DAY, 30) }
+        val fmt = { c: Calendar -> "%04d-%02d-%02d %02d:%02d".format(
+            c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
+            c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)
+        ) }
+        // The board sits between the two lifts: 10P is on the left, 13P on the right.
+        val side = when (capacity) { "10" -> " (left)"; "13" -> " (right)"; else -> "" }
+        val row = GithubUploader.TickerRow(
+            location, fmt(start), fmt(expiry), "LIFT MAINTENANCE",
+            "$capacity Passenger Lift$side will be in maintenance on $maintStr, 10:30am to 3pm"
+        )
+        mutateSchedules("Lift maintenance: $location $maintStr", getString(R.string.lift_added),
+            onSuccess = {
+                liftCapacitySpinner.setSelection(0)
+                liftDate = null
+                liftDateBtn.text = getString(R.string.lift_select_date)
+            }) { rows -> rows.add(row) }
+    }
+
+    /** Load all schedules from ticker.txt and render them. */
+    private fun loadSchedules() {
+        val token = Prefs.token(this)
+        if (token.isBlank()) { setLiftStatus(getString(R.string.no_token_hint), true); return }
+        liftListStatus.text = getString(R.string.lift_loading)
+        liftScheduleList.removeAllViews()
+        io.execute {
+            try {
+                val file = GithubUploader.fetchTickerFile(token)
+                ui.post { tickerFile = file; renderScheduleList() }
+            } catch (e: Exception) {
+                ui.post { liftListStatus.text = getString(R.string.lift_load_error, e.message ?: "") }
+            }
+        }
+    }
+
+    private fun renderScheduleList() {
+        val rows = tickerFile?.rows ?: mutableListOf()
+        liftScheduleList.removeAllViews()
+        liftListStatus.text =
+            if (rows.isEmpty()) getString(R.string.lift_none) else getString(R.string.lift_count, rows.size)
+        rows.forEach { row -> liftScheduleList.addView(buildScheduleRowView(row)) }
+    }
+
+    private fun buildScheduleRowView(row: GithubUploader.TickerRow): View {
+        val dp = resources.displayMetrics.density
+        fun pad(v: Float) = (v * dp).toInt()
+
+        val texts = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        texts.addView(TextView(this).apply {
+            text = row.location.ifBlank { "—" }
+            setTextColor(Color.parseColor("#111827"))
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+        })
+        texts.addView(TextView(this).apply {
+            text = row.message
+            setTextColor(getColor(R.color.muted))
+            textSize = 13f
+            maxLines = 2
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        })
+        texts.addView(TextView(this).apply {
+            val s = row.start.ifBlank { "now" }
+            val e = row.expiry.ifBlank { "never" }
+            text = "$s → $e" + if (row.attention.isNotBlank()) "  ·  ${row.attention}" else ""
+            setTextColor(getColor(R.color.muted))
+            textSize = 11f
+        })
+
+        fun action(label: String, color: Int, onClick: () -> Unit) = TextView(this).apply {
+            text = label
+            setTextColor(color)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setPadding(pad(12f), pad(8f), pad(12f), pad(8f))
+            isClickable = true
+            setOnClickListener { onClick() }
+        }
+
+        val rowView = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding(0, pad(8f), 0, pad(8f))
+            addView(texts)
+            addView(action(getString(R.string.lift_edit), Color.parseColor("#2563EB")) { editSchedule(row) })
+            addView(action(getString(R.string.lift_delete), getColor(R.color.red)) { confirmDelete(row) })
+        }
+
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(rowView)
+            addView(View(this@MainActivity).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
+                setBackgroundColor(Color.parseColor("#EEF0F3"))
+            })
+        }
+    }
+
+    private fun editSchedule(row: GithubUploader.TickerRow) {
+        val dp = resources.displayMetrics.density
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((20 * dp).toInt(), (8 * dp).toInt(), (20 * dp).toInt(), 0)
+        }
+        fun field(hint: String, value: String, multiline: Boolean = false): EditText {
+            layout.addView(TextView(this).apply {
+                text = hint; setTextColor(getColor(R.color.muted)); textSize = 12f
+                setPadding(0, (10 * dp).toInt(), 0, 0)
+            })
+            val et = EditText(this).apply {
+                setText(value)
+                if (multiline) { setSingleLine(false); minLines = 2; maxLines = 4 }
+            }
+            layout.addView(et)
+            return et
+        }
+        val loc = field(getString(R.string.lift_f_location), row.location)
+        val start = field(getString(R.string.lift_f_start), row.start)
+        val expiry = field(getString(R.string.lift_f_expiry), row.expiry)
+        val attention = field(getString(R.string.lift_f_attention), row.attention)
+        val message = field(getString(R.string.lift_f_message), row.message, multiline = true)
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.lift_edit_title)
+            .setView(ScrollView(this).apply { addView(layout) })
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val nLoc = loc.text.toString().trim()
+                val nMsg = message.text.toString().trim()
+                if (nLoc.isBlank() || nMsg.isBlank()) {
+                    setLiftStatus(getString(R.string.lift_field_required), true)
+                    return@setPositiveButton
+                }
+                val nStart = start.text.toString().trim()
+                val nExpiry = expiry.text.toString().trim()
+                val nAtt = attention.text.toString().trim()
+                mutateSchedules("Edit ticker: $nLoc", getString(R.string.lift_saved)) { _ ->
+                    row.location = nLoc; row.start = nStart; row.expiry = nExpiry
+                    row.attention = nAtt; row.message = nMsg
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun confirmDelete(row: GithubUploader.TickerRow) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.lift_delete)
+            .setMessage(R.string.lift_delete_confirm)
+            .setPositiveButton(R.string.lift_delete) { _, _ ->
+                mutateSchedules("Delete ticker: ${row.location}", getString(R.string.lift_deleted)) { rows ->
+                    rows.remove(row)
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * Apply [op] to the loaded schedule rows and save ticker.txt. Fetches the
+     * file first if not already loaded. On a server-side change (stale sha) it
+     * reloads and asks the user to redo. [op] runs off the UI thread, so it must
+     * only touch the rows list (values captured beforehand).
+     */
+    private fun mutateSchedules(
+        commitMsg: String,
+        successMsg: String,
+        onSuccess: (() -> Unit)? = null,
+        op: (MutableList<GithubUploader.TickerRow>) -> Unit,
+    ) {
+        if (busy) return
+        val token = Prefs.token(this)
+        if (token.isBlank()) {
+            setLiftStatus(getString(R.string.no_token_hint), true)
+            startActivity(Intent(this, AdminActivity::class.java))
+            return
+        }
+        setBusy(true)
+        liftAddBtn.isEnabled = false
+        liftRefreshBtn.isEnabled = false
+        setLiftStatus(getString(R.string.lift_saving), false)
+        io.execute {
+            try {
+                val file = tickerFile ?: GithubUploader.fetchTickerFile(token).also { tickerFile = it }
+                op(file.rows)
+                GithubUploader.saveTickerFile(token, file, commitMsg)
+                ui.post {
+                    setBusy(false)
+                    liftAddBtn.isEnabled = true
+                    liftRefreshBtn.isEnabled = true
+                    renderScheduleList()
+                    setLiftStatus(successMsg, false)
+                    onSuccess?.invoke()
+                }
+            } catch (c: GithubUploader.ConflictException) {
+                ui.post {
+                    setBusy(false)
+                    liftAddBtn.isEnabled = true
+                    liftRefreshBtn.isEnabled = true
+                    setLiftStatus(getString(R.string.lift_reloaded), true)
+                    loadSchedules()
+                }
+            } catch (e: Exception) {
+                ui.post {
+                    setBusy(false)
+                    liftAddBtn.isEnabled = true
+                    liftRefreshBtn.isEnabled = true
+                    setLiftStatus("❌ ${e.message}", true)
+                }
+            }
+        }
+    }
+
+    private fun setLiftStatus(msg: String, error: Boolean) {
+        liftStatus.text = msg
+        liftStatus.setTextColor(getColor(if (error) R.color.red else R.color.green_dark))
     }
 
     // ---- Decoding (downsample + EXIF rotation) ----

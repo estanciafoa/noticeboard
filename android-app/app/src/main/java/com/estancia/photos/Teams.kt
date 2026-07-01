@@ -16,6 +16,12 @@ data class Team(
     /** Brand color + a darker shade (status bar / pressed) as hex strings. */
     val colorHex: String,
     val darkHex: String,
+    /**
+     * When true this portfolio doesn't upload a photo slide; instead it adds a
+     * lift-maintenance entry to the scheduled ticker (ticker.txt). [file] and
+     * [title] are unused for such portfolios.
+     */
+    val scheduleOnly: Boolean = false,
 )
 
 object Teams {
@@ -24,6 +30,7 @@ object Teams {
         Team("pest", "Pest Control", "pest-control-estancia.jpg", "Pest Control @ Estancia", "#C0392B", "#97291D"),
         Team("housekeeping", "Housekeeping", "housekeeping-estancia.jpg", "Housekeeping @ Estancia", "#00897B", "#00675B"),
         Team("maintenance", "Maintenance", "maintenance-estancia.jpg", "Maintenance @ Estancia", "#1565C0", "#0D47A1"),
+        Team("lift", "Lift", "", "", "#6D28D9", "#4C1D95", scheduleOnly = true),
     )
 
     fun byKey(key: String?): Team? = ALL.firstOrNull { it.key == key }

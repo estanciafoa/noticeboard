@@ -1008,12 +1008,14 @@ function parseLiftLine(line) {
   startDate.setDate(startDate.getDate() - LIFT_IMPORT.startOffsetDays);
   const start = `${startDate.getFullYear()}-${pad(startDate.getMonth() + 1)}-${pad(startDate.getDate())} ${LIFT_IMPORT.startTime}`;
 
+  // The board sits between the two lifts: 10P is on the left, 13P on the right.
+  const side = capacity === "10" ? " (left)" : capacity === "13" ? " (right)" : "";
   return {
     location: `t${tower}c${core}`,
     start,
     expiry: tsHoursToExpiry(start, LIFT_IMPORT.expiryHours),   // stored as absolute datetime
     attention: LIFT_IMPORT.attention,
-    message: `${capacity} Passenger Lift will be in maintenance on ${maintStr}, ${LIFT_IMPORT.window}`
+    message: `${capacity} Passenger Lift${side} will be in maintenance on ${maintStr}, ${LIFT_IMPORT.window}`
   };
 }
 

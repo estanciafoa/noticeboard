@@ -183,6 +183,106 @@ object GithubUploader {
         putConfig(token, config, sha, message)
     }
 
+    // ---- ticker.txt (scheduled ticker) --------------------------------------
+
+    private const val TICKER_PATH = "ticker.txt"
+
+    private val DEFAULT_TICKER_HEADER = listOf(
+        "# ESTANCIA NOTICEBOARD — SCHEDULED TICKER",
+        "# location | start | expiry | attention | message",
+        "#   location : t1c1..t5c2, club, gate, or 'all' (comma-separate several)",
+        "#   start/expiry : YYYY-MM-DD HH:MM (blank start = now, blank expiry = never)",
+        "#   message : use | for line breaks. # lines and blanks are ignored."
+    )
+
+    /** One scheduled ticker line. Mutable so the editor can modify it in place. */
+    data class TickerRow(
+        var location: String,
+        var start: String,
+        var expiry: String,
+        var attention: String,
+        var message: String
+    )
+
+    /** Parsed ticker.txt: preserved header comments, the rows, and the blob sha. */
+    class TickerFile(var sha: String?, val header: MutableList<String>, val rows: MutableList<TickerRow>)
+
+    /** Thrown when a save is rejected because ticker.txt changed on the server. */
+    class ConflictException(message: String) : Exception(message)
+
+    /** Read and parse ticker.txt. Returns an empty file (default header) if absent. */
+    fun fetchTickerFile(token: String): TickerFile {
+        if (token.isBlank()) throw UploadException("No access token.")
+        val get = open("$API/contents/$TICKER_PATH?ref=$BRANCH", token, "GET")
+        val code = get.responseCode
+        val text = get.bodyText()
+        get.disconnect()
+        if (code == 404) return TickerFile(null, DEFAULT_TICKER_HEADER.toMutableList(), mutableListOf())
+        if (code != 200) throw UploadException("Could not read ticker.txt (HTTP $code).")
+        val meta = JSONObject(text)
+        val sha = meta.optString("sha").ifBlank { null }
+        val content = String(Base64.decode(meta.optString("content"), Base64.DEFAULT), Charsets.UTF_8)
+
+        val header = mutableListOf<String>()
+        val rows = mutableListOf<TickerRow>()
+        content.split("\n").forEach { line ->
+            val t = line.trim()
+            if (t.startsWith("#")) { header.add(line); return@forEach }
+            if (t.isEmpty()) return@forEach
+            val parts = line.split("|")
+            val loc = parts.getOrElse(0) { "" }.trim()
+            if (loc.isEmpty()) return@forEach
+            rows.add(TickerRow(
+                loc,
+                parts.getOrElse(1) { "" }.trim(),
+                parts.getOrElse(2) { "" }.trim(),
+                parts.getOrElse(3) { "" }.trim(),
+                parts.drop(4).joinToString("|").trim()
+            ))
+        }
+        if (header.isEmpty()) header.addAll(DEFAULT_TICKER_HEADER)
+        return TickerFile(sha, header, rows)
+    }
+
+    /**
+     * Write [file] back to ticker.txt using its held sha. On success the sha is
+     * updated in place. Throws [ConflictException] if the file changed on the
+     * server (held sha stale) so the caller can reload before retrying.
+     */
+    fun saveTickerFile(token: String, file: TickerFile, message: String) {
+        if (token.isBlank()) throw UploadException("No access token.")
+
+        val sb = StringBuilder()
+        file.header.forEach { sb.append(it).append("\n") }
+        if (file.header.isNotEmpty() && file.header.last().trim().isNotEmpty()) sb.append("\n")
+        file.rows.forEach { r ->
+            if (r.location.isBlank() || r.message.isBlank()) return@forEach
+            sb.append("${r.location} | ${r.start} | ${r.expiry} | ${r.attention} | ${r.message}\n")
+        }
+
+        val putConn = open("$API/contents/$TICKER_PATH", token, "PUT")
+        putConn.doOutput = true
+        putConn.setRequestProperty("Content-Type", "application/json")
+        val payload = JSONObject().apply {
+            put("message", message)
+            put("content", Base64.encodeToString(sb.toString().toByteArray(Charsets.UTF_8), Base64.NO_WRAP))
+            put("branch", BRANCH)
+            if (file.sha != null) put("sha", file.sha)
+        }
+        putConn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
+        val pcode = putConn.responseCode
+        val body = putConn.bodyText()
+        putConn.disconnect()
+        if (pcode == 409 || pcode == 422) {
+            throw ConflictException("ticker.txt changed on the server. Reload and try again.")
+        }
+        if (pcode !in 200..299) {
+            val detail = try { JSONObject(body).optString("message") } catch (_: Exception) { "" }
+            throw UploadException("Schedule update failed (HTTP $pcode)${if (detail.isNotBlank()) ": $detail" else ""}")
+        }
+        file.sha = try { JSONObject(body).getJSONObject("content").optString("sha").ifBlank { null } } catch (_: Exception) { null }
+    }
+
     /** Recent commits that touched the slides/ folder (i.e. photo pushes), newest first. */
     fun fetchHistory(token: String, perPage: Int = 10): List<CommitInfo> {
         val conn = open("$API/commits?path=slides&per_page=$perPage", token, "GET")

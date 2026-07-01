@@ -25,3 +25,4 @@
 # all | | 2026-07-01 00:00 | NOTICE | Annual General Body Meeting on 30th June, 6 PM at Clubhouse
 
 t1c1 | 2026-07-16 09:00 | 2026-07-17 15:00 | LIFT MAINTENANCE | 10 Passenger Lift will be in maintenance on 17/07/2026, 10:30am to 3pm
+t1c2 | 2026-07-21 09:00 | 2026-07-22 15:00 | LIFT MAINTENANCE | 13 Passenger Lift will be in maintenance on 22/07/2026, 10:30am to 3pm

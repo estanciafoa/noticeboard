@@ -24,4 +24,3 @@
 # t4c1,t4c2 | 2026-06-26 09:00 | 2026-06-26 18:00 | WATER SHUTDOWN | Water supply interrupted 9 AM - 6 PM
 # all | | 2026-07-01 00:00 | NOTICE | Annual General Body Meeting on 30th June, 6 PM at Clubhouse
 
-t1c1 | 2026-07-02 09:00 | 2026-07-03 15:00 | LIFT MAINTENANCE | 10 Passenger Lift will be in maintenance on 03/07/2026, 10:30am to 3pm

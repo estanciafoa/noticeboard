@@ -973,11 +973,13 @@ function addTickerScheduleRow() {
 }
 
 /* ---- Lift-maintenance import from clipboard --------------------------------
-   Converts pasted lift-maintenance lines into schedule rows.
-   Input line (whitespace-separated; leading serial / lift code are ignored):
+   Converts pasted lift-maintenance records into schedule rows. Records may be
+   one-per-line or run together on a single line; each record ends at its date.
+   Record (whitespace-separated; leading serial / lift code are ignored):
      <serial> <lift-code> T<tower>/C<core>/<capacity>P <DD/MM/YYYY>
    e.g.  "1 L-C1872 T1/C1/13P 01/06/2026"
-   becomes:
+   Records without the T#/C#/#P form (e.g. "MLCB INSIDE", "CLUB HOUSE") are
+   skipped and reported. A single record like this becomes:
      location : t1c1
      start    : (maintenance date − 1 day) 09:00
      expiry   : 30 hours
@@ -1025,11 +1027,14 @@ async function importTickerFromClipboard() {
   }
   if (!text || !text.trim()) { alert("Clipboard is empty."); return; }
 
+  // Records may be one-per-line OR run together on a single line; each record
+  // ends at its DD/MM/YYYY date, so split on the trailing date rather than "\n".
   const rows = [], skipped = [];
-  text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(l => {
-    const r = parseLiftLine(l);
-    if (r) rows.push(r); else skipped.push(l);
-  });
+  (text.match(/[\s\S]*?\d{1,2}\/\d{1,2}\/\d{4}/g) || [])
+    .map(s => s.trim()).filter(Boolean).forEach(rec => {
+      const r = parseLiftLine(rec);
+      if (r) rows.push(r); else skipped.push(rec);
+    });
 
   if (!rows.length) {
     alert("No lift-maintenance lines recognised.\nExpected e.g.:  1 L-C1872 T1/C1/13P 01/06/2026");

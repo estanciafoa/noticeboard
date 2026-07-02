@@ -52,4 +52,4 @@ Edit the corresponding HTML file in `/panes/` without touching other files.
 All styling is centralized in `styles.css` for easy modification.
 
 ### Testing
-Use `index-modular.html` to test the refactored version. Keep original `admin.html` as backup.
+`index-modular.html` is the live admin console.

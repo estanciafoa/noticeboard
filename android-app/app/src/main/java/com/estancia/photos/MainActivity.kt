@@ -9,6 +9,7 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import android.app.DatePickerDialog
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -87,6 +88,8 @@ class MainActivity : AppCompatActivity() {
     private val pickPhotos = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         if (!uris.isNullOrEmpty()) addFromUris(uris)
     }
+    private val requestNotifPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* reminders post if granted */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,6 +136,17 @@ class MainActivity : AppCompatActivity() {
         // MyGate notice: pick display locations, then upload the first photo
         // as-is (no title) and point the slide at those towers/cores.
         mygateBtn.setOnClickListener { promptMygateLocations() }
+
+        // Daily "post the photos" reminder (hourly, noon–9pm, until posted).
+        // Armed only when enabled in Admin.
+        Reminders.ensureChannel(this)
+        Reminders.apply(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            requestNotifPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     override fun onResume() {
@@ -334,6 +348,9 @@ class MainActivity : AppCompatActivity() {
                 if (towers != null) {
                     GithubUploader.setSlideTowers(token, file, towers.joinToString(","), "$message: set display locations")
                 }
+                // A daily team collage (not a MyGate notice) counts as today's
+                // post — silence the reminders until tomorrow noon.
+                if (!singleAsIs) Reminders.onPosted(this)
                 ui.post {
                     // Clear first (clearPhotos resets the status), then show success.
                     clearPhotos()

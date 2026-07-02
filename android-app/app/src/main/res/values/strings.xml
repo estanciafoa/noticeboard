@@ -77,6 +77,8 @@
     <string name="checking_token">Checking token…</string>
     <string name="token_rejected">Token rejected. Check it and try again.</string>
     <string name="saved">Saved.</string>
+    <string name="reminder_label">Daily photo reminder</string>
+    <string name="reminder_help">Reminds you every hour from noon until the day\'s photos are posted. Turn off to silence.</string>
 
     <!-- Camera -->
     <string name="done">Done</string>

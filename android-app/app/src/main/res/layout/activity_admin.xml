@@ -50,6 +50,24 @@
             android:textColor="@color/muted"
             android:textSize="12sp" />
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/reminderSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:minHeight="48dp"
+            android:text="@string/reminder_label"
+            android:textColor="@color/muted"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/reminder_help"
+            android:textColor="@color/muted"
+            android:textSize="12sp" />
+
         <Button
             android:id="@+id/saveBtn"
             android:layout_width="match_parent"

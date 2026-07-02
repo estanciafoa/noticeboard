@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.switchmaterial.SwitchMaterial
 import java.util.concurrent.Executors
 
 /** Admin view: choose which team this device publishes as, and store the access token. */
@@ -37,6 +38,14 @@ class AdminActivity : AppCompatActivity() {
         spinner.setSelection(Teams.ALL.indexOf(Prefs.team(this)).coerceAtLeast(0))
 
         tokenInput.setText(Prefs.token(this))
+
+        // Daily photo reminder on/off — applied immediately (independent of the token).
+        val reminderSwitch = findViewById<SwitchMaterial>(R.id.reminderSwitch)
+        reminderSwitch.isChecked = Prefs.remindersEnabled(this)
+        reminderSwitch.setOnCheckedChangeListener { _, checked ->
+            Prefs.setRemindersEnabled(this, checked)
+            Reminders.apply(this)
+        }
 
         saveBtn.setOnClickListener { save() }
     }

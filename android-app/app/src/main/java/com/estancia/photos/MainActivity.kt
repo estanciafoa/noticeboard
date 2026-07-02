@@ -145,6 +145,9 @@ class MainActivity : AppCompatActivity() {
         photoCard.visibility = if (lift) View.GONE else View.VISIBLE
         liftCard.visibility = if (lift) View.VISIBLE else View.GONE
 
+        // MyGate notice publishing is restricted to the Maintenance team.
+        mygateBtn.visibility = if (!lift && team.key == "maintenance") View.VISIBLE else View.GONE
+
         if (lift) {
             subtitle.text = getString(R.string.lift_subtitle)
             if (Prefs.isConfigured(this)) loadSchedules()

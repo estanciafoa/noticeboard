@@ -1,6 +1,10 @@
 const repoOwner = "estanciafoa";
 const repoName  = "noticeboard";
 
+/* Bump when the display code changes so the admin status panel can flag stale
+   boards still running an old build. */
+const APP_VERSION = "1.0";
+
 const DEFAULT_DURATION_MS = 10000;
 const DEFAULT_REFRESH_INTERVAL_MS = 15 * 60 * 1000;  // default: fetch slides every 15 min
 const REBUILD_INTERVAL_MS = 60 * 1000;                // re-evaluate visibility rules every minute
@@ -17,6 +21,7 @@ let timer    = null;
 let transitionEffect = "fade";
 let transitionMs = 700;
 let ticker = { commonText: "", towerTexts: {} };
+let heartbeatUrl = "";          // Google Apps Script web-app URL (from config.json)
 let scheduledTickerRows = [];   // parsed from ticker.txt: time-scheduled per-tower messages
 let lastTickerSignature = null; // skip re-render when the resolved ticker is unchanged
 
@@ -56,6 +61,37 @@ function setNetworkStatus(message) {
   el.style.display = message ? "block" : "none";
 }
 
+/* HEARTBEAT — tell the admin status panel this display is alive.
+   Fire-and-forget POST to the Google Apps Script web app (configured via
+   config.json → heartbeatUrl). Sent on boot and on every successful config
+   refresh (~every refreshInterval minutes), so a display that goes dark simply
+   stops reporting and the admin panel shows it stale/red.
+   Skipped in local dev and for displays with no ?t= tower assigned. */
+function sendHeartbeat() {
+  if (isLocal || !heartbeatUrl || !towerParam) return;
+  const payload = JSON.stringify({
+    tv: towerParam,
+    online: true,
+    slides: elements.length,
+    version: APP_VERSION,
+    href: location.href,
+    ua: navigator.userAgent
+  });
+  try {
+    // text/plain keeps it a "simple" request (no CORS preflight, which Apps
+    // Script can't answer). sendBeacon survives page unload; fetch is fallback.
+    const blob = new Blob([payload], { type: "text/plain;charset=UTF-8" });
+    if (navigator.sendBeacon && navigator.sendBeacon(heartbeatUrl, blob)) return;
+    fetch(heartbeatUrl, {
+      method: "POST",
+      mode: "no-cors",
+      keepalive: true,
+      headers: { "Content-Type": "text/plain;charset=UTF-8" },
+      body: payload
+    }).catch(() => {});
+  } catch (_) {}
+}
+
 function withTimeout(promise, ms) {
   return Promise.race([
     promise,
@@ -88,6 +124,8 @@ function applyConfigSettings(data) {
   // Update refresh interval if configured (value is in minutes, convert to milliseconds)
   const newRefreshInterval = Number(data.refreshInterval) > 0 ? Number(data.refreshInterval) * 60000 : DEFAULT_REFRESH_INTERVAL_MS;
   refreshIntervalMs = newRefreshInterval;
+
+  heartbeatUrl = data.heartbeatUrl || "";
 
   ticker = {
     commonText: data.ticker?.commonText || "",
@@ -140,6 +178,7 @@ async function load({ showError = true } = {}) {
     await cacheBackupSlide(data.offlineBackup || "");
 
     setNetworkStatus("");
+    sendHeartbeat();
     return true;
   } catch (e) {
     console.error("Failed to load config:", e);

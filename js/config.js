@@ -29,6 +29,7 @@ let appConfig = {
   refreshInterval: DEFAULT_REFRESH_INTERVAL,
   offlineBackup: "",        // filename of the slide cached for offline display
   offlineCacheVersion: "",  // bump to force displays to clear their offline cache
+  heartbeatUrl: "",         // Google Apps Script web-app URL displays report status to
   ticker: {
     commonText: "",
     towerTexts: {},
@@ -55,6 +56,7 @@ async function load() {
   appConfig.refreshInterval = Number(json.refreshInterval) > 0 ? Number(json.refreshInterval) : DEFAULT_REFRESH_INTERVAL;
   appConfig.offlineBackup = json.offlineBackup || "";
   appConfig.offlineCacheVersion = json.offlineCacheVersion || "";
+  appConfig.heartbeatUrl = json.heartbeatUrl || "";
   appConfig.ticker = {
     commonText: json.ticker?.commonText || "",
     towerTexts: json.ticker?.towerTexts || {},
@@ -149,6 +151,7 @@ async function saveConfig({ silent = false } = {}) {
     refreshInterval: appConfig.refreshInterval,
     offlineBackup: appConfig.offlineBackup || "",
     offlineCacheVersion: appConfig.offlineCacheVersion || "",
+    heartbeatUrl: appConfig.heartbeatUrl || "",
     ticker: {
       commonText: appConfig.ticker?.commonText || "",
       towerTexts: appConfig.ticker?.towerTexts || {},

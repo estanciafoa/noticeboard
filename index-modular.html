@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Estancia Admin</title>
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="styles.css?v=10">
 </head>
 
 <body>
@@ -51,6 +51,7 @@
 
     </div>
     <div class="topbar-right">
+      <button class="preview-btn" onclick="openStatusPanel()" title="Live status of each display TV">📺 Displays</button>
       <button class="preview-btn" onclick="clearOfflineCacheOnDisplays()" title="Force displays to clear their offline cache on next connection">Clear Offline Cache</button>
       <button class="preview-btn" onclick="previewSlide()" title="Preview slideshow"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="6,3 20,12 6,21"/></svg></button>
       <button class="save-btn" onclick="saveConfig()">Save</button>
@@ -149,6 +150,27 @@
       <div class="modal-footer">
         <button onclick="closeTickerSchedule()">Cancel</button>
         <button class="primary" id="tickerScheduleSaveBtn" onclick="saveTickerSchedule()">Save to repo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISPLAY STATUS MODAL -->
+  <div id="statusModal" class="modal" style="display:none">
+    <div class="modal-backdrop" onclick="closeStatusPanel()"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Display status <span id="statusSummary" class="status-summary"></span></h3>
+        <button class="modal-close" onclick="closeStatusPanel()" title="Close">&times;</button>
+      </div>
+      <div class="status-url-row">
+        <label for="heartbeatUrlInput">Backend URL</label>
+        <input type="text" id="heartbeatUrlInput" placeholder="Google Apps Script /exec URL — see heartbeat/README.md">
+        <button class="primary" id="heartbeatUrlSaveBtn" onclick="saveHeartbeatUrl()">Save</button>
+      </div>
+      <div id="statusBody" class="status-body"></div>
+      <div class="modal-footer">
+        <button onclick="refreshStatus()">↻ Refresh</button>
+        <button onclick="closeStatusPanel()">Close</button>
       </div>
     </div>
   </div>
@@ -297,6 +319,7 @@
 <script src="js/config.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/upload.js"></script>
+<script src="js/status.js"></script>
 <script src="js/app.js"></script>
 
 </body>

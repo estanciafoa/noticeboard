@@ -18,9 +18,6 @@ function openStatusPanel() {
   if (!modal) return;
   modal.style.display = "flex";
 
-  const urlInput = document.getElementById("heartbeatUrlInput");
-  if (urlInput) urlInput.value = appConfig.heartbeatUrl || "";
-
   refreshStatus();
   if (statusTimer) clearInterval(statusTimer);
   statusTimer = setInterval(refreshStatus, STATUS_AUTO_REFRESH_MS);
@@ -30,24 +27,6 @@ function closeStatusPanel() {
   const modal = document.getElementById("statusModal");
   if (modal) modal.style.display = "none";
   if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
-}
-
-/* Save the backend URL into config.json (round-tripped by js/config.js). */
-async function saveHeartbeatUrl() {
-  const urlInput = document.getElementById("heartbeatUrlInput");
-  if (!urlInput) return;
-  appConfig.heartbeatUrl = urlInput.value.trim();
-  const btn = document.getElementById("heartbeatUrlSaveBtn");
-  const prev = btn ? btn.textContent : "";
-  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
-  try {
-    await saveConfig({ silent: true });
-    refreshStatus();
-  } catch (e) {
-    alert("Failed to save backend URL: " + e.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = prev; }
-  }
 }
 
 function relativeTime(ms) {
@@ -74,7 +53,7 @@ async function refreshStatus() {
     body.innerHTML =
       `<div class="status-empty">
          <p><strong>No backend configured yet.</strong></p>
-         <p>Paste your Google Apps Script Web App URL above and Save.
+         <p>Set <code>heartbeatUrl</code> in config.json.
          See <code>heartbeat/README.md</code> for the one-time setup.</p>
        </div>`;
     return;

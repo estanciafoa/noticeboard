@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Estancia Admin</title>
-<link rel="stylesheet" href="styles.css?v=10">
+<link rel="stylesheet" href="styles.css?v=11">
 </head>
 
 <body>
@@ -163,9 +163,7 @@
         <button class="modal-close" onclick="closeStatusPanel()" title="Close">&times;</button>
       </div>
       <div class="status-url-row">
-        <label for="heartbeatUrlInput">Backend URL</label>
-        <input type="text" id="heartbeatUrlInput" placeholder="Google Apps Script /exec URL — see heartbeat/README.md">
-        <button class="primary" id="heartbeatUrlSaveBtn" onclick="saveHeartbeatUrl()">Save</button>
+        <p class="status-note">Displays report automatically every ~15 min. A red dot means no heartbeat in the last 35 min (TV off or no internet).</p>
       </div>
       <div id="statusBody" class="status-body"></div>
       <div class="modal-footer">

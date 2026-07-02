@@ -5,7 +5,6 @@
   "refreshInterval": 15,
   "offlineBackup": "Main Ingate.jpg",
   "offlineCacheVersion": "",
-  "heartbeatUrl": "",
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, |8807922309, 7358386494\nHelpdesk : 9384001882",
     "towerTexts": {},

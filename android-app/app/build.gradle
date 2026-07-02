@@ -30,11 +30,11 @@ android {
         jvmTarget = '17'
     }
 
-    // Name the output APK e.g. EstDailySnaps-1.0.apk (debug/ and release/ folders
-    // keep them separate, so no version-suffix collision).
+    // Name the output APK e.g. EstPortfolioUpdater-1.0.apk (debug/ and release/
+    // folders keep them separate, so no version-suffix collision).
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            output.outputFileName = "EstDailySnaps-${variant.versionName}.apk"
+            output.outputFileName = "EstPortfolioUpdater-${variant.versionName}.apk"
         }
     }
 }

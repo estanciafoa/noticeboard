@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">EstDailySnaps</string>
+    <string name="app_name">EstPortfolioUpdater</string>
     <string name="admin_title">Admin</string>
     <string name="admin">Admin</string>
     <string name="history">History</string>
-    <string name="header_title">Estancia Display Photo Uploader</string>
-    <string name="daily_update">Daily photo update</string>
+    <string name="header_title">EstPortfolioUpdater</string>
+    <string name="daily_update">Portfolio update</string>
     <string name="team_updates">%1$s Team Updates</string>
     <string name="admin_password_hint">Admin password</string>
     <string name="wrong_password">Wrong password</string>

@@ -1,6 +1,6 @@
-# Estancia Photos — native Android app
+# EstPortfolioUpdater — native Android app
 
-A pure native Kotlin app (no web code, no Capacitor) for field teams to publish a daily photo
+A pure native Kotlin app (no web code, no Capacitor) for field teams to publish a photo
 collage to their dedicated slide on the notice board.
 
 - **One app for all teams.** The team is **switchable in the Admin view** (⚙ *Admin* button on the
@@ -30,12 +30,17 @@ android-app/
 |------|-----------|------------------|
 | Gardening | `gardening-estancia.jpg` | ✅ |
 | Pest Control | `pest-control-estancia.jpg` | ✅ |
-| Housekeeping | `housekeeping-estancia.jpg` | ⚠️ add entry first |
-| Maintenance | `maintenance-estancia.jpg` | ⚠️ add entry first |
+| Housekeeping | `housekeeping-estancia.jpg` | ✅ |
+| Maintenance | `maintenance-estancia.jpg` | ✅ |
 
 Filenames are case-sensitive and must byte-match the config.json entries, or a second file is created
-instead of overwriting. Housekeeping & maintenance have no slide yet — an admin must add the entry
-(with `towers`) to the board's config.json once before those teams' uploads will display.
+instead of overwriting. All four team slides are registered in the board's config.json (with `towers`),
+so team uploads display right away. To add a **new** team, register its slide entry in config.json once
+before its first upload.
+
+The **MyGate notice** button (`mygate-estancia.jpg`) is different: it lets the uploader pick the
+towers/cores per notice, and the app upserts that slide's config.json entry (name + chosen `towers`)
+automatically on upload — so it needs no pre-registration.
 
 ## Access token (one shared token for all apps)
 
@@ -70,7 +75,7 @@ release APK with `./gradlew assembleRelease` once a signing config is added.
 
 1. Transfer `app-debug.apk` to the phone.
 2. Allow "install unknown apps" for the source app, open the APK, install.
-3. Launch **Estancia Photos** → ⚙ Admin → pick the team + paste the token → Save. Done.
+3. Launch **EstPortfolioUpdater** → ⚙ Admin → pick the team + paste the token → Save. Done.
 
 ## Build versions
 

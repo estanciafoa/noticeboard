@@ -4,7 +4,7 @@
   "transitionMs": 700,
   "refreshInterval": 15,
   "offlineBackup": "Main Ingate.jpg",
-  "offlineCacheVersion": "",
+  "offlineCacheVersion": "1783171332270",
   "heartbeatUrl": "https://script.google.com/macros/s/AKfycbyRGuBWEPqLeabg66RqrEwn1rgHyi9gTIjIhPiJSHN-pXYCQsXZ8viK_NlPoSheBO-ZpA/exec",
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, |8807922309, 7358386494\nHelpdesk : 9384001882",

@@ -178,7 +178,7 @@
       "duration": "",
       "times": [],
       "dates": [],
-      "expiry": "",
+      "expiry": "4H",
       "towers": "club,gate"
     }
   ]

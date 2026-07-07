@@ -5,7 +5,7 @@
   "refreshInterval": 15,
   "offlineBackup": "Main Ingate.jpg",
   "offlineCacheVersion": "1783171332270",
-  "heartbeatUrl": "https:\/\/script.google.com\/macros\/s\/AKfycbyRGuBWEPqLeabg66RqrEwn1rgHyi9gTIjIhPiJSHN-pXYCQsXZ8viK_NlPoSheBO-ZpA\/exec",
+  "heartbeatUrl": "https://script.google.com/macros/s/AKfycbyRGuBWEPqLeabg66RqrEwn1rgHyi9gTIjIhPiJSHN-pXYCQsXZ8viK_NlPoSheBO-ZpA/exec",
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, |8807922309, 7358386494\nHelpdesk : 9384001882",
     "towerTexts": {},
@@ -115,7 +115,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
       "name": "GarbageYard.jpg",
@@ -123,7 +123,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
       "name": "2.png",
@@ -139,7 +139,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
       "name": "pest-control-estancia.jpg",
@@ -147,7 +147,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
       "name": "housekeeping-estancia.jpg",
@@ -155,7 +155,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
       "name": "Parcel.jpg",
@@ -163,7 +163,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     },
     {
       "name": "mygate-estancia.jpg",

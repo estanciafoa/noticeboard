@@ -115,7 +115,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
     },
     {
       "name": "GarbageYard.jpg",
@@ -123,7 +123,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
     },
     {
       "name": "2.png",
@@ -139,7 +139,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
     },
     {
       "name": "pest-control-estancia.jpg",
@@ -147,7 +147,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
     },
     {
       "name": "housekeeping-estancia.jpg",
@@ -155,7 +155,7 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
     },
     {
       "name": "Parcel.jpg",
@@ -163,15 +163,15 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2"
     },
     {
-      "name": "mygate-estancia.jpg",
+      "name": "maintenance-estancia.jpg",
       "duration": "",
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t2c2"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
     }
   ]
 }

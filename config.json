@@ -3,7 +3,7 @@
   "transitionEffect": "fade",
   "transitionMs": 700,
   "refreshInterval": 15,
-  "offlineBackup": "Club.png",
+  "offlineBackup": "studentwelcomenotice.jpg",
   "offlineCacheVersion": "1783171332270",
   "heartbeatUrl": "https://script.google.com/macros/s/AKfycbyRGuBWEPqLeabg66RqrEwn1rgHyi9gTIjIhPiJSHN-pXYCQsXZ8viK_NlPoSheBO-ZpA/exec",
   "ticker": {
@@ -167,11 +167,11 @@
     },
     {
       "name": "studentwelcomenotice.jpg",
-      "duration": "",
+      "duration": "20",
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "club"
     }
   ]
 }

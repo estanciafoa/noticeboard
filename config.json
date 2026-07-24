@@ -1,6 +1,6 @@
 {
   "defaultDuration": 10,
-  "transitionEffect": "cut",
+  "transitionEffect": "push",
   "transitionMs": 700,
   "refreshInterval": 15,
   "offlineBackup": "studentwelcomenotice.jpg",

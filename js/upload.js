@@ -395,11 +395,7 @@ async function upload() {
       statusEl.innerText = "Uploading…";
       const base64 = await toBase64(finalFile);
 
-      await githubFetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${entry.name}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: "upload", content: base64 })
-      });
+      await putSlideFile(entry.name, base64);
 
       // Cache a local blob URL so the thumbnail/preview shows the file
       // immediately, before GitHub Pages rebuilds + the CDN propagates.
@@ -429,6 +425,48 @@ async function upload() {
 
   render();
   insertAtIndex = -1;
+}
+
+/* PUT a slide file to the repo, overwriting cleanly if it already exists.
+   GitHub's Contents API requires the current blob sha to REPLACE an existing
+   file (a PUT without it 422s), so fetch the sha first — 404 means it's a new
+   file and no sha is needed. Retries once if the sha goes stale between the
+   read and the write. Mirrors the native app's GithubUploader.uploadSlide. */
+async function putSlideFile(name, base64) {
+  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/slides/${encodeURIComponent(name)}`;
+
+  async function fetchSha() {
+    try {
+      const existing = await githubFetch(url);
+      return existing.sha || null;
+    } catch (e) {
+      if (e.status === 404) return null;   // new file — no sha
+      throw e;
+    }
+  }
+
+  async function put(sha) {
+    const body = { message: "upload", content: base64 };
+    if (sha) body.sha = sha;
+    await githubFetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  }
+
+  let sha = await fetchSha();
+  try {
+    await put(sha);
+  } catch (e) {
+    // Stale sha (someone else committed in between) — re-read once and retry.
+    if (e.status === 409 || e.status === 422) {
+      sha = await fetchSha();
+      await put(sha);
+    } else {
+      throw e;
+    }
+  }
 }
 
 async function buildCollageFile(fileList, fileName, title) {

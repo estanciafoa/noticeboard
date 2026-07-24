@@ -18,6 +18,7 @@ let refreshIntervalTimer = null;
 let offlineRetryTimer = null;
 let index    = 0;
 let timer    = null;
+let activeEl = null;            // currently-shown slide element (for push transition)
 let transitionEffect = "fade";
 let transitionMs = 700;
 let ticker = { commonText: "", towerTexts: {} };
@@ -249,7 +250,7 @@ async function showOfflineBackup() {
 function buildSingle(name, blobUrl) {
   const frame = document.getElementById("frame");
   frame.style.setProperty("--transition-ms", `${transitionMs}ms`);
-  frame.classList.remove("effect-cut", "effect-fade", "effect-zoom");
+  frame.classList.remove("effect-cut", "effect-fade", "effect-zoom", "effect-push");
   frame.classList.add(`effect-${transitionEffect}`);
   frame.querySelectorAll(".slide").forEach(el => el.remove());
   elements = [];
@@ -284,6 +285,7 @@ function buildSingle(name, blobUrl) {
   frame.appendChild(div);
   elements.push(div);
   index = 0;
+  activeEl = null;
   show(0);
 }
 
@@ -596,7 +598,7 @@ function applyTicker() {
 function build() {
   const frame = document.getElementById("frame");
   frame.style.setProperty("--transition-ms", `${transitionMs}ms`);
-  frame.classList.remove("effect-cut", "effect-fade", "effect-zoom");
+  frame.classList.remove("effect-cut", "effect-fade", "effect-zoom", "effect-push");
   frame.classList.add(`effect-${transitionEffect}`);
 
   frame.querySelectorAll(".slide").forEach(el => el.remove());
@@ -663,6 +665,7 @@ function build() {
   });
 
   index = 0;
+  activeEl = null;               // slides were rebuilt; drop the stale reference
   show(index);
 }
 
@@ -671,14 +674,35 @@ function show(i) {
   if (timer) { clearTimeout(timer); timer = null; }
   if (!elements.length) return;
 
+  const el = elements[i];
+  const prevEl = activeEl;
+
   elements.forEach(e => {
     e.classList.remove("active");
     const v = e.querySelector("video");
     if (v) { try { v.pause(); v.currentTime = 0; } catch (_) {} }
   });
 
-  const el = elements[i];
+  // Push transition: send the outgoing slide out to the left while the new one
+  // slides in from the right. Other slides stay parked off-screen right.
+  if (transitionEffect === "push" && prevEl && prevEl !== el) {
+    elements.forEach(e => { if (e !== prevEl) e.classList.remove("leaving"); });
+    prevEl.classList.add("leaving");
+    const leaving = prevEl;
+    setTimeout(() => {
+      // Once it's off-screen left, park it back on the right without animating
+      // the long jump, so it can slide in again next time.
+      leaving.classList.add("no-anim");
+      leaving.classList.remove("leaving");
+      void leaving.offsetWidth;      // force reflow so the snap isn't tweened
+      leaving.classList.remove("no-anim");
+    }, transitionMs);
+  } else {
+    elements.forEach(e => e.classList.remove("leaving"));
+  }
+
   el.classList.add("active");
+  activeEl = el;
 
   const video = el.querySelector("video");
   if (video) {

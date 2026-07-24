@@ -55,6 +55,24 @@ html, body {
   transform: scale(1);
 }
 
+/* PUSH: the new slide slides in from the right and pushes the old one out to
+   the left. Non-active slides sit parked off-screen to the right; the outgoing
+   slide gets .leaving (added by viewer.js) to exit left. */
+#frame.effect-push .slide {
+  opacity: 1;
+  transform: translateX(100%);
+}
+#frame.effect-push .slide.active {
+  transform: translateX(0);
+}
+#frame.effect-push .slide.leaving {
+  transform: translateX(-100%);
+}
+/* Snap a parked slide back into place without animating the long jump. */
+.slide.no-anim {
+  transition: none !important;
+}
+
 .slide img,
 .slide video {
   width: 100%;

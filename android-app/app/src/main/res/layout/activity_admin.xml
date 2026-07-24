@@ -75,6 +75,23 @@
             android:layout_marginTop="20dp"
             android:text="@string/save_continue" />
 
+        <Button
+            android:id="@+id/manageSlidesBtn"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/slides_manage" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/slides_manage_help"
+            android:textColor="@color/muted"
+            android:textSize="12sp" />
+
+
         <TextView
             android:id="@+id/adminStatus"
             android:layout_width="match_parent"

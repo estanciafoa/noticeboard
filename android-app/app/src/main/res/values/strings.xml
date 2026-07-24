@@ -80,6 +80,64 @@
     <string name="reminder_label">Daily photo reminder</string>
     <string name="reminder_help">Reminds you every hour from noon until the day\'s photos are posted. Turn off to silence.</string>
 
+    <!-- Board slides manager -->
+    <string name="slides_title">Board slides</string>
+    <string name="slides_manage">🖼 Manage board slides</string>
+    <string name="slides_manage_help">View the notice-board deck: hide/show slides, change where each shows, and add a slide at any position.</string>
+    <string name="slides_need_token">Save an access token first.</string>
+    <string name="slides_lock_title">Noticeboard control</string>
+    <string name="slides_lock_hint">Control password</string>
+    <string name="slides_intro">Order = the order slides play on the displays. A slide shows on a display only if that display is in its locations.</string>
+    <string name="slides_refresh">↻ Refresh</string>
+    <string name="slides_upload_new">＋ Upload new slide</string>
+    <string name="slides_on_board">On the board</string>
+    <string name="slides_on_board_count">On the board (%1$d)</string>
+    <string name="slides_available">Available to add</string>
+    <string name="slides_available_count">Available to add (%1$d)</string>
+    <string name="slides_available_hint">Images already in the repo that aren\'t on the board yet.</string>
+    <string name="slides_available_none">Nothing else in the repo — every image is on the board.</string>
+    <string name="slides_board_empty">No slides on the board yet.</string>
+    <string name="slides_not_on_board">Not on the board</string>
+    <string name="slides_pos_onboard">%1$d / %2$d · on board</string>
+    <string name="slides_pos_available">Available to add</string>
+    <string name="slides_position_of">%1$d / %2$d · %3$s</string>
+    <string name="slides_all_locations">All locations</string>
+    <string name="slides_hidden_note">Hidden — shows nowhere</string>
+    <string name="slides_hidden_badge">🙈 Hidden</string>
+    <string name="slides_move">Move</string>
+    <string name="slides_location">Location</string>
+    <string name="slides_hide">Hide</string>
+    <string name="slides_show">Show</string>
+    <string name="slides_add">Add</string>
+    <string name="slides_pick_locations">Show on which locations?</string>
+    <string name="slides_move_title">Move “%1$s” to position</string>
+    <string name="slides_add_title">Add “%1$s” at position</string>
+    <string name="slides_new_title">New slide</string>
+    <string name="slides_position_label">Position</string>
+    <string name="slides_position_range">Position (1 = first, %1$d = last)</string>
+    <string name="slides_filename_label">File name (e.g. notice-jul.jpg)</string>
+    <string name="slides_filename_required">Enter a file name.</string>
+    <string name="slides_filename_exists">That name is already on the board. Pick a different one.</string>
+    <string name="slides_preparing">Preparing image…</string>
+    <string name="slides_image_error">Couldn\'t read that image.</string>
+    <string name="slides_saving">Saving…</string>
+    <string name="slides_added">✅ Added. Appears on the displays within ~15 minutes.</string>
+    <string name="slides_moved">✅ Moved.</string>
+    <string name="slides_locations_saved">✅ Locations updated.</string>
+    <string name="slides_hidden_done">✅ Hidden. It now shows nowhere.</string>
+    <string name="slides_shown">✅ Shown again.</string>
+
+    <!-- Display status -->
+    <string name="status_title">Display status</string>
+    <string name="status_manage">📺 Display status</string>
+    <string name="status_manage_help">See which notice-board displays are online, offline, or have never reported.</string>
+    <string name="status_refresh">↻ Refresh</string>
+    <string name="status_summary">%1$d of %2$d online</string>
+    <string name="status_foot">Updated %1$s · displays report every ~15 min · offline after 35 min silent</string>
+    <string name="status_online">ONLINE</string>
+    <string name="status_offline">OFFLINE</string>
+    <string name="status_never">NO REPORT</string>
+
     <!-- Camera -->
     <string name="done">Done</string>
     <string name="shots_zero">0 photos</string>

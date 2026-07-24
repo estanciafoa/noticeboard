@@ -43,6 +43,20 @@
             android:parentActivityName=".MainActivity" />
 
         <activity
+            android:name=".SlidesActivity"
+            android:exported="false"
+            android:label="@string/slides_title"
+            android:theme="@style/Theme.EstanciaPhotos.Admin"
+            android:parentActivityName=".AdminActivity" />
+
+        <activity
+            android:name=".DisplayStatusActivity"
+            android:exported="false"
+            android:label="@string/status_title"
+            android:theme="@style/Theme.EstanciaPhotos.Admin"
+            android:parentActivityName=".SlidesActivity" />
+
+        <activity
             android:name=".CameraActivity"
             android:exported="false"
             android:screenOrientation="portrait"

@@ -183,6 +183,158 @@ object GithubUploader {
         putConfig(token, config, sha, message)
     }
 
+    // ---- board deck management (config.json slides[]) -----------------------
+
+    /**
+     * One slide in the board deck, in display order.
+     *
+     * [towers] is the comma-separated list of display locations the slide shows
+     * on; an empty string means the slide is hidden (shows nowhere). [savedTowers]
+     * holds the locations to restore when un-hiding — set by [hideSlide], cleared
+     * once restored. Both are ignored by the displays except for [towers].
+     */
+    data class DeckSlide(val name: String, val towers: String, val savedTowers: String) {
+        val hidden: Boolean get() = towers.isBlank()
+    }
+
+    private val MEDIA_EXT = Regex("\\.(jpg|jpeg|png|gif|webp|mp4|webm|mov|m4v)$", RegexOption.IGNORE_CASE)
+
+    /** The board deck (config.json slides[]) in display order. */
+    fun fetchDeck(token: String): List<DeckSlide> {
+        if (token.isBlank()) throw UploadException("No access token.")
+        val (config, _) = fetchConfig(token)
+        val slides = config.optJSONArray("slides") ?: JSONArray()
+        val out = ArrayList<DeckSlide>(slides.length())
+        for (i in 0 until slides.length()) {
+            val s = slides.optJSONObject(i) ?: continue
+            val name = s.optString("name")
+            if (name.isBlank()) continue
+            out.add(DeckSlide(name, s.optString("towers"), s.optString("savedTowers")))
+        }
+        return out
+    }
+
+    /** The display-heartbeat backend URL from config.json (empty if unset). */
+    fun fetchHeartbeatUrl(token: String): String {
+        if (token.isBlank()) throw UploadException("No access token.")
+        val (config, _) = fetchConfig(token)
+        return config.optString("heartbeatUrl").trim()
+    }
+
+    /** All media files in the slides/ folder (case-sensitive), for the "add" picker. */
+    fun fetchSlideFiles(token: String): List<String> {
+        val conn = open("$API/contents/slides?ref=$BRANCH", token, "GET")
+        val code = conn.responseCode
+        val text = conn.bodyText()
+        conn.disconnect()
+        if (code != 200) throw UploadException("Could not list slides/ (HTTP $code).")
+        val arr = JSONArray(text)
+        val out = ArrayList<String>(arr.length())
+        for (i in 0 until arr.length()) {
+            val f = arr.optJSONObject(i) ?: continue
+            if (f.optString("type") != "file") continue
+            val name = f.optString("name")
+            if (name.isNotBlank() && MEDIA_EXT.containsMatchIn(name)) out.add(name)
+        }
+        return out
+    }
+
+    /** Index of the slide named [name] in [slides], or -1. */
+    private fun findSlide(slides: JSONArray, name: String): Int {
+        for (i in 0 until slides.length()) {
+            if (slides.optJSONObject(i)?.optString("name") == name) return i
+        }
+        return -1
+    }
+
+    private fun newSlideEntry(name: String) = JSONObject().apply {
+        put("name", name)
+        put("duration", "")
+        put("times", JSONArray())
+        put("dates", JSONArray())
+        put("expiry", "")
+        put("towers", "")
+    }
+
+    /**
+     * Fetch config.json, apply [op] to its slides[] array, and write it back.
+     * Retries once on a sha conflict (someone else saved in between).
+     */
+    private fun mutateDeck(token: String, message: String, op: (JSONArray) -> Unit) {
+        if (token.isBlank()) throw UploadException("No access token.")
+        fun apply() {
+            val (config, sha) = fetchConfig(token)
+            val slides = config.optJSONArray("slides") ?: JSONArray().also { config.put("slides", it) }
+            op(slides)
+            putConfig(token, config, sha, message)
+        }
+        try { apply() } catch (e: UploadException) { apply() }
+    }
+
+    /**
+     * Insert (or move) the slide [name] to [index] (0-based, clamped to the deck
+     * size) with the given [towers]. Creates the config entry if it's new, else
+     * moves the existing entry, preserving its other settings.
+     */
+    fun placeSlideAt(token: String, name: String, index: Int, towers: String, message: String) {
+        mutateDeck(token, message) { slides ->
+            val existing = findSlide(slides, name)
+            val obj = if (existing >= 0) slides.getJSONObject(existing) else newSlideEntry(name)
+            obj.put("towers", towers)
+            // Keep the remembered hidden-state when moving a hidden slide (towers
+            // still blank); otherwise the slide is now visible, so drop it.
+            if (towers.isNotBlank()) obj.remove("savedTowers")
+            val kept = ArrayList<JSONObject>(slides.length())
+            for (i in 0 until slides.length()) {
+                if (i == existing) continue
+                slides.optJSONObject(i)?.let { kept.add(it) }
+            }
+            val at = index.coerceIn(0, kept.size)
+            kept.add(at, obj)
+            while (slides.length() > 0) slides.remove(slides.length() - 1)
+            kept.forEach { slides.put(it) }
+        }
+    }
+
+    /**
+     * Set the display locations of the existing slide [name] without moving it,
+     * clearing any remembered hidden-state. Adds the entry if missing.
+     */
+    fun updateSlideLocations(token: String, name: String, towers: String, message: String) {
+        mutateDeck(token, message) { slides ->
+            val i = findSlide(slides, name)
+            val obj = if (i >= 0) slides.getJSONObject(i) else newSlideEntry(name).also { slides.put(it) }
+            obj.put("towers", towers)
+            obj.remove("savedTowers")
+        }
+    }
+
+    /** Hide [name]: clear its locations (shows nowhere), remembering them to restore later. */
+    fun hideSlide(token: String, name: String, message: String) {
+        mutateDeck(token, message) { slides ->
+            val i = findSlide(slides, name)
+            if (i >= 0) {
+                val o = slides.getJSONObject(i)
+                val cur = o.optString("towers")
+                if (cur.isNotBlank()) o.put("savedTowers", cur)
+                o.put("towers", "")
+            }
+        }
+    }
+
+    /** Un-hide [name]: restore its remembered locations, or [fallbackTowers] if none were saved. */
+    fun showSlide(token: String, name: String, fallbackTowers: String, message: String) {
+        mutateDeck(token, message) { slides ->
+            val i = findSlide(slides, name)
+            if (i >= 0) {
+                val o = slides.getJSONObject(i)
+                val saved = o.optString("savedTowers")
+                o.put("towers", if (saved.isNotBlank()) saved else fallbackTowers)
+                o.remove("savedTowers")
+            }
+        }
+    }
+
     // ---- ticker.txt (scheduled ticker) --------------------------------------
 
     private const val TICKER_PATH = "ticker.txt"

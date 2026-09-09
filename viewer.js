@@ -205,10 +205,11 @@ async function cacheBackupSlide(name) {
       try { await caches.delete(BACKUP_CACHE); } catch (_) {}
       return;
     }
-    const { primary, fallback } = mediaUrls(name);
+    const urls = mediaUrls(name);
     let res = null;
-    try { const r = await fetch(primary, { cache: "reload" }); if (r && r.ok) res = r; } catch (_) {}
-    if (!res) { try { const r = await fetch(fallback, { cache: "reload" }); if (r && r.ok) res = r; } catch (_) {} }
+    for (const url of urls) {
+      try { const r = await fetch(url, { cache: "reload" }); if (r && r.ok) { res = r; break; } } catch (_) {}
+    }
     if (!res) return;   // couldn't fetch — keep whatever was cached before
     const cache = await caches.open(BACKUP_CACHE);
     await cache.put(BACKUP_KEY, res.clone());
@@ -400,21 +401,23 @@ function isVideo(name) {
   return /\.(mp4|webm|ogg|mov|m4v)$/i.test(name);
 }
 
+/* Returns an ordered list of candidate URLs to try for a slide. raw.githubusercontent.com
+   is known to be unreliable/blocked on some networks (times out where Pages and
+   jsDelivr both succeed), so it's never the last resort. */
 function mediaUrls(name) {
   const bust = Date.now();
   const enc = encodeURIComponent(name);
   if (isLocal) {
-    const local = `slides/${enc}?t=${bust}`;
-    return { primary: local, fallback: local };
+    return [`slides/${enc}?t=${bust}`];
   }
-  const pages = `https://${repoOwner}.github.io/${repoName}/slides/${enc}?t=${bust}`;
-  const raw   = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${enc}?t=${bust}`;
-  // Videos: prefer raw (Pages often 404s / ORB-blocks large files)
-  // Images: prefer Pages (faster CDN), fallback to raw
-  if (/\.(mp4|webm|ogg|mov|m4v)$/i.test(name)) {
-    return { primary: raw, fallback: pages };
-  }
-  return { primary: pages, fallback: raw };
+  const pages    = `https://${repoOwner}.github.io/${repoName}/slides/${enc}?t=${bust}`;
+  const raw      = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/slides/${enc}?t=${bust}`;
+  const jsdelivr = `https://cdn.jsdelivr.net/gh/${repoOwner}/${repoName}@main/slides/${enc}`;
+  // Videos: prefer raw (Pages often 404s / ORB-blocks large files).
+  // Images: prefer Pages (faster CDN), then raw. Either way, jsDelivr's GitHub
+  // mirror is the final fallback since it's reliably reachable when raw isn't.
+  if (isVideo(name)) return [raw, pages, jsdelivr];
+  return [pages, raw, jsdelivr];
 }
 
 /* TICKER */
@@ -627,35 +630,43 @@ function build() {
       video.preload = "auto";
       video.onended = next;
 
-      const applyFallback = () => {
-        if (video.dataset.fallbackApplied) return;
-        video.dataset.fallbackApplied = "1";
-        video.src = urls.fallback;
+      let urlIndex = 0;
+      let stallTimer = null;
+
+      const armStallTimer = () => {
+        clearTimeout(stallTimer);
+        // ORB/CORS blocks may not fire onerror; detect via stall timeout
+        stallTimer = setTimeout(() => {
+          if (video.readyState === 0) tryNextUrl();
+        }, 4000);
+      };
+
+      const tryNextUrl = () => {
+        urlIndex++;
+        if (urlIndex >= urls.length) return;
+        video.src = urls[urlIndex];
         video.load();
         const p = video.play();
         if (p && p.catch) p.catch(() => {});
+        armStallTimer();
       };
-      video.onerror = applyFallback;
-
-      // ORB/CORS blocks may not fire onerror; detect via stall timeout
-      let stallTimer = setTimeout(() => {
-        if (video.readyState === 0) applyFallback();
-      }, 4000);
+      video.onerror = tryNextUrl;
       video.onloadeddata = () => clearTimeout(stallTimer);
 
       const source = document.createElement("source");
-      source.src = urls.primary;
+      source.src = urls[0];
       source.type = "video/mp4";
-      source.onerror = applyFallback;
+      source.onerror = tryNextUrl;
       video.appendChild(source);
+      armStallTimer();
       div.appendChild(video);
     } else {
       const img = document.createElement("img");
-      img.src = urls.primary;
+      let urlIndex = 0;
+      img.src = urls[urlIndex];
       img.onerror = () => {
-        if (img.dataset.fallbackApplied) return;
-        img.dataset.fallbackApplied = "1";
-        img.src = urls.fallback;
+        urlIndex++;
+        if (urlIndex < urls.length) img.src = urls[urlIndex];
       };
       div.appendChild(img);
     }
@@ -758,7 +769,14 @@ function stopOfflineRetry() {
 /* PERIODIC REBUILD (re-evaluate time-based visibility) */
 setInterval(() => {
   const currentNames = elements
-    .map(el => el.querySelector("img,video")?.src.split("/").pop().split("?")[0])
+    .map(el => {
+      const media = el.querySelector("img,video");
+      // Videos start out sourced via a <source> child, not the src attribute/
+      // property, so .src is "" until a fallback URL is applied directly —
+      // .currentSrc reflects whichever URL is actually in use either way.
+      const src = media && (media.currentSrc || media.src) || "";
+      return src.split("/").pop().split("?")[0];
+    })
     .join("|");
   const visibleNames = slides.filter(isVisible).map(s => encodeURIComponent(s.name)).join("|");
   if (currentNames !== visibleNames) build();

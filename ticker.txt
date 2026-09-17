@@ -60,3 +60,4 @@ t4c2 | 2026-09-09 09:00 | 2026-09-10 15:00 | LIFT MAINTENANCE | 13 Passenger Lif
 t5c1 | 2026-09-10 09:00 | 2026-09-11 15:00 | LIFT MAINTENANCE | 13 Passenger Lift (right) will be in maintenance on 11/09/2026, 10:30am to 3pm
 t5c2 | 2026-09-14 09:00 | 2026-09-15 15:00 | LIFT MAINTENANCE | 13 Passenger Lift (right) will be in maintenance on 15/09/2026, 10:30am to 3pm
 t1c1 | 2026-09-15 09:00 | 2026-09-16 15:00 | LIFT MAINTENANCE | 10 Passenger Lift (left) will be in maintenance on 16/09/2026, 10:30am to 3pm
+t1c2 | 2026-09-16 09:00 | 2026-09-17 15:00 | LIFT MAINTENANCE | 10 Passenger Lift (left) will be in maintenance on 17/09/2026, 10:30am to 3pm

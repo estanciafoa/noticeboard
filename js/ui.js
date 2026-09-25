@@ -441,6 +441,15 @@ function render() {
       div.appendChild(badge);
     }
 
+    // paid promotion marker
+    if (config[name]?.paidPromotion) {
+      const badge = document.createElement("div");
+      badge.className = "thumb-badge paid-promotion";
+      badge.textContent = "PAID";
+      badge.title = "Shows a \"PAID PROMOTION\" tag over this slide on the displays";
+      div.appendChild(badge);
+    }
+
     // offline backup marker
     if (appConfig.offlineBackup === name) {
       const badge = document.createElement("div");
@@ -568,7 +577,8 @@ async function toggleEnable(name) {
       times: [],
       dates: [],
       expiry: "",
-      towers: defaultTowers()
+      towers: defaultTowers(),
+      paidPromotion: false
     };
   }
 
@@ -735,6 +745,16 @@ function selectSlide(name) {
 
   duration.value = c.duration || "";
   expiry.value = c.expiry || "";
+
+  const paidCb = document.getElementById("paidPromotion");
+  if (paidCb) {
+    paidCb.checked = !!c.paidPromotion;
+    paidCb.onchange = () => {
+      if (!config[name]) return;
+      config[name].paidPromotion = paidCb.checked;
+      render();
+    };
+  }
 
   buildTimeSlotsUI(name);
   buildDateRangesUI(name);

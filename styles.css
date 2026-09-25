@@ -372,6 +372,13 @@ body {
   transform: none;
   background: #0891b2;
 }
+/* Paid promotion marker sits in the top-right corner. */
+.thumb-badge.paid-promotion {
+  left: auto;
+  right: 6px;
+  transform: none;
+  background: #b45309;
+}
 
 .thumb-disabled-overlay svg {
   width: 38%;

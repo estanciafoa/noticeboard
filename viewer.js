@@ -151,7 +151,8 @@ function applyConfigData(data) {
     dates: Array.isArray(s.dates) ? s.dates
          : (s.startDate ? [{startDate: s.startDate, endDate: s.endDate || ""}] : []),
     expiry: s.expiry || null,
-    towers: s.towers || ""
+    towers: s.towers || "",
+    paidPromotion: !!s.paidPromotion
   })).filter(s => !!s.name);
 
   build();
@@ -669,6 +670,13 @@ function build() {
         if (urlIndex < urls.length) img.src = urls[urlIndex];
       };
       div.appendChild(img);
+    }
+
+    if (s.paidPromotion) {
+      const tag = document.createElement("div");
+      tag.className = "paid-promotion-tag";
+      tag.textContent = "Paid Promotion";
+      div.appendChild(tag);
     }
 
     frame.appendChild(div);

@@ -90,7 +90,8 @@ async function load() {
       times,
       dates,
       expiry: s.expiry || "",
-      towers: s.towers || ""
+      towers: s.towers || "",
+      paidPromotion: !!s.paidPromotion
     };
     files.push(name);
   });
@@ -168,7 +169,8 @@ async function saveConfig({ silent = false } = {}) {
           times: c.times || [],
           dates: c.dates || [],
           expiry: c.expiry || "",
-          towers: c.towers || ""
+          towers: c.towers || "",
+          paidPromotion: !!c.paidPromotion
         };
       })
   };

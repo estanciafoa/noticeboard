@@ -19,7 +19,8 @@
       "times": [],
       "dates": [],
       "expiry": "3H",
-      "towers": "gate"
+      "towers": "gate",
+      "paidPromotion": false
     },
     {
       "name": "Club.png",
@@ -27,7 +28,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "club"
+      "towers": "club",
+      "paidPromotion": false
     },
     {
       "name": "t1 c1.png",
@@ -35,7 +37,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1"
+      "towers": "t1c1",
+      "paidPromotion": false
     },
     {
       "name": "t1c2.jpg",
@@ -43,7 +46,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c2"
+      "towers": "t1c2",
+      "paidPromotion": false
     },
     {
       "name": "T2C1.jpg",
@@ -51,7 +55,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t2c1"
+      "towers": "t2c1",
+      "paidPromotion": false
     },
     {
       "name": "T2C2.jpg",
@@ -59,7 +64,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t2c2"
+      "towers": "t2c2",
+      "paidPromotion": false
     },
     {
       "name": "T3C1.jpg",
@@ -67,7 +73,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t3c1"
+      "towers": "t3c1",
+      "paidPromotion": false
     },
     {
       "name": "T3C2.jpg",
@@ -75,7 +82,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t3c2"
+      "towers": "t3c2",
+      "paidPromotion": false
     },
     {
       "name": "T4C1.jpg",
@@ -83,7 +91,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t4c1"
+      "towers": "t4c1",
+      "paidPromotion": false
     },
     {
       "name": "T4C2.jpg",
@@ -91,7 +100,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t4c2"
+      "towers": "t4c2",
+      "paidPromotion": false
     },
     {
       "name": "T5C1.jpg",
@@ -99,7 +109,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t5c1"
+      "towers": "t5c1",
+      "paidPromotion": false
     },
     {
       "name": "T5C2.jpg",
@@ -107,7 +118,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t5c2"
+      "towers": "t5c2",
+      "paidPromotion": false
     },
     {
       "name": "gardening-estancia.jpg",
@@ -115,7 +127,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "paidPromotion": false
     },
     {
       "name": "pest-control-estancia.jpg",
@@ -123,7 +136,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "paidPromotion": false
     },
     {
       "name": "housekeeping-estancia.jpg",
@@ -131,7 +145,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "paidPromotion": false
     },
     {
       "name": "WhatsApp Image 2026-09-21 at 1.15.54 PM.jpg",
@@ -139,7 +154,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "paidPromotion": false
     },
     {
       "name": "WhatsApp Image 2026-09-07 at 11.20.06 AM.jpg",
@@ -147,7 +163,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "paidPromotion": false
     },
     {
       "name": "Modha Rathri.jpg",
@@ -155,7 +172,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "paidPromotion": false
     },
     {
       "name": "sec gri.jpg",
@@ -163,7 +181,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "gate"
+      "towers": "gate",
+      "paidPromotion": false
     },
     {
       "name": "WhatsApp Image 2026-09-24 at 6.30.39 PM.jpg",
@@ -171,15 +190,8 @@
       "times": [],
       "dates": [],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
-    },
-    {
-      "name": "sripigai.jpg",
-      "duration": "",
-      "times": [],
-      "dates": [],
-      "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club"
+      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "paidPromotion": false
     }
   ]
 }

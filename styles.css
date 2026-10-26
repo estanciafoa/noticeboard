@@ -1910,16 +1910,20 @@ button {
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .ticker-sched-row .ts-del { border-radius: 999px; }
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .ticker-sched-row input { padding: 9px 9px !important; font-size: 13px !important; }
 
-/* A soft glow behind the TV in the dashboard's own colours — warm orange to
-   the upper left, blue to the lower right, blurred and still (no rotation). */
+/* A soft glow behind the TV in the dashboard's status colours — red, orange,
+   green, blue and purple, each a faint pool around the set, blurred together
+   and still (no rotation). */
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .tv-bezel::before {
-  display: block; content: ""; position: absolute; inset: -46px -40px; z-index: -1; border-radius: 40px;
+  display: block; content: ""; position: absolute; inset: -50px -44px; z-index: -1; border-radius: 44px;
   background:
-    radial-gradient(60% 50% at 18% 22%, rgba(255, 150, 80, .55), transparent 70%),
-    radial-gradient(60% 55% at 82% 80%, rgba(60, 140, 235, .55), transparent 70%);
-  filter: blur(46px); opacity: .7; animation: none;
+    radial-gradient(42% 32% at 20% 14%, rgba(229, 72, 77, .50), transparent 72%),   /* red, top left */
+    radial-gradient(42% 32% at 82% 20%, rgba(242, 122, 26, .50), transparent 72%),  /* orange, top right */
+    radial-gradient(40% 30% at 12% 62%, rgba(46, 170, 98, .45), transparent 72%),   /* green, left */
+    radial-gradient(44% 34% at 86% 70%, rgba(29, 140, 240, .50), transparent 72%),  /* blue, right */
+    radial-gradient(46% 30% at 48% 94%, rgba(139, 79, 224, .45), transparent 72%);  /* purple, foot */
+  filter: blur(48px); opacity: .68; animation: none;
 }
-[data-theme="estancia-dark"] .tv-bezel::before { opacity: .42; }
+[data-theme="estancia-dark"] .tv-bezel::before { opacity: .58; }
 /* the TV is its own layer, so the glow sits above the band but behind the set */
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .tv { isolation: isolate; }
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .nav-controls { position: relative; z-index: 1; }

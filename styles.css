@@ -1609,3 +1609,183 @@ button {
   color: var(--muted);
   text-align: center;
 }
+
+/* =====================================================================
+   ESTANCIA THEMES — the look of the Estancia works register, so the admin
+   sits naturally inside it: Outfit type, soft cool greys, white cards with
+   rounded corners, pill controls and one deep-blue main action. "estancia"
+   is light, "estancia-dark" is dark; both drop the neon glows.
+   ===================================================================== */
+[data-theme="estancia"] {
+  --bg-0: #F3F5F8; --bg-1: #FFFFFF; --bg-2: #F5F7FA; --bg-3: #ECEFF3;
+  --line: #E1E5EB; --text: #111418; --muted: #6B737D;
+  --accent: #1570C9; --accent-2: #8B4FE0;
+  --accent-soft: rgba(21, 112, 201, 0.10); --danger: #E5484D;
+  --cta: #1570C9; --cta-hover: #115FAE;
+  --glow1: rgba(255, 160, 90, 0.30); --glow2: rgba(80, 150, 230, 0.28);
+  --shadow: 0 1px 2px rgba(17,20,24,.04), 0 8px 28px rgba(17,20,24,.06);
+  --shadow-lift: 0 4px 12px rgba(17,20,24,.08), 0 24px 60px rgba(17,20,24,.14);
+  color-scheme: light;
+}
+[data-theme="estancia-dark"] {
+  --bg-0: #0E1014; --bg-1: #171A20; --bg-2: #1D2128; --bg-3: #252A32;
+  --line: #2C323C; --text: #EEF1F5; --muted: #9CA3AD;
+  --accent: #4BA6F5; --accent-2: #A881EE;
+  --accent-soft: rgba(75, 166, 245, 0.14); --danger: #F0696D;
+  --cta: #2873C8; --cta-hover: #2266B4;
+  --glow1: rgba(242, 122, 26, 0.12); --glow2: rgba(29, 140, 240, 0.14);
+  --shadow: 0 1px 2px rgba(0,0,0,.35), 0 8px 28px rgba(0,0,0,.28);
+  --shadow-lift: 0 4px 12px rgba(0,0,0,.45), 0 24px 60px rgba(0,0,0,.5);
+  color-scheme: dark;
+}
+
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) body {
+  font-family: 'Outfit', system-ui, -apple-system, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(900px 420px at -5% -8%, var(--glow1), transparent 65%),
+    radial-gradient(1000px 460px at 105% -8%, var(--glow2), transparent 65%),
+    var(--bg-0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* login */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) #login {
+  background:
+    radial-gradient(900px 500px at 0% 0%, var(--glow1), transparent 65%),
+    radial-gradient(900px 500px at 100% 100%, var(--glow2), transparent 65%), var(--bg-0);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) #loginBox {
+  border-radius: 20px; padding: 32px 30px; box-shadow: var(--shadow-lift);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) #loginBox h3 {
+  color: var(--text); font-size: 24px; font-weight: 500; letter-spacing: -.02em;
+}
+
+/* header band and top bar: quiet, no neon underline */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band {
+  background: transparent; border-bottom: 0; padding: 16px 24px 8px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band::after { display: none; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band h1 {
+  font-size: 22px; font-weight: 500; letter-spacing: -.02em; text-transform: none;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band h1 .accent {
+  color: var(--muted); text-shadow: none; font-weight: 400; font-size: 15px; margin-left: 10px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar {
+  background: transparent; border-bottom: 0; padding: 6px 24px 14px; gap: 12px; flex-wrap: wrap;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-mid label {
+  text-transform: none; letter-spacing: 0; font-size: 12.5px;
+}
+
+/* pill controls */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.topbar select, .topbar input, .upload-option-row select) {
+  border-radius: 999px; padding: 7px 12px; font-size: 13px; background: var(--bg-1); border-color: var(--line);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar button,
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .preview-btn {
+  border-radius: 999px !important; background: var(--bg-1) !important; border: 1px solid var(--line) !important;
+  color: var(--text) !important; padding: 8px 15px !important; font-size: 13px; letter-spacing: 0;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar button:hover,
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .preview-btn:hover {
+  background: var(--bg-1) !important; border-color: var(--text) !important; color: var(--text) !important;
+}
+
+/* the main actions — upload and save — are the one blue */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.upload-plus-btn.upload-plus-btn, .topbar .save-btn, .modal-footer button.primary, #loginBox button) {
+  background: var(--cta) !important; border: 1px solid var(--cta) !important; color: #fff !important;
+  border-radius: 999px !important; box-shadow: 0 2px 8px color-mix(in srgb, var(--cta) 35%, transparent);
+  text-transform: none; letter-spacing: 0; font-weight: 500;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.upload-plus-btn.upload-plus-btn, .topbar .save-btn, .modal-footer button.primary, #loginBox button):hover {
+  background: var(--cta-hover) !important; border-color: var(--cta-hover) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--cta) 35%, transparent);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .upload-plus-btn.upload-plus-btn {
+  width: 40px; height: 40px; padding: 0 !important; font-size: 22px; font-weight: 400;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar .save-btn { padding: 8px 22px !important; font-size: 13.5px; }
+
+/* the three panes become cards on the page */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .container {
+  gap: 14px; padding: 0 16px 16px; height: calc(100vh - 128px);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.left, .right) {
+  border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .left::-webkit-scrollbar-track { background: transparent; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .center {
+  background: transparent; border-radius: 16px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .tv-bezel::before { display: none; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .tv-bezel {
+  box-shadow: inset 0 0 0 1px #222, 0 0 0 1px #050505, 0 24px 60px rgba(17, 20, 24, .28);
+}
+
+/* thumbnails: rounded, a plain blue ring for the selected one */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .thumb { border-radius: 12px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .thumb.active {
+  border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .thumb-insert button:hover { background: var(--accent-soft); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .loc-tag { background: var(--accent); color: #fff; }
+
+/* prev / next */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .nav-controls button {
+  border-radius: 999px; background: var(--bg-1); color: var(--text); padding: 6px 14px; font-size: 12.5px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .nav-controls button:hover {
+  background: var(--bg-1); border-color: var(--text); color: var(--text);
+}
+
+/* right pane: a segmented control for its two tabs, sentence-case labels */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right-tabs {
+  border-bottom: 0; margin: 12px 14px 0; padding: 3px; gap: 2px; background: var(--bg-2);
+  border: 1px solid var(--line); border-radius: 999px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right-tab {
+  border: 0; margin: 0; border-radius: 999px; padding: 7px 8px; font-weight: 500; font-size: 12.5px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right-tab.active {
+  background: var(--text); color: var(--bg-1);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right h3 {
+  color: var(--text); font-size: 17px; font-weight: 500; letter-spacing: -.01em;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .field label {
+  text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 400;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(input, textarea, select) { border-radius: 10px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(input, textarea):focus {
+  border-color: var(--text); box-shadow: 0 0 0 4px color-mix(in srgb, var(--text) 8%, transparent);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(input, textarea)::placeholder { color: var(--muted); opacity: .7; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .loc-hint { color: var(--muted); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .loc-pill { border-radius: 999px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .loc-pill:has(input:checked) { background: var(--accent-soft); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.slot-add-btn, .sched-ticker-btn) { border-radius: 999px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .slot-add-btn:hover { background: var(--accent-soft); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .multi-select-bar {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--text); border-radius: 12px;
+}
+
+/* modals */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .modal-backdrop { background: rgba(14, 16, 20, .4); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .modal-box { border-radius: 20px; box-shadow: var(--shadow-lift); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .modal-header h3 {
+  color: var(--text); text-transform: none; letter-spacing: -.01em; font-size: 18px; font-weight: 500;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .modal-footer button { border-radius: 999px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.upload-mode-pill:has(input:checked)) { box-shadow: 0 0 0 1px var(--accent-soft); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.collage-status.done, .previewCard .status.done) { color: var(--accent); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.upload-options, .status-url-row) { background: var(--bg-2); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(input[type="date"], input[type="time"])::-webkit-calendar-picker-indicator { filter: none; }
+[data-theme="estancia-dark"] :is(input[type="date"], input[type="time"])::-webkit-calendar-picker-indicator { filter: invert(1); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) button.loc-action {
+  text-transform: none; letter-spacing: 0; border-radius: 999px; font-size: 12px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar input[type="number"] {
+  width: 64px !important; padding: 7px 10px; text-align: center;
+}

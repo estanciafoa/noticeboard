@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Estancia Admin</title>
-<link rel="stylesheet" href="styles.css?v=11">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css?v=12">
 </head>
 
 <body>
@@ -274,6 +275,8 @@
 <script>
 (function() {
   var THEMES = [
+    { name: "estancia",      bg: "#F3F5F8", accent: "#1570C9", label: "Estancia" },
+    { name: "estancia-dark", bg: "#171A20", accent: "#4BA6F5", label: "Estancia Dark" },
     { name: "dark",     bg: "#0b0f17", accent: "#22d3ee", label: "Neon Blue" },
     { name: "neonpink", bg: "#120b14", accent: "#f472b6", label: "Neon Pink" },
     { name: "sand",     bg: "#f2ede5", accent: "#a0522d", label: "Sand" },
@@ -307,9 +310,19 @@
     });
   }
 
-  var saved = "dark";
-  try { saved = localStorage.getItem("admin-theme") || "dark"; } catch(e) {}
-  applyTheme(saved);
+  // Opened inside the Estancia works register, the page follows the register's
+  // theme: first from ?theme= in its address, then from a message each time
+  // the register switches between light and dark. Only known theme names are
+  // accepted, so a message can do nothing but change the look.
+  var param = null;
+  try { param = new URLSearchParams(location.search).get("theme"); } catch(e) {}
+  var saved = "estancia";
+  try { saved = localStorage.getItem("admin-theme") || "estancia"; } catch(e) {}
+  applyTheme(param && THEMES.some(function(t) { return t.name === param; }) ? param : saved);
+  window.addEventListener("message", function(e) {
+    var d = e.data;
+    if (d && d.type === "estancia-theme" && THEMES.some(function(t) { return t.name === d.theme; })) applyTheme(d.theme);
+  });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", buildDots);
   } else {

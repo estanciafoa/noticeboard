@@ -1809,3 +1809,117 @@ button {
 [data-theme="estancia-dark"] .container {
   padding-top: 16px; height: calc(100vh - 128px);
 }
+
+/* =====================================================================
+   ESTANCIA THEMES — refinement, to match the works dashboard: the title
+   with a quiet subtitle under it, the tools gathered into pill tracks,
+   the three panes set inside one shaded band, and white fields with a
+   fine border instead of filled grey boxes.
+   ===================================================================== */
+[data-theme="estancia"]      { --band: #E5E9EF; --band-line: #DCE1E8; --line-2: #D9DDE4; --field: #FFFFFF; }
+[data-theme="estancia-dark"] { --band: #0A0C10; --band-line: #262B33; --line-2: #343A44; --field: #1D2128; }
+
+/* header: title over a muted subtitle; theme dots in a small track */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band { padding: 18px 24px 10px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band h1 {
+  display: flex; flex-direction: column; gap: 2px; font-size: 24px; letter-spacing: -.03em; line-height: 1.15;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band h1 .accent {
+  margin: 0; font-size: 12.5px; letter-spacing: 0; color: var(--muted);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .theme-picker {
+  padding: 6px 9px; gap: 6px !important; background: var(--bg-1); border: 1px solid var(--line);
+  border-radius: 999px; box-shadow: var(--shadow);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .theme-dot { width: 15px; height: 15px; border-width: 1.5px; border-color: var(--line-2); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .theme-dot.active { border-color: var(--text); box-shadow: none; transform: scale(1.12); }
+
+/* tool row: the settings in one pill track, the actions in another */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar { padding: 4px 24px 16px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-mid {
+  background: var(--bg-1); border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 6px 4px 16px; gap: 8px; box-shadow: var(--shadow);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-mid :is(select, input) {
+  background: var(--bg-2) !important; border-color: transparent !important; padding: 6px 12px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-mid label { margin-left: 6px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-mid label:first-child { margin-left: 0; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-right {
+  background: var(--bg-1); border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px; gap: 2px; box-shadow: var(--shadow);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-right :is(button, .preview-btn) {
+  border-color: transparent !important; background: transparent !important; padding: 7px 14px !important;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-right :is(button, .preview-btn):hover {
+  background: var(--bg-2) !important; border-color: transparent !important;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-right .save-btn { margin-left: 4px; }
+
+/* the work area: one shaded band holding the panes, as on the dashboard */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .container {
+  margin: 0 16px 16px; padding: 14px; gap: 14px; background: var(--band);
+  border: 1px solid var(--band-line); border-radius: 22px;
+  height: calc(100vh - 150px); box-shadow: inset 0 1px 2px rgba(17,20,24,.04);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.left, .right) { border-color: var(--line); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .left { padding: 12px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .center {
+  background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--bg-1) 70%, transparent) 0%, transparent 62%);
+  padding: 14px 20px 10px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) #slideCounter { font-variant-numeric: tabular-nums; letter-spacing: 0; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .thumb { transition: border-color .15s, box-shadow .15s, transform .15s; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .thumb:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+
+/* settings pane: dashboard-style fields */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right-tab-content { padding: 16px 18px 22px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right h3 { padding-bottom: 14px; margin-bottom: 14px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .field { margin-bottom: 16px; gap: 6px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .field label { color: var(--muted); font-size: 12.5px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right :is(input[type="text"], input:not([type]), input[type="time"], input[type="date"], textarea, select),
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .modal-box :is(input[type="text"], input:not([type]), input[type="time"], input[type="date"], textarea, select) {
+  background: var(--field); border: 1px solid var(--line-2); border-radius: 12px; padding: 10px 12px; font-size: 13.5px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .slot-add-btn {
+  border: 1px dashed var(--line-2); color: var(--accent); background: transparent; padding: 9px; font-size: 13px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .loc-pill {
+  border-color: var(--line-2); background: var(--field); padding: 5px 12px; font-size: 12.5px;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .loc-pill:has(input:checked) {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--accent);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) button.loc-action { background: var(--bg-2); border-color: transparent; }
+
+/* Estancia Dark: the header no longer needs its own raised band — the work
+   band below now does the separating, as on the dashboard */
+[data-theme="estancia-dark"] .header-band,
+[data-theme="estancia-dark"] .topbar { background: transparent; }
+[data-theme="estancia-dark"] .topbar { border-bottom: 0; box-shadow: none; }
+[data-theme="estancia-dark"] .container { padding-top: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.03); }
+[data-theme="estancia-dark"] .topbar-right :is(button, .preview-btn) { background: transparent !important; }
+[data-theme="estancia-dark"] .topbar-mid :is(select, input) { background: var(--bg-2) !important; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.right, .modal-box) :is(input[type="datetime-local"], input[type="number"]) {
+  background: var(--field); border: 1px solid var(--line-2); border-radius: 12px; padding: 10px 12px; font-size: 13.5px; color: var(--text);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .ticker-sched-head {
+  text-transform: none; letter-spacing: 0; font-size: 12.5px; color: var(--muted);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .ticker-sched-row .ts-del { border-radius: 999px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .ticker-sched-row input { padding: 9px 9px !important; font-size: 13px !important; }
+
+/* A soft glow behind the TV in the dashboard's own colours — warm orange to
+   the upper left, blue to the lower right, blurred and still (no rotation). */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .tv-bezel::before {
+  display: block; content: ""; position: absolute; inset: -46px -40px; z-index: -1; border-radius: 40px;
+  background:
+    radial-gradient(60% 50% at 18% 22%, rgba(255, 150, 80, .55), transparent 70%),
+    radial-gradient(60% 55% at 82% 80%, rgba(60, 140, 235, .55), transparent 70%);
+  filter: blur(46px); opacity: .7; animation: none;
+}
+[data-theme="estancia-dark"] .tv-bezel::before { opacity: .42; }
+/* the TV is its own layer, so the glow sits above the band but behind the set */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .tv { isolation: isolate; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .nav-controls { position: relative; z-index: 1; }

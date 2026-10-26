@@ -1789,3 +1789,23 @@ button {
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar input[type="number"] {
   width: 64px !important; padding: 7px 10px; text-align: center;
 }
+
+/* Estancia Dark: the header (title row + tool bar) sits on its own raised
+   surface with an edge and a shadow, so it reads as a band above the work
+   area instead of floating on the same near-black as the page. */
+[data-theme="estancia-dark"] .header-band,
+[data-theme="estancia-dark"] .topbar {
+  background: var(--bg-1);
+}
+[data-theme="estancia-dark"] .header-band { padding-top: 14px; }
+[data-theme="estancia-dark"] .topbar {
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .45);
+  position: relative; z-index: 1;
+}
+[data-theme="estancia-dark"] :is(.topbar select, .topbar input, .topbar button, .preview-btn) {
+  background: var(--bg-2) !important;
+}
+[data-theme="estancia-dark"] .container {
+  padding-top: 16px; height: calc(100vh - 128px);
+}

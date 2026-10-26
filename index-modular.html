@@ -284,11 +284,16 @@
     { name: "lavender", bg: "#f0ecf6", accent: "#7c3aed", label: "Lavender" }
   ];
 
-  function applyTheme(name) {
+  // The choice is kept under a new key. The old "admin-theme" was written on
+  // every visit, picked or not, so it says nothing about what anyone chose —
+  // reading it would keep everyone on Neon Blue. Only a click on a dot is
+  // remembered now; otherwise the page opens in Estancia.
+  var THEME_KEY = "admin-theme-v2";
+  function applyTheme(name, remember) {
     var valid = THEMES.find(function(t) { return t.name === name; });
     var theme = valid ? valid.name : "dark";
     document.documentElement.setAttribute("data-theme", theme);
-    try { localStorage.setItem("admin-theme", theme); } catch(e) {}
+    if (remember) { try { localStorage.setItem(THEME_KEY, theme); } catch(e) {} }
     document.querySelectorAll(".theme-dot").forEach(function(d) {
       d.classList.toggle("active", d.dataset.theme === theme);
     });
@@ -305,7 +310,7 @@
       dot.dataset.theme = t.name;
       dot.style.background = "linear-gradient(to right, " + t.bg + " 50%, " + t.accent + " 50%)";
       dot.title = t.label;
-      dot.addEventListener("click", function() { applyTheme(t.name); });
+      dot.addEventListener("click", function() { applyTheme(t.name, true); });
       container.appendChild(dot);
     });
   }
@@ -317,7 +322,7 @@
   var param = null;
   try { param = new URLSearchParams(location.search).get("theme"); } catch(e) {}
   var saved = "estancia";
-  try { saved = localStorage.getItem("admin-theme") || "estancia"; } catch(e) {}
+  try { saved = localStorage.getItem(THEME_KEY) || "estancia"; } catch(e) {}
   applyTheme(param && THEMES.some(function(t) { return t.name === param; }) ? param : saved);
   window.addEventListener("message", function(e) {
     var d = e.data;

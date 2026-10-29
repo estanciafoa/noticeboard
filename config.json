@@ -5,7 +5,7 @@
   "refreshInterval": 15,
   "offlineBackup": "studentwelcomenotice.jpg",
   "offlineCacheVersion": "1783171332270",
-  "heartbeatUrl": "https:\/\/script.google.com\/macros\/s\/AKfycbyRGuBWEPqLeabg66RqrEwn1rgHyi9gTIjIhPiJSHN-pXYCQsXZ8viK_NlPoSheBO-ZpA\/exec",
+  "heartbeatUrl": "https://script.google.com/macros/s/AKfycbyRGuBWEPqLeabg66RqrEwn1rgHyi9gTIjIhPiJSHN-pXYCQsXZ8viK_NlPoSheBO-ZpA/exec",
   "ticker": {
     "commonText": "Lift Emergency: 7338745516, |8807922309, 7358386494\nHelpdesk : 9384001882",
     "towerTexts": {},
@@ -176,21 +176,13 @@
       "paidPromotion": false
     },
     {
-      "name": "WhatsApp Image 2026-10-25 at 6.31.29 PM.jpg",
+      "name": "mygate-estancia.jpg",
       "duration": "",
       "times": [],
       "dates": [],
       "expiry": "",
       "towers": "t3c1,t3c2",
       "paidPromotion": false
-    },
-    {
-      "name": "mygate-estancia.jpg",
-      "duration": "",
-      "times": [],
-      "dates": [],
-      "expiry": "",
-      "towers": "t3c1,t3c2"
     }
   ]
 }

@@ -179,7 +179,12 @@
       "name": "WhatsApp Image 2026-10-26 at 3.56.35 PM.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-10-30",
+          "endDate": "2026-10-31"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
       "paidPromotion": false
@@ -188,7 +193,12 @@
       "name": "WhatsApp Image 2026-10-26 at 4.09.25 PM.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-10-30",
+          "endDate": "2026-10-31"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
       "paidPromotion": false

@@ -188,9 +188,14 @@
       "name": "Estancia’s Golden Diwali Celebration.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-11-08",
+          "endDate": "2026-11-08"
+        }
+      ],
       "expiry": "",
-      "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
+      "towers": "club,gate",
       "paidPromotion": false
     }
   ]

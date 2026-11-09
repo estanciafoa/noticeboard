@@ -296,6 +296,9 @@ html, body {
   align-items: center;
   gap: 8px;
   padding: 0 12px;
+  /* Centred when the thumbnails fit; auto margins collapse to 0 on overflow,
+     so the track falls back to left-aligned and the scroll logic still works. */
+  margin: 0 auto;
   transition: transform 0.6s ease;
   will-change: transform;
 }

@@ -114,7 +114,8 @@ html, body {
   align-items: center;
   transition: height 0.3s, background 0.3s;
 }
-.bottom-bar.has-ticker {
+.bottom-bar.has-ticker,
+.bottom-bar.has-strip {
   height: 64px;
 }
 .bottom-bar.flash-news {
@@ -274,6 +275,83 @@ html, body {
   100% { transform: translateX(-100%); opacity: 0; }
 }
 
+/* SLIDE STRIP: miniatures of the playlist in the centre of the ribbon, with the
+   playing slide highlighted. Hidden while a flash-news bulletin is shown (the
+   bulletin owns the centre), and when there's only one slide. */
+.slide-strip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: none;
+  align-items: center;
+}
+.bottom-bar.has-strip:not(.flash-news) .slide-strip {
+  display: flex;
+}
+.bottom-bar.flash-news .slide-strip {
+  display: none;
+}
+.slide-strip-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  transition: transform 0.6s ease;
+  will-change: transform;
+}
+.slide-thumb {
+  position: relative;
+  flex-shrink: 0;
+  height: 46px;
+  aspect-ratio: 9 / 16;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: 2px solid transparent;
+  opacity: 0.45;
+  transform: scale(0.92);
+  transition: opacity 0.4s, transform 0.4s, border-color 0.4s;
+  box-sizing: border-box;
+}
+.slide-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.slide-thumb.is-video::after {
+  content: "▶";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+}
+.slide-thumb.active {
+  opacity: 1;
+  transform: scale(1.12);
+  border-color: #f5c518;
+  box-shadow: 0 0 8px rgba(245, 197, 24, 0.7);
+}
+/* Progress fill along the bottom of the playing thumbnail. */
+.slide-thumb .thumb-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  background: #f5c518;
+}
+.slide-thumb.active .thumb-progress {
+  animation: thumb-progress var(--thumb-ms, 10000ms) linear forwards;
+}
+@keyframes thumb-progress {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
 /* RIGHT: logo area */
 .ticker-right {
   flex-shrink: 0;
@@ -339,6 +417,7 @@ html, body {
 
     <div class="ticker-left" id="tickerLeft"></div>
     <div class="ticker-center">
+      <div class="slide-strip" id="slideStrip"><div class="slide-strip-track" id="slideStripTrack"></div></div>
       <div class="ticker-scroll-wrap" id="tickerScrollWrap">
         <span class="ticker-text" id="tickerScroll"></span>
         <span class="ticker-text" id="tickerScroll2"></span>

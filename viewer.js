@@ -21,6 +21,7 @@ let timer    = null;
 let activeEl = null;            // currently-shown slide element (for push transition)
 let transitionEffect = "fade";
 let transitionMs = 700;
+let showSlideStrip = true;      // config.json → showSlideStrip (admin toggle)
 let ticker = { commonText: "", towerTexts: {} };
 let heartbeatUrl = "";          // Google Apps Script web-app URL (from config.json)
 let scheduledTickerRows = [];   // parsed from ticker.txt: time-scheduled per-tower messages
@@ -127,6 +128,7 @@ function applyConfigSettings(data) {
   refreshIntervalMs = newRefreshInterval;
 
   heartbeatUrl = data.heartbeatUrl || "";
+  showSlideStrip = data.showSlideStrip !== false;
 
   ticker = {
     commonText: data.ticker?.commonText || "",
@@ -256,6 +258,7 @@ function buildSingle(name, blobUrl) {
   frame.classList.add(`effect-${transitionEffect}`);
   frame.querySelectorAll(".slide").forEach(el => el.remove());
   elements = [];
+  buildStrip([]);
 
   if (!blobUrl) {
     document.getElementById("empty").style.display = "flex";
@@ -609,6 +612,7 @@ function build() {
   elements = [];
 
   const visible = slides.filter(isVisible);
+  const thumbs = [];
 
   document.getElementById("empty").style.display = visible.length ? "none" : "flex";
 
@@ -661,8 +665,11 @@ function build() {
       video.appendChild(source);
       armStallTimer();
       div.appendChild(video);
+      thumbs.push({ video: true });
     } else {
       const img = document.createElement("img");
+      const thumb = { video: false, img };
+      thumbs.push(thumb);
       let urlIndex = 0;
       img.src = urls[urlIndex];
       img.onerror = () => {
@@ -683,9 +690,76 @@ function build() {
     elements.push(div);
   });
 
+  buildStrip(thumbs);
+
   index = 0;
   activeEl = null;               // slides were rebuilt; drop the stale reference
   show(index);
+}
+
+/* SLIDE STRIP — miniatures of the playlist in the bottom ribbon so viewers can
+   see what's coming next. Image thumbnails reuse the slide's own resolved URL
+   (served from cache, no extra download); videos get a ▶ tile rather than a
+   second download. Hidden via CSS during flash-news and for a single slide. */
+let thumbEls = [];
+
+function buildStrip(thumbs) {
+  const track = document.getElementById("slideStripTrack");
+  const bar = document.querySelector(".bottom-bar");
+  if (!track) return;
+  track.innerHTML = "";
+  track.style.transform = "";
+  thumbEls = [];
+
+  thumbs.forEach(t => {
+    const el = document.createElement("div");
+    el.className = "slide-thumb" + (t.video ? " is-video" : "");
+    if (!t.video && t.img) {
+      const mini = document.createElement("img");
+      mini.alt = "";
+      const copySrc = () => { mini.src = t.img.currentSrc || t.img.src; };
+      if (t.img.complete && t.img.naturalWidth) copySrc();
+      else t.img.addEventListener("load", copySrc, { once: true });
+      el.appendChild(mini);
+    }
+    const prog = document.createElement("div");
+    prog.className = "thumb-progress";
+    el.appendChild(prog);
+    track.appendChild(el);
+    thumbEls.push(el);
+  });
+
+  if (bar) bar.classList.toggle("has-strip", showSlideStrip && thumbEls.length > 1);
+}
+
+function highlightThumb(i) {
+  if (!thumbEls.length) return;
+  thumbEls.forEach((t, n) => t.classList.toggle("active", n === i));
+  const cur = thumbEls[i];
+  if (!cur) return;
+
+  // Restart the progress fill for this slide's duration (videos: no fixed
+  // duration, so no fill).
+  const prog = cur.querySelector(".thumb-progress");
+  const isVid = cur.classList.contains("is-video");
+  if (prog) {
+    prog.style.display = isVid ? "none" : "";
+    cur.style.setProperty("--thumb-ms", `${Number(elements[i]?.dataset.duration) || DEFAULT_DURATION_MS}ms`);
+    prog.style.animation = "none";
+    void prog.offsetWidth;
+    prog.style.animation = "";
+  }
+
+  // Keep the active thumbnail in view: if the strip overflows, slide the track
+  // so the current one sits near the left third (upcoming slides visible).
+  const strip = document.getElementById("slideStrip");
+  const track = document.getElementById("slideStripTrack");
+  if (!strip || !track) return;
+  const overflow = track.scrollWidth - strip.clientWidth;
+  if (overflow <= 0) { track.style.transform = ""; return; }
+  const target = cur.offsetLeft - strip.clientWidth / 3;
+  const shift = Math.max(0, Math.min(overflow, target));
+  track.style.transform = `translateX(${-shift}px)`;
 }
 
 /* SHOW SLIDE */
@@ -722,6 +796,7 @@ function show(i) {
 
   el.classList.add("active");
   activeEl = el;
+  highlightThumb(i);
 
   const video = el.querySelector("video");
   if (video) {

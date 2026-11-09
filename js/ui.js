@@ -89,6 +89,14 @@ function applyTopbarSettingsFromConfig() {
     };
   }
 
+  const stripChk = document.getElementById("showSlideStrip");
+  if (stripChk) {
+    stripChk.checked = appConfig.showSlideStrip !== false;
+    stripChk.onchange = () => {
+      appConfig.showSlideStrip = stripChk.checked;
+    };
+  }
+
   initTickerConfig();
 }
 

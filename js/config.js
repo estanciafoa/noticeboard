@@ -27,6 +27,7 @@ let appConfig = {
   transitionEffect: DEFAULT_TRANSITION_EFFECT,
   transitionMs: DEFAULT_TRANSITION_MS,
   refreshInterval: DEFAULT_REFRESH_INTERVAL,
+  showSlideStrip: true,     // slide miniatures in the display's bottom ribbon
   offlineBackup: "",        // filename of the slide cached for offline display
   offlineCacheVersion: "",  // bump to force displays to clear their offline cache
   heartbeatUrl: "",         // Google Apps Script web-app URL displays report status to
@@ -54,6 +55,7 @@ async function load() {
   appConfig.transitionEffect = json.transitionEffect || DEFAULT_TRANSITION_EFFECT;
   appConfig.transitionMs = Number(json.transitionMs) > 0 ? Number(json.transitionMs) : DEFAULT_TRANSITION_MS;
   appConfig.refreshInterval = Number(json.refreshInterval) > 0 ? Number(json.refreshInterval) : DEFAULT_REFRESH_INTERVAL;
+  appConfig.showSlideStrip = json.showSlideStrip !== false;
   appConfig.offlineBackup = json.offlineBackup || "";
   appConfig.offlineCacheVersion = json.offlineCacheVersion || "";
   appConfig.heartbeatUrl = json.heartbeatUrl || "";
@@ -150,6 +152,7 @@ async function saveConfig({ silent = false } = {}) {
     transitionEffect: appConfig.transitionEffect,
     transitionMs: appConfig.transitionMs,
     refreshInterval: appConfig.refreshInterval,
+    showSlideStrip: appConfig.showSlideStrip !== false,
     offlineBackup: appConfig.offlineBackup || "",
     offlineCacheVersion: appConfig.offlineCacheVersion || "",
     heartbeatUrl: appConfig.heartbeatUrl || "",

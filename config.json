@@ -189,7 +189,12 @@
       "name": "WhatsApp Image 2026-11-10 at 9.32.33 AM.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-11-12",
+          "endDate": "2026-11-14"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
       "paidPromotion": false

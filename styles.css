@@ -1612,35 +1612,27 @@ button {
 
 /* =====================================================================
    ESTANCIA THEMES — the look of the Estancia works register, so the admin
-   sits naturally inside it: Outfit type, soft cool greys, white cards with
+   sits naturally inside it: system type, soft greys, white cards with
    rounded corners, pill controls and one deep-blue main action. "estancia"
    is light, "estancia-dark" is dark; both drop the neon glows.
    ===================================================================== */
-[data-theme="estancia"] {
-  --bg-0: #F3F5F8; --bg-1: #FFFFFF; --bg-2: #F5F7FA; --bg-3: #ECEFF3;
-  --line: #E1E5EB; --text: #111418; --muted: #6B737D;
-  --accent: #1570C9; --accent-2: #8B4FE0;
-  --accent-soft: rgba(21, 112, 201, 0.10); --danger: #E5484D;
-  --cta: #1570C9; --cta-hover: #115FAE;
-  --glow1: rgba(255, 160, 90, 0.30); --glow2: rgba(80, 150, 230, 0.28);
-  --shadow: 0 1px 2px rgba(17,20,24,.04), 0 8px 28px rgba(17,20,24,.06);
-  --shadow-lift: 0 4px 12px rgba(17,20,24,.08), 0 24px 60px rgba(17,20,24,.14);
-  color-scheme: light;
+/* Every colour comes from the shared Estancia theme (estancia-theme.css,
+   copied from em-dashboard/theme/ by its theme/sync.py — change it there).
+   That file switches light / dark by these same two theme names. */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) {
+  --bg-0: var(--es-ground); --bg-1: var(--es-surf); --bg-2: var(--es-surf2); --bg-3: var(--es-surf3);
+  --line: var(--es-line); --text: var(--es-ink); --muted: var(--es-ink3);
+  --accent: var(--es-blue); --accent-2: var(--es-purple);
+  --accent-soft: color-mix(in srgb, var(--es-blue) 12%, transparent); --danger: var(--es-red);
+  --cta: var(--es-blue); --cta-hover: var(--es-blue-hover);
+  --glow1: transparent; --glow2: transparent;
+  --shadow: var(--es-shadow); --shadow-lift: var(--es-shadow-lift);
 }
-[data-theme="estancia-dark"] {
-  --bg-0: #0E1014; --bg-1: #171A20; --bg-2: #1D2128; --bg-3: #252A32;
-  --line: #2C323C; --text: #EEF1F5; --muted: #9CA3AD;
-  --accent: #4BA6F5; --accent-2: #A881EE;
-  --accent-soft: rgba(75, 166, 245, 0.14); --danger: #F0696D;
-  --cta: #2873C8; --cta-hover: #2266B4;
-  --glow1: rgba(242, 122, 26, 0.12); --glow2: rgba(29, 140, 240, 0.14);
-  --shadow: 0 1px 2px rgba(0,0,0,.35), 0 8px 28px rgba(0,0,0,.28);
-  --shadow-lift: 0 4px 12px rgba(0,0,0,.45), 0 24px 60px rgba(0,0,0,.5);
-  color-scheme: dark;
-}
+[data-theme="estancia"] { color-scheme: light; }
+[data-theme="estancia-dark"] { color-scheme: dark; }
 
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) body {
-  font-family: 'Outfit', system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--es-font);
   background:
     radial-gradient(900px 420px at -5% -8%, var(--glow1), transparent 65%),
     radial-gradient(1000px 460px at 105% -8%, var(--glow2), transparent 65%),
@@ -1816,8 +1808,10 @@ button {
    the three panes set inside one shaded band, and white fields with a
    fine border instead of filled grey boxes.
    ===================================================================== */
-[data-theme="estancia"]      { --band: #E5E9EF; --band-line: #DCE1E8; --line-2: #D9DDE4; --field: #FFFFFF; }
-[data-theme="estancia-dark"] { --band: #0A0C10; --band-line: #262B33; --line-2: #343A44; --field: #1D2128; }
+/* the work band is plain ground now (Apple look); fields are grey-filled */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) {
+  --band: transparent; --band-line: transparent; --line-2: transparent; --field: var(--es-fill2);
+}
 
 /* header: title over a muted subtitle; theme dots in a small track */
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band { padding: 18px 24px 10px; }
@@ -1927,3 +1921,34 @@ button {
 /* the TV is its own layer, so the glow sits above the band but behind the set */
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .tv { isolation: isolate; }
 :is([data-theme="estancia"],[data-theme="estancia-dark"]) .nav-controls { position: relative; z-index: 1; }
+
+/* =====================================================================
+   ESTANCIA THEMES — Apple look, shared with the works register: a
+   segmented control for the pane tabs, grey-filled pill tools with blue
+   text, translucent header, hairlines instead of borders.
+   ===================================================================== */
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .container { box-shadow: none; padding: 0 2px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.left, .right) { border: 0; border-radius: var(--es-radius-card); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .header-band h1 { font-family: var(--es-font-display); font-weight: 700; letter-spacing: -.025em; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.topbar-mid, .topbar-right, .theme-picker) {
+  background: var(--es-fill); border: 0; box-shadow: none;
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-right :is(button, .preview-btn) { color: var(--es-blue) !important; font-weight: 500; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-right :is(button, .preview-btn):hover { background: color-mix(in srgb, var(--es-blue) 12%, transparent) !important; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-right .save-btn { color: #fff !important; font-weight: 600; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .topbar-mid :is(select, input) { background: var(--es-surf) !important; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right-tabs { background: var(--es-fill); border: 0; border-radius: 10px; padding: 2px; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right-tab { border-radius: 8px; color: var(--es-ink); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right-tab.active {
+  background: var(--es-surf); color: var(--es-ink); font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0,0,0,.12), 0 3px 1px rgba(0,0,0,.04);
+}
+[data-theme="estancia-dark"] .right-tab.active { background: #636366; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .right h3 { font-weight: 700; border-bottom: .5px solid var(--es-sep); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(input, textarea):focus {
+  border-color: var(--es-blue); box-shadow: 0 0 0 3.5px var(--es-focus); background: var(--es-surf);
+}
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .thumb.active { border-color: var(--es-blue); box-shadow: 0 0 0 3px var(--es-focus); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) :is(.upload-plus-btn.upload-plus-btn, .topbar .save-btn, .modal-footer button.primary, #loginBox button) { box-shadow: none; }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) .modal-backdrop { background: var(--es-overlay); }
+:is([data-theme="estancia"],[data-theme="estancia-dark"]) #loginBox { border-radius: var(--es-radius-sheet); border: 0; }

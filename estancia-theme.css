@@ -1,0 +1,136 @@
+/* Generated from em-dashboard/theme/estancia-theme.css by theme/sync.py — edit that file, not this one. */
+/* =====================================================================
+   Estancia theme — the ONE place the look of every Estancia app is set.
+
+   Change a value here, then run   python3 theme/sync.py   from em-dashboard.
+   That copies it into every project that uses it:
+     • works register     estancia-works-register/apps-script/Theme.html
+     • visitor approval   ../visitor-approval/Theme.html
+     • display boards     ../estancianoticeboard/estancia-theme.css
+     • EM + staff apps    estancia-works-register/android/core/.../ThemeTokens.kt
+   then deploy each one as usual (new Apps Script version, git push, APK).
+
+   Apple's system palette: grey grouped ground, white cards, hairline
+   separators, system blue for what can be pressed, system green switches.
+   Every token is --es-*; each app maps its own variable names onto these.
+
+   Light is the default. Dark applies when a page says data-theme="dark"
+   or "estancia-dark", or when the device is dark and the page has not
+   pinned a light theme ("light" or "estancia").
+   ===================================================================== */
+
+:root {
+  /* surfaces and text */
+  --es-ground: #F2F2F7;     /* the page behind everything */
+  --es-surf: #FFFFFF;       /* cards */
+  --es-surf2: #F2F2F7;      /* a quiet fill inside a card */
+  --es-surf3: #E5E5EA;
+  --es-raised: #FFFFFF;     /* sheets and dialogs */
+  --es-raised2: #F2F2F7;
+  --es-bar: rgba(246, 246, 248, .82);   /* translucent header / sidebar */
+  --es-ink: #1C1C1E;
+  --es-ink2: #48484A;
+  --es-ink3: #8E8E93;
+  --es-line: #E5E5EA;
+  --es-line2: #D1D1D6;
+  --es-sep: rgba(60, 60, 67, .18);      /* hairline separators */
+  --es-fill: rgba(118, 118, 128, .12);  /* grey-filled buttons, fields, tracks */
+  --es-fill2: rgba(118, 118, 128, .08);
+
+  /* colours: each hue has the colour, a pale background, an edge and a text ink */
+  --es-blue: #007AFF;   --es-blue-hover: #0066D6;
+  --es-blue-bg: #E5F0FF;   --es-blue-line: #B3D4FF;   --es-blue-ink: #0058C4;
+  --es-orange: #FF9500; --es-orange-bg: #FFF3E0; --es-orange-line: #FFD59E; --es-orange-ink: #B25E00;
+  --es-red: #FF3B30;    --es-red-bg: #FFEBEA;    --es-red-line: #FFC2BE;    --es-red-ink: #C4271D;
+  --es-green: #34C759;  --es-green-bg: #E8F8EC;  --es-green-line: #B5E8C2;  --es-green-ink: #1E7B34;
+  --es-purple: #AF52DE; --es-purple-bg: #F6ECFB; --es-purple-line: #E3C4F3; --es-purple-ink: #8A2CB8;
+  --es-yellow: #D9A400; --es-yellow-bg: #FFF8DB; --es-yellow-line: #F2DC8C; --es-yellow-ink: #7A5A00;
+  --es-gray: #8E8E93;   --es-gray-bg: #F2F2F7;   --es-gray-line: #D1D1D6;   --es-gray-ink: #636366;
+  --es-switch-on: #34C759;
+
+  /* a blue ramp for charts, light to deep */
+  --es-seq1: #B3D4FF; --es-seq2: #8CBEFF; --es-seq3: #66A8FF; --es-seq4: #3D91FF; --es-seq5: #1A7DFF; --es-seq6: #006BE0;
+
+  /* depth */
+  --es-shadow: 0 0 0 .5px rgba(0, 0, 0, .04), 0 1px 3px rgba(0, 0, 0, .05), 0 6px 20px rgba(0, 0, 0, .04);
+  --es-shadow-lift: 0 0 0 .5px rgba(0, 0, 0, .06), 0 10px 30px rgba(0, 0, 0, .10), 0 30px 70px rgba(0, 0, 0, .12);
+  --es-focus: rgba(0, 122, 255, .25);
+  --es-overlay: rgba(0, 0, 0, .25);
+
+  /* type and shape */
+  --es-font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --es-font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --es-font-round: ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --es-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  --es-radius: 10px;        /* buttons and fields */
+  --es-radius-card: 14px;   /* cards */
+  --es-radius-sheet: 20px;  /* dialogs and sign-in cards */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="estancia"]) {
+    /* @dark — keep this block and the one below identical */
+    --es-ground: #000000;
+    --es-surf: #1C1C1E;
+    --es-surf2: #2C2C2E;
+    --es-surf3: #3A3A3C;
+    --es-raised: #2C2C2E;
+    --es-raised2: #3A3A3C;
+    --es-bar: rgba(28, 28, 30, .82);
+    --es-ink: #F5F5F7;
+    --es-ink2: #C7C7CC;
+    --es-ink3: #8E8E93;
+    --es-line: #2C2C2E;
+    --es-line2: #3A3A3C;
+    --es-sep: rgba(84, 84, 88, .6);
+    --es-fill: rgba(118, 118, 128, .24);
+    --es-fill2: rgba(118, 118, 128, .16);
+    --es-blue: #0A84FF;   --es-blue-hover: #409CFF;
+    --es-blue-bg: #0B2440;   --es-blue-line: #1F4F86;   --es-blue-ink: #8CC2FF;
+    --es-orange: #FF9F0A; --es-orange-bg: #3A2708; --es-orange-line: #6B4A12; --es-orange-ink: #FFB340;
+    --es-red: #FF453A;    --es-red-bg: #3D1512;    --es-red-line: #6E2A25;    --es-red-ink: #FF8A80;
+    --es-green: #30D158;  --es-green-bg: #0F3319;  --es-green-line: #1E5C2E;  --es-green-ink: #7EE29A;
+    --es-purple: #BF5AF2; --es-purple-bg: #2E1A3A; --es-purple-line: #553071; --es-purple-ink: #DA8FFF;
+    --es-yellow: #FFD60A; --es-yellow-bg: #3A3208; --es-yellow-line: #6B5C12; --es-yellow-ink: #FFE066;
+    --es-gray: #98989D;   --es-gray-bg: #2C2C2E;   --es-gray-line: #48484A;   --es-gray-ink: #AEAEB2;
+    --es-switch-on: #30D158;
+    --es-seq1: #0B3A6E; --es-seq2: #0D4C8F; --es-seq3: #1263B5; --es-seq4: #1F7EE0; --es-seq5: #4A9DF5; --es-seq6: #8CC2FF;
+    --es-shadow: none;
+    --es-shadow-lift: 0 0 0 .5px rgba(255, 255, 255, .08), 0 20px 60px rgba(0, 0, 0, .6);
+    --es-focus: rgba(10, 132, 255, .4);
+    --es-overlay: rgba(0, 0, 0, .5);
+  }
+}
+:root[data-theme="dark"],
+:root[data-theme="estancia-dark"] {
+  /* @dark — keep this block and the one above identical */
+  --es-ground: #000000;
+  --es-surf: #1C1C1E;
+  --es-surf2: #2C2C2E;
+  --es-surf3: #3A3A3C;
+  --es-raised: #2C2C2E;
+  --es-raised2: #3A3A3C;
+  --es-bar: rgba(28, 28, 30, .82);
+  --es-ink: #F5F5F7;
+  --es-ink2: #C7C7CC;
+  --es-ink3: #8E8E93;
+  --es-line: #2C2C2E;
+  --es-line2: #3A3A3C;
+  --es-sep: rgba(84, 84, 88, .6);
+  --es-fill: rgba(118, 118, 128, .24);
+  --es-fill2: rgba(118, 118, 128, .16);
+  --es-blue: #0A84FF;   --es-blue-hover: #409CFF;
+  --es-blue-bg: #0B2440;   --es-blue-line: #1F4F86;   --es-blue-ink: #8CC2FF;
+  --es-orange: #FF9F0A; --es-orange-bg: #3A2708; --es-orange-line: #6B4A12; --es-orange-ink: #FFB340;
+  --es-red: #FF453A;    --es-red-bg: #3D1512;    --es-red-line: #6E2A25;    --es-red-ink: #FF8A80;
+  --es-green: #30D158;  --es-green-bg: #0F3319;  --es-green-line: #1E5C2E;  --es-green-ink: #7EE29A;
+  --es-purple: #BF5AF2; --es-purple-bg: #2E1A3A; --es-purple-line: #553071; --es-purple-ink: #DA8FFF;
+  --es-yellow: #FFD60A; --es-yellow-bg: #3A3208; --es-yellow-line: #6B5C12; --es-yellow-ink: #FFE066;
+  --es-gray: #98989D;   --es-gray-bg: #2C2C2E;   --es-gray-line: #48484A;   --es-gray-ink: #AEAEB2;
+  --es-switch-on: #30D158;
+  --es-seq1: #0B3A6E; --es-seq2: #0D4C8F; --es-seq3: #1263B5; --es-seq4: #1F7EE0; --es-seq5: #4A9DF5; --es-seq6: #8CC2FF;
+  --es-shadow: none;
+  --es-shadow-lift: 0 0 0 .5px rgba(255, 255, 255, .08), 0 20px 60px rgba(0, 0, 0, .6);
+  --es-focus: rgba(10, 132, 255, .4);
+  --es-overlay: rgba(0, 0, 0, .5);
+}

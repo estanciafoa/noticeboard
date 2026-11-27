@@ -189,7 +189,12 @@
       "name": "IMG-20261016-WA0000(1).jpg.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "",
+          "endDate": "2026-12-10"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
       "paidPromotion": false
@@ -198,7 +203,12 @@
       "name": "WhatsApp Image 2026-11-24 at 3.08.12 PM.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-11-28",
+          "endDate": "2026-11-28"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
       "paidPromotion": false
@@ -207,7 +217,12 @@
       "name": "Premium Ranabaali Movie Screening Poster.jpg",
       "duration": "",
       "times": [],
-      "dates": [],
+      "dates": [
+        {
+          "startDate": "2026-11-27",
+          "endDate": "2026-11-28"
+        }
+      ],
       "expiry": "",
       "towers": "t1c1,t1c2,t2c1,t2c2,t3c1,t3c2,t4c1,t4c2,t5c1,t5c2,club",
       "paidPromotion": false
